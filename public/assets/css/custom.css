@@ -1,0 +1,175 @@
+/* About Us Page Styles */
+.sc-team-section-area {
+    position: relative;
+    z-index: 1;
+}
+
+.sc-team-item {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    height: 100%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s;
+    margin-bottom: 20px;
+}
+
+.sc-team-item:hover {
+    transform: translateY(-10px);
+}
+
+.min-hgt-520 {
+    min-height: 520px;
+}
+
+.team-image {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.team-image img {
+    max-height: 120px;
+}
+
+.sc-team-content h4 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #9155F1;
+}
+
+.sc-services-style3 {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    height: 100%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s;
+    margin-bottom: 20px;
+}
+
+.sc-services-style3:hover {
+    transform: translateY(-10px);
+}
+
+.sc-services-icon {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sc-services-icon img {
+    max-height: 80px;
+}
+
+.service-text-right h4 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #9155F1;
+}
+
+.sc-click-text {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.sc-click-text a {
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: #9155F1;
+    color: white;
+    border-radius: 30px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.sc-click-text a:hover {
+    background-color: #7a3de8;
+    color: white;
+}
+
+/* Swiper Styles */
+.swiper {
+    width: 100%;
+    height: 100%;
+}
+
+.swiper-slide {
+    text-align: center;
+    font-size: 18px;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.swiper-pagination-bullet {
+    width: 12px;
+    height: 12px;
+    background-color: #9155F1;
+    opacity: 0.5;
+}
+
+.swiper-pagination-bullet-active {
+    opacity: 1;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .desktop-layout {
+        display: none;
+    }
+    
+    .mobile-layout {
+        display: block;
+    }
+    
+    .order-first {
+        order: -1;
+    }
+}
+
+@media (min-width: 769px) {
+    .desktop-layout {
+        display: flex;
+    }
+    
+    .mobile-layout {
+        display: none;
+    }
+}
+
+.subscription-badges {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.subscription-badges .badge {
+  margin-bottom: 2px;
+}
+
+.bg-label-primary {
+  background-color: rgba(105, 108, 255, 0.16) !important;
+  color: #696cff !important;
+}
+
+.bg-label-success {
+  background-color: rgba(71, 189, 154, 0.16) !important;
+  color: #47bd9a !important;
+}
+
+.bg-label-danger {
+  background-color: rgba(252, 161, 155, 0.16) !important;
+  color: #fca19b !important;
+}
+
+.bg-label-warning {
+  background-color: rgba(255, 171, 0, 0.16) !important;
+  color: #ffab00 !important;
+}
+
+.bg-label-info {
+  background-color: rgba(0, 207, 232, 0.16) !important;
+  color: #00cfe8 !important;
+}

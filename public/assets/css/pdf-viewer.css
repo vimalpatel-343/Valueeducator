@@ -1,0 +1,79 @@
+/* PDF Viewer Styles */
+.pdf-page-container {
+    position: relative;
+    display: inline-block;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.pdf-page-container canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid #ddd;
+}
+
+.pdf-page-number {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.pdf-loading {
+    padding: 50px 0;
+}
+
+/* Disable text selection in PDF viewer */
+#pdfViewer {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hide download button that might appear in some browsers */
+#pdfViewer::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+#pdfViewer::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#pdfViewer::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+#pdfViewer::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Additional security measures */
+#pdfModal * {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
+#pdfModal img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    pointer-events: none;
+}
+
+/* Print prevention */
+@media print {
+    #pdfModal {
+        display: none !important;
+    }
+}

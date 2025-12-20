@@ -1,0 +1,178 @@
+body .search-modal.w-90 {
+width:90%;
+border:0px solid red;
+z-index:999999999999999!important;
+}
+body .search-modal.w-90 .modal-dialog {
+	max-width:98%;
+}
+
+.tabs_wrapper {
+	 width: 100%;
+	 text-align: center;
+	 margin: 0;
+	 background: transparent;
+}
+ ul.tabs-company {
+	 display: inline-block;
+	 vertical-align: top;
+	 position: relative;
+	 z-index: 10;
+	 left:0;
+	 margin: 20px 0 0;
+	 padding: 0;
+	 width: 20%;
+	 min-width: 175px;
+	 list-style: none;
+	 -ms-transition: all 0.3s ease;
+	 -webkit-transition: all 0.3s ease;
+	 transition: all 0.3s ease;
+	 border:0px solid red;
+}
+ ul.tabs-company li {
+	 margin:0px 20px 2px 0px;
+	 cursor: pointer;
+	 padding: 10px 8px;
+	 line-height: 31px;
+	 text-align: center;
+	 font-weight: 500;
+	 font-size:16px;
+	 background: #fff;
+	 color: #121212;
+	 border-radius:8px;
+	/* IE6-9 */
+	 -ms-transition: all 0.3s ease;
+	 -webkit-transition: all 0.3s ease;
+	 transition: all 0.3s ease;
+}
+ ul.tabs-company li:hover {
+	 background: #9155F1;
+	 color: #fff;
+	 -ms-transition: all 0.3s ease;
+	 -webkit-transition: all 0.3s ease;
+	 transition: all 0.3s ease;
+}
+ ul.tabs-company li.active {
+	 background: #9155F1;
+	 color: #fff;
+	 -ms-transition: all 0.3s ease;
+	 -webkit-transition: all 0.3s ease;
+	 transition: all 0.3s ease;
+}
+ .tab_container {
+	 display: inline-block;
+	 vertical-align: top;
+	 position: relative;
+	 z-index: 20;
+	 left: 0;
+	 width: 79%;
+	 min-width: 10px;
+	 text-align: left;
+	 background: #F7F7F7;
+	 border-radius: 8px;
+	 margin-top:20px;
+	 height:500px;
+	 overflow-y:auto;
+}
+ .tab_content {
+	 padding: 20px;
+	 height: auto;
+	 display: none;
+}
+ .tab_drawer_heading {
+	 display: none;
+}
+@media screen and (max-width: 781px) {
+    body .search-modal.w-90 { 
+        height:95%;
+    }
+    .tabs_wrapper {
+        margin-top:20px;
+    }
+	 ul.tabs-company {
+		 display: none;
+	}
+	 .tab_container {
+		 display: block;
+		 margin: 0 auto;
+		 width: 95%;
+		 border-top: none;
+		 border-radius: 0;
+	}
+	 .tab_drawer_heading {
+		 margin: 0px 0px 2px 0px;
+		 padding: 10px 8px;
+	 line-height: 31px;
+	 text-align: center;
+	 font-weight: 500;
+	 font-size:16px;
+	 background: #fff;
+	 color: #121212;
+	 border-radius:8px;
+		 display: block;
+		 cursor: pointer;
+		 -webkit-touch-callout: none;
+		 -webkit-user-select: none;
+		 -khtml-user-select: none;
+		 -moz-user-select: none;
+		 -ms-user-select: none;
+		 user-select: none;
+		 text-align: center;
+	}
+	 .tab_drawer_heading:hover {
+		 background: #9155F1;
+	 color: #fff;
+	}
+	 .d_active {
+		 background: #9155F1;
+	 color: #fff;
+	}
+	.more-content {
+      display: none;
+    }
+    .read-more-btn {
+      display: block;
+	  color:#121212;
+	  text-align:center;
+	  cursor:pointer;
+      margin-top: 10px;
+    }
+}
+
+ .custom-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-modal-left {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-grow: 1;
+    max-width: 80%; /* important */
+}
+
+.custom-modal-left h3 {
+    margin: 0;
+    white-space: normal;     /* allows wrapping */
+    word-break: break-word;  /* avoids overflow */
+}
+.custom-close-btn {
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+    position: static !important;   /* FIXES overlap issue */
+    padding: 2px;
+}
+@media screen and (max-width: 768px) {
+    .custom-modal-left {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        flex-grow: 1;
+        max-width: 70%; /* important */
+    }
+}
