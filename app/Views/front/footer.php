@@ -70,7 +70,7 @@
             </div>
             <div><a class="sc-primary-btn btn-color-2" href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $siteSettings['fld_mobile']); ?>?text=Hello%20I%20am%20interested%20in%20your%20services" target="_blank">
                 <?php $otherChatWithUsImage = $pageImages['other']['chat_with_us'] ?? null; ?>
-                <img src="<?= base_url($otherChatWithUsImage['image_path'] ?? 'front/icon-chat.svg') ?>" alt="<?= esc($otherChatWithUsImage['image_alt'] ?? 'Chat With Us') ?>" class="other-icon" loading="lazy"> <span>Chat With Us</span></a><p>Chat</p>
+                <img src="<?= base_url($otherChatWithUsImage['image_path'] ?? 'front/icon-chat.svg') ?>" alt="" class="other-icon" loading="lazy"> <span>Chat With Us</span></a><p>Chat</p>
             </div>
         <?php endif; ?>
     </div>
@@ -153,7 +153,7 @@
                                 <p class="footer-des font-lg-16-normal font-14-normal"><?= $siteSettings['fld_full_address'] ?></p>
                                 <div class="sc-contact-number d-flex align-items-center sc-mb-5">
                                     <div class="phone-icon">
-                                        <img src="<?= base_url('front/icon-map.svg') ?>">
+                                        <img src="<?= base_url('front/icon-map.svg') ?>" alt="Location icon">
                                     </div>
                                     <div class="contact-number">
                                         <a href="#" class="number">Google Map Location</a>
@@ -161,7 +161,7 @@
                                 </div>
                                 <div class="sc-contact-number d-flex align-items-center sc-mb-5">
                                     <div class="phone-icon">
-                                        <img src="<?= base_url('front/icon-envelope.svg') ?>">
+                                        <img src="<?= base_url('front/icon-envelope.svg') ?>" alt="Envelope icon">
                                     </div>
                                     <div class="contact-number">
                                         <a href="mailto:<?= $siteSettings['fld_email'] ?>" class="number"><?= $siteSettings['fld_email'] ?></a>
@@ -169,7 +169,7 @@
                                 </div>
                                 <div class="sc-contact-number d-flex align-items-center sc-mb-5">
                                     <div class="phone-icon">
-                                        <img src="<?= base_url('front/icon-phone.svg') ?>">
+                                        <img src="<?= base_url('front/icon-phone.svg') ?>" alt="Phone icon">
                                     </div>
                                     <div class="contact-number">
                                         <a href="tel:<?= $siteSettings['fld_mobile'] ?>" class="number ph"><?= $siteSettings['fld_mobile'] ?></a>
@@ -205,11 +205,6 @@
                             </div>
                             <div class="col-lg-3 col-4">
                                 <div class="sc-menu-select-box d-flex align-items-center justify-content-end">                        
-                                    <!-- <div class="header-btn d-block d-lg-none">
-                                        <a data-bs-target="#authModal" data-bs-toggle="modal" href="#" id="accountIcon">
-                                            <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>" width="32" style="width:32px; pointer: cursor;">
-                                        </a>
-                                    </div> -->
                                     <div class="offcanvas-icon sc-ml-20 sc-mr-0 sc-mt-10">            
                                         <a id="canva_close" href="#">
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="25px" height="25px">
@@ -624,6 +619,7 @@
     <?= $this->include('front/payment/paymentmodal.php') ?>
     <?= $this->include('front/payment/razorpay.php') ?>
     <?= $this->include('front/modals/editprofilemodal.php') ?>
-
+    
+    </main>
 </body>
 </html>

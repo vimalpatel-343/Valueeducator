@@ -164,7 +164,7 @@
                         Value Educator							
                         <span class="txt2 font-lg-16-normal font-14-normal">@Value Educator • 143k subscribers</span></h2>
                         </div>
-                        <a class="sc-primary-btn btn-color-5 font-lg-20-normal font-18-normal" href="https://www.youtube.com/@ValueEducator" target="_blank"><img src="images/notification.png"> Subscribe to YouTube Channel</a>
+                        <a class="sc-primary-btn btn-color-5 font-lg-20-normal font-18-normal" href="https://www.youtube.com/@ValueEducator" target="_blank"><img src="images/notification.png" alt="Notification icon"> Subscribe to YouTube Channel</a>
                         </div>
                 </div>
             </div>

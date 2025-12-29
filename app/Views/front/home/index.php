@@ -249,7 +249,7 @@
                                     </div>
                                     <div class="sc-team-content">
                                         <h2 class="letter"><?= substr($philosophy['fld_title'], 0, 1) ?></h2>
-                                        <h4 class="font-lg-24-bold font-20-bold"><?= esc($philosophy['fld_title']) ?></h4>
+                                        <h3 class="font-lg-24-bold font-20-bold"><?= esc($philosophy['fld_title']) ?></h3>
                                         <span class="font-lg-16-normal"><?= $philosophy['fld_description'] ?></span>
                                     </div>
                                 </div>
@@ -307,9 +307,9 @@
                                                 <div class="sc-service-text text-center">
                                                     <div class="sc-services-icon">
                                                         <?php if (!empty($feature['fld_image'])): ?>
-                                                            <img src="<?= base_url($feature['fld_image']) ?>" class="set-w">
+                                                            <img src="<?= base_url($feature['fld_image']) ?>" class="set-w" alt="<?= esc($feature['fld_title']) ?>" />
                                                         <?php else: ?>
-                                                            <img src="images/product/default-feature-icon.svg" class="set-w">
+                                                            <img src="images/product/default-feature-icon.svg" class="set-w" alt="<?= esc($feature['fld_title']) ?>" />
                                                         <?php endif; ?>
                                                     </div>
                                                     <h4 class="service-title font-lg-24-semibold font-20-bold"><?= esc($feature['fld_title']) ?></h4>
@@ -327,14 +327,14 @@
                                 // Get app images for this product
                                 if (isset($appImages[$product['id']]) && !empty($appImages[$product['id']]) && isset($appImages[$product['id']][0])):
                                 ?>
-                                    <img src="<?= base_url($appImages[$product['id']][0]['fld_image']) ?>" width="240">
+                                    <img src="<?= base_url($appImages[$product['id']][0]['fld_image']) ?>" width="300" height="630" alt="<?= esc($product['fld_title']) ?>" />
                                 <?php else: ?>
-                                    <img src="<?= base_url('images/product/default-product-image.png') ?>" width="240">
+                                    <img src="<?= base_url('images/product/default-product-image.png') ?>" width="300" height="630" alt="<?= esc($product['fld_title']) ?>" />
                                 <?php endif; ?>
                             </div>
                             <div class="titan-box">
                                 <div class="text-center">
-                                    <img src="<?= base_url('images/product/empowering-01.svg') ?>">
+                                    <img src="<?= base_url('images/product/empowering-01.svg') ?>" alt="<?= esc($product['fld_title']) ?>" />
                                     <h3 class="sc-mb-0 font-lg-36-bold font-36-bold text-md-center text-start">₹<?= number_format($product['fld_pricing'], 0) ?></h3>
                                     <p class="font-lg-18-normal font-18-medium text-md-center text-start">(12 month subscription)</p>
                                 </div>
@@ -417,15 +417,15 @@
                                 // Get app images for this product
                                 if (isset($appImages[$product['id']]) && !empty($appImages[$product['id']]) && isset($appImages[$product['id']][0])):
                                 ?>
-                                    <img src="<?= base_url($appImages[$product['id']][0]['fld_image']) ?>" width="240">
+                                    <img src="<?= base_url($appImages[$product['id']][0]['fld_image']) ?>" style="width:100%; height:auto; display:block;" alt="<?= esc($product['fld_title']) ?>">
                                 <?php else: ?>
-                                    <img src="images/product/default-product-image.png" width="240">
+                                    <img src="images/product/default-product-image.png" style="width:100%; height:auto; display:block;" alt="<?= esc($product['fld_title']) ?>">
                                 <?php endif; ?>
                             </div>
                             
                             <!-- Price -->
                             <div class="titan-box text-center">
-                                <img src="<?= base_url('images/product/empowering-01.svg') ?>">
+                                <img src="<?= base_url('images/product/empowering-01.svg') ?>" alt="<?= esc($product['fld_title']) ?>" />
                                 <h3 class="sc-mb-0 font-lg-36-bold font-36-bold">₹<?= number_format($product['fld_pricing'], 2) ?></h3>
                                 <p class="font-lg-18-normal font-18-medium">(12 month subscription)</p>
                             </div>
@@ -462,7 +462,7 @@
                         Value Educator							
                         <span class="txt2 font-lg-16-normal font-14-normal">@Value Educator • 143k subscribers</span></h2>
                         </div>
-                        <a class="sc-primary-btn btn-color-5 font-lg-20-normal font-18-normal" href="https://www.youtube.com/@ValueEducator" target="_blank"><img src="images/notification.png"> Subscribe to YouTube Channel</a>
+                        <a class="sc-primary-btn btn-color-5 font-lg-20-normal font-18-normal" href="https://www.youtube.com/@ValueEducator" target="_blank"><img src="images/notification.png" alt="Notification icon"> Subscribe to YouTube Channel</a>
                         </div>
                 </div>
             </div>
@@ -490,12 +490,20 @@
                         <div class="swiper-slide">
                             <div class="sc-test-item">
                                 <div class="video-container">
-                                    <iframe width="560" height="315" src="https://www.youtube.com/embed/<?= esc($video['video_id']) ?>" title="<?= esc($video['fld_title']) ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
+                                    <iframe width="560" height="315" 
+                                        src="https://www.youtube-nocookie.com/embed/<?= esc($video['video_id']) ?>" 
+                                        title="<?= esc($video['fld_title']) ?>" 
+                                        frameborder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                        referrerpolicy="strict-origin-when-cross-origin" 
+                                        allowfullscreen>
+                                    </iframe>
+    
                                 </div>
                                 <div class="sc-auother-text d-flex align-items-center">
                                     <div class="sc-auother-header sc-mt-20">
                                         <div class="min-hgt-70">
-                                            <h5 class="font-lg-20-bold"><?= esc($video['fld_title']) ?></h5>
+                                            <h4 class="font-lg-20-bold"><?= esc($video['fld_title']) ?></h4>
                                             <p class="font-lg-16-normal"><?= short_text_char(strip_tags($video['fld_description']), 100) ?></p>
                                         </div>
                                         <p class="views font-lg-16-normal"><?= shortNumber($video['fld_total_views']) ?> views • Posted <?= time_ago(strtotime($video['fld_posted_at'])) ?></p>
@@ -529,7 +537,7 @@
 
                     <h3 class="sc-mb-25 sc-mt-0 font-lg-24-bold">Shashank Mahajan</h3>
                     </div>
-                    <h5 class="sc-mb-15  sc-mt-0 font-lg-20-bold font-16-bold">Driven by a passion for uncovering multibagger opportunities, our founder -an engineer and MBA- with 12+ years of experience founded the value educator to identify and unlock the high-growth potential of small and micro-cap stocks.</h5>
+                    <p class="sc-mb-15 sc-mt-0 font-lg-20-bold font-16-bold">Driven by a passion for uncovering multibagger opportunities, our founder -an engineer and MBA- with 12+ years of experience founded the value educator to identify and unlock the high-growth potential of small and micro-cap stocks.</p>
                     <p class="sc-mb-25  sc-mt-0 font-lg-16-normal font-14-normal">Inspired by Warren Buffett’s value investing principles, his multibagger approach combines bottom-up stock picking, rigorous research, and a scuttlebutt to discover undervalued gems early. Through a thriving YouTube channel with over 143,000 subscribers, he shares actionable insights on stock analysis, business models, and market trends. With a steadfast focus on integrity and data-driven investing, he aims to empower investors to uncover hidden opportunities in the equity markets for sustainable wealth creation.</p>
                     <a class="sc-primary-btn d-block d-lg-inline-block text-center" href="<?= base_url('about-us') ?>" target="_blank">About Us</a>                    
                 </div>

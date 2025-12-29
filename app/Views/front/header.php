@@ -1,25 +1,41 @@
 <!DOCTYPE html>
-<html lang="zxx">
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title><?= $meta['title'] ?></title>
-    <meta name="description" content="<?= $meta['description'] ?>">
+    <meta charset="UTF-8">
+    <title><?= esc($meta['title']) ?></title>
+    <meta name="description" content="<?= esc($meta['description']) ?>">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Favicon -->
     <link rel="apple-touch-icon" href="<?= base_url('front/fav.svg') ?>">
     <link rel="shortcut icon" type="image/x-icon" href="<?= base_url('front/fav.svg') ?>">
-    
-    <link rel="stylesheet" href="<?= base_url('front/css/bootstrap.min.css') ?>">
 
+    <!-- Inline Critical CSS for Above-the-Fold Content -->
+    <style>
+        body { margin:0; font-family: 'Montserrat', sans-serif; }
+        .navbar, .hero { display:flex; align-items:center; justify-content:space-between; }
+        .hero h1, .hero p { color:#333; margin:0; }
+        /* Add other critical styles for above-the-fold content here */
+    </style>
+
+    <!-- Main CSS (synchronous to avoid FOUC) -->
+    <link rel="stylesheet" href="<?= base_url('front/css/bootstrap.min.css') ?>">    
+    <link rel="stylesheet" href="<?= base_url('front/css/softcoders.min.css') ?>">
     <link rel="stylesheet" href="<?= base_url('front/css/swiper.min.css') ?>">
-    
-    <link rel="stylesheet" type="text/css" href="<?= base_url('front/css/style-new.css') ?>">
-    <link rel="stylesheet" type="text/css" href="<?= base_url('front/css/softcoders.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('front/css/auth-modal.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('front/css/style-new.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('front/css/auth-modal.min.css') ?>">
 
-    <!-- Custom Media Queries -->
+    <!-- Custom CSS (separate) -->
     <link rel="stylesheet" href="<?= asset_versioned('front/css/custom-media.css') ?>">
+
+    <!-- Google Fonts (preload + swap) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    </noscript>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-F6G7FWC4EQ"></script>
@@ -27,10 +43,8 @@
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-
         gtag('config', 'G-F6G7FWC4EQ');
     </script>
-    
 </head>
 <body>
     <header class="sc-header-section" id="sc-header-sticky">
@@ -55,7 +69,7 @@
                                     <li><a href="<?= base_url('about-us') ?>" data-text="About Us" class="">About Us</a></li>
                                     <li><a href="<?= base_url('investment-philosophy') ?>" data-text="Investment Philosophy" class="">Investment Philosophy</a></li>
                                     <li class="menu-item-has-children">
-                                        <a href="javascript:void(0);" class="">Products</a>
+                                        <a href="<?= base_url('emerging-titans') ?>" onclick="return false;">Products</a>
                                         <?php
                                             $dashboardLinks = [];
                                             foreach ($userSubscriptions as $sub) {
@@ -122,7 +136,7 @@
                             <div class="sc-menu-select-box d-flex align-items-center justify-content-end">
                                 <div class="header-btn d-block d-lg-none">
                                     <a data-bs-target="#authModal" data-bs-toggle="modal" href="#" id="accountIcon">
-                                        <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>" width="32" style="width:32px; pointer: cursor;">
+                                        <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>" width="32" style="width:32px; pointer: cursor;" alt="User Account Icon">
                                     </a>
                                 </div>
                                 <div class="sc-hambagur-icon d-none sc-ml-20 sc-mt-0">
@@ -134,7 +148,7 @@
                                 </div>
                                 <div class="header-btn d-none d-lg-block">
                                     <a class="sc-primary-btn auth-trigger" data-bs-toggle="modal" data-bs-target="#authModal" href="#">
-                                        <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>"> Sign Up
+                                        <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>" alt="Sign Up Icon"> Sign Up
                                     </a>
                                     <a class="info" href="#" onmouseover="showDiv('content1')" onmouseout="hideDiv('content1')">
                                         <div class="image"></div>
@@ -216,3 +230,4 @@
             </div>
         </div>
     </header>
+    <main id="main-content">

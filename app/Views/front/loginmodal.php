@@ -253,7 +253,7 @@
                     </div>
 
                     <div class="text-center mb-4">
-                        <img src="<?= base_url('images/product/empowering-01.svg') ?>">
+                        <img src="<?= base_url('images/product/empowering-01.svg') ?>" alt="Empowering">
                     </div>
 
                     <div class="d-grid">

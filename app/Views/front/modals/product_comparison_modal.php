@@ -2,7 +2,7 @@
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header d-flex justify-content-between align-items-top">
-        <h6 class="font-lg-18-semibold sc-mb-0 sc-ml-0 sc-pl-0">Compare Products</h6>
+        <p class="font-lg-18-semibold sc-mb-0 sc-ml-0 sc-pl-0">Compare Products</p>
         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           Close <img src="<?= base_url('images/cancel.svg') ?>">
         </button>
@@ -75,7 +75,7 @@
                                         <?php if (!empty($feature['fld_image'])): ?>
                                           <img src="<?= base_url($feature['fld_image']) ?>" style="width:47px;">
                                         <?php endif; ?>
-                                        <h6 class="font-lg-16-semibold font-16-semibold"><?= $feature['fld_title'] ?? '' ?></h6>
+                                        <p class="font-lg-16-semibold font-16-semibold"><?= $feature['fld_title'] ?? '' ?></p>
                                       </div>
                                     <?php endforeach; ?>
                                   <?php endif; ?>

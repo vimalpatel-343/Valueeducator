@@ -81,41 +81,37 @@
     });
   });
   // team and project
-  $(document).ready(function () {
-    var swiper = new Swiper(".sc-swiper-slider", {
-      slidesPerView: 3,
-	  slidesPerGroup: 3, // Move 2 slides at a time
-      spaceBetween: 25,
-      navigation: {
-        nextEl: ".swiper-button-next",
-        prevEl: ".swiper-button-prev",
-      },
-	  pagination: {
-        el: ".swiper-pagination",
-        clickable: true,
-      },
-      autoplay: {
-        delay: 8000,
-      },
-      loop: true,
-      breakpoints: {
-        576: {
-          slidesPerView: 2,
-        },
-        320: {
-          slidesPerView: 1,
-        },
-        640: {
-          slidesPerView: 2,
-        },
-        768: {
-          slidesPerView: 2,
-        },
-        1024: {
-          slidesPerView: 3,
-        },
-      },
-    });
+  jQuery(document).ready(function($) {
+      // Optional: batch DOM changes using requestAnimationFrame
+      requestAnimationFrame(function() {
+          var swiper = new Swiper(".sc-swiper-slider", {
+              slidesPerView: 3,
+              slidesPerGroup: 3,
+              spaceBetween: 25,
+              navigation: {
+                  nextEl: ".swiper-button-next",
+                  prevEl: ".swiper-button-prev",
+              },
+              pagination: {
+                  el: ".swiper-pagination",
+                  clickable: true,
+              },
+              autoplay: {
+                  delay: 8000,
+              },
+              loop: true,
+              breakpoints: {
+                  320: { slidesPerView: 1 },
+                  576: { slidesPerView: 2 },
+                  640: { slidesPerView: 2 },
+                  768: { slidesPerView: 2 },
+                  1024: { slidesPerView: 3 },
+              },
+              // Optional: observe DOM changes to avoid reflows manually
+              observer: true,
+              observeParents: true,
+          });
+      });
   });
   // Blog Slider
   $(document).ready(function () {

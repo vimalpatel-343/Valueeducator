@@ -91,7 +91,7 @@
                 <div class="sc-heading-area sc-mt-0 sc-mb-20 text-left">
                     <div class="d-flex justify-content-between align-items-center sc-mt-0 sc-md-mt-0 sc-mb-10 sc-md-mb-10">
                         <h3 class="text-lg-start text-center mx-lg-0 mx-auto font-lg-32-bold font-20-bold">Our Investment Philosophy</h3>
-                        <a href="<?= base_url('investment-philosophy') ?>" class="more d-none d-md-inline-block">Learn More</a>
+                        <a href="<?= base_url('investment-philosophy') ?>" aria-label="Learn more about our investment philosophy" class="more d-none d-md-inline-block">Learn More</a>
                     </div>
                     <span class="sub-title d-none d-md-block font-lg-16-normal">
                         <span>SPRINT</span> represents a dynamic investment approach, centered on uncovering businesses with the potential for rapid and sustainable profitability...
@@ -113,7 +113,7 @@
                             </div>
                             <div class="sc-team-content">
                                 <h1 class="letter"><?= substr($philosophy['fld_title'], 0, 1) ?></h1>
-                                <h4 class="font-lg-24-bold font-20-bold"><?= $philosophy['fld_title'] ?></h4>
+                                <h3 class="font-lg-24-bold font-20-bold"><?= $philosophy['fld_title'] ?></h3>
                                 <span class="font-lg-16-normal"><?= $philosophy['fld_description'] ?></span>
                             </div>
                         </div>
@@ -124,7 +124,7 @@
             <div class="swiper-button-next"></div>
             <div class="swiper-button-prev"></div>
             <div class="swiper-pagination"></div>
-            <a class="sc-primary-btn d-block d-md-none text-center btn-color-white font-18-medium" href="<?= base_url('investment-philosophy') ?>">Learn More</a>
+            <a class="sc-primary-btn d-block d-md-none text-center btn-color-white font-18-medium" href="<?= base_url('investment-philosophy') ?>" aria-label="Learn more about our investment philosophy">Learn More</a>
         </div>
     </div>
 </div>
@@ -170,7 +170,7 @@
                                 <div class="sc-services-style3 min-hgt-200">
                                     <div class="sc-service-text text-center">
                                         <div class="sc-services-icon">
-                                            <img src="<?= base_url('product_images/' . $feature['fld_image']) ?>" class="set-w">
+                                            <img src="<?= base_url('product_images/' . $feature['fld_image']) ?>" class="set-w" alt="<?= $feature['fld_title'] ?>">
                                         </div>
                                         <h4 class="service-title font-lg-24-semibold font-20-bold"><?= $feature['fld_title'] ?></h4>
                                     </div>
@@ -181,12 +181,12 @@
                     </div>
                     
                     <div class="titan-box text-center">
-                        <img src="<?= base_url('product_images/' . $productData['product']['fld_image']) ?>" width="240">
+                        <img src="<?= base_url('product_images/' . $productData['product']['fld_image']) ?>" width="240" alt="<?= $productData['product']['fld_title'] ?>" />
                     </div>
                     
                     <div class="titan-box">
                         <div class="text-center">
-                            <img src="<?= base_url('images/product/empowering-01.svg') ?>">
+                            <img src="<?= base_url('images/product/empowering-01.svg') ?>" alt="<?= $productData['product']['fld_title'] ?>">
                             <h3 class="sc-mb-0 font-lg-36-bold font-36-bold text-md-center text-start">
                                 ₹<?= number_format($productData['product']['fld_pricing'], 2) ?>
                             </h3>
@@ -196,7 +196,7 @@
                     
                     <div class="row">
                         <div class="col-lg-6 col-md-6">
-                            <a class="w-100 sc-primary-btn btn-color-1 text-center" href="<?= base_url($productData['product']['fld_slug']) ?>">Learn More</a>
+                            <a class="w-100 sc-primary-btn btn-color-1 text-center" href="<?= base_url($productData['product']['fld_slug']) ?>" aria-label="Learn more about <?= $productData['product']['fld_title'] ?> stocks">Learn More</a>
                         </div>
                         <div class="col-lg-6 col-md-6">
                             <a class="w-100 sc-primary-btn btn-color-3 text-center buy-now-btn" href="#" 
@@ -259,20 +259,20 @@
                 <div class="swiper-slide">
                     <div class="sc-test-item">
                         <div class="video-container" data-index="<?= $video['id'] ?>">
-                            <iframe width="560" height="315" 
-                                    src="<?= $video['video_url'] ?>" 
-                                    title="YouTube video player" 
-                                    frameborder="0" 
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                    referrerpolicy="strict-origin-when-cross-origin" 
-                                    allowfullscreen>
+                            <iframe width="560" height="315"
+                                src="<?= str_replace('youtube.com', 'youtube-nocookie.com', $video['video_url']) ?>"
+                                title="YouTube video player"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                allowfullscreen>
                             </iframe>
                         </div>
                         
                         <div class="sc-auother-text d-flex align-items-center">
                             <div class="sc-auother-header sc-mt-20">
                                 <div class="min-hgt-70">
-                                    <h5 class="font-lg-20-bold"><?= $video['title'] ?></h5>
+                                    <h4 class="font-lg-20-bold"><?= $video['title'] ?></h4>
                                     <p class="font-lg-16-normal"><?= $video['description'] ?></p>
                                 </div>
                                 <p class="views font-lg-16-normal">
