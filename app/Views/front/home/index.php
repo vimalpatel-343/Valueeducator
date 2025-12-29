@@ -224,8 +224,8 @@
             <div class="col-lg-12 col-md-12">
                 <div class="sc-heading-area sc-mt-0 sc-mb-20 text-left">
                     <div class="d-flex justify-content-between align-items-center sc-mt-0 sc-md-mt-0 sc-mb-10 sc-md-mb-10">
-                        <h3 class="text-lg-start text-center mx-lg-0 mx-auto font-lg-32-bold font-20-bold sc-mt-40 sc-mb-0">Our Investment Philosophy</h3>
-                        <a href="<?= base_url('investment-philosophy') ?>" class="more d-none d-md-inline-block" target="_blank">Learn More</a>
+                        <h3 class="text-lg-start text-center mx-lg-0 mx-auto font-lg-32-bold font-20-bold sc-mt-0 sc-mb-0">Our Investment Philosophy</h3>
+                        <a href="<?= base_url('investment-philosophy') ?>" class="more d-none d-md-inline-block" target="_blank">Learn More <span class="visually-hidden">about our investment philosophy</span></a>
                     </div>
                     <span class="sub-title d-none d-md-block font-lg-16-normal sc-mt-20"><span>SPRINT</span> represents a dynamic investment approach, centered on uncovering businesses with the potential for rapid and sustainable profitability, driven by scuttlebutt research at its core, and focused on seizing opportunities early to drive long-term wealth creation.</span>
                 </div>
@@ -262,7 +262,7 @@
             <div class="swiper-button-prev"></div>
             <div class="swiper-pagination"></div>
         </div>
-        <a class="sc-primary-btn d-block d-md-none text-center btn-color-white- font-18-medium sc-mt-30" href="investment-philosophy">Learn More</a>
+        <a class="sc-primary-btn d-block d-md-none text-center btn-color-white- font-18-medium sc-mt-30" href="investment-philosophy">Learn More <span class="visually-hidden">about our investment philosophy</span></a>
     </div>
 </div>
 
@@ -341,7 +341,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-6 col-md-6">
-                                    <a class="w-100 sc-primary-btn btn-color-1 text-center" href="<?= base_url($product['fld_slug']) ?>">Learn More</a>
+                                    <a class="w-100 sc-primary-btn btn-color-1 text-center" href="<?= base_url($product['fld_slug']) ?>">Learn More <span class="visually-hidden"> about <?= $product['fld_title'] ?> stocks</span></a>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <a class="w-100 sc-primary-btn btn-color-3 text-center buy-now-btn" href="#" data-product-id="<?= esc($product['id']) ?>" data-product-name="<?= esc($product['fld_title']) ?>" data-amount="<?= esc($product['fld_pricing']) ?>" data-sub-title="12 month subscription" data-expired-month="12">Buy Now</a>
@@ -433,7 +433,7 @@
                             <!-- Buttons -->
                             <div class="row">
                                 <div class="col-lg-6 col-md-6">
-                                    <a class="w-100 sc-primary-btn btn-color-1 text-center" href="<?= base_url($product['fld_slug']) ?>">Learn More</a>
+                                    <a class="w-100 sc-primary-btn btn-color-1 text-center" href="<?= base_url($product['fld_slug']) ?>">Learn More <span class="visually-hidden"> about <?= $product['fld_title'] ?> stocks</span></a>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <a class="w-100 sc-primary-btn btn-color-3 text-center buy-now-btn" href="#" data-product-name="<?= esc($product['fld_title']) ?>" data-amount="<?= esc($product['fld_pricing']) ?>" data-sub-title="12 month subscription" data-expired-month="12">Buy Now</a>
