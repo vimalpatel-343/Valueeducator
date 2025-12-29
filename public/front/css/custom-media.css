@@ -32,6 +32,10 @@
     max-width: 95%;
 }
 
+.sc-swiper-slider {
+    min-height: 320px;
+}
+
 /* Small devices (phones, <576px) */
 @media (max-width: 575.98px) {
     
@@ -60,6 +64,15 @@
     .video-wrapper {
         height: 150px !important;
     }
+
+    .titan-tabs .nav-link {
+        font-size: 14px;
+        padding: 8px 0;
+    }
+
+    .titan-tabs .nav-link.active {
+        font-size: 14px;
+    }
 }
 
 /* Medium devices (tablets, ≥768px) */
@@ -77,6 +90,15 @@
     .titan-modal {
         width: 95% !important;
         height: auto !important;
+    }
+
+    .titan-tabs .nav-link {
+        font-size: 14px;
+        padding: 8px 0;
+    }
+
+    .titan-tabs .nav-link.active {
+        font-size: 14px;
     }
 }
 

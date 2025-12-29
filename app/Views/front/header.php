@@ -56,7 +56,7 @@
                             <div class="sc-header-logo sc-pr-100 d-flex align-items-center">
                                 <a href="<?= base_url() ?>">
                                     <?php if (!empty($siteSettings['fld_header_logo'])): ?>
-                                        <img src="<?= base_url($siteSettings['fld_header_logo']) ?>" alt="Logo">
+                                        <img src="<?= base_url($siteSettings['fld_header_logo']) ?>" alt="Logo" srcset="<?= base_url($siteSettings['fld_header_logo']) ?> 476w, <?= base_url($siteSettings['fld_header_logo']) ?> 240w" sizes="(max-width: 576px) 240px, 476px">
                                     <?php else: ?>
                                         <img src="<?= base_url('front/logo.svg') ?>" alt="Logo">
                                     <?php endif; ?>
@@ -150,9 +150,9 @@
                                     <a class="sc-primary-btn auth-trigger" data-bs-toggle="modal" data-bs-target="#authModal" href="#">
                                         <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>" alt="Sign Up Icon"> Sign Up
                                     </a>
-                                    <a class="info" href="#" onmouseover="showDiv('content1')" onmouseout="hideDiv('content1')">
+                                    <button type="button" class="info" aria-label="More information" aria-describedby="content1" nmouseenter="showDiv('content1')" onmouseleave="hideDiv('content1')" onfocus="showDiv('content1')" onblur="hideDiv('content1')" style="border: 0px; background: none;">
                                         <div class="image"></div>
-                                    </a>
+                                    </button>
                                     <div id="content1" class="hidden-content text-right">
                                         <p>Get access to our free<br>E-book and other resources!</p>
                                     </div>

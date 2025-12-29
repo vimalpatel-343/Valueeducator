@@ -104,7 +104,7 @@
                             <?php 
                             $homeMainImage = isset($pageImages['home']['main_image']) ? $pageImages['home']['main_image'] : null;
                             if ($homeMainImage): ?>
-                                <img class="sc-border-radius" src="<?= base_url($homeMainImage['image_path']) ?>" alt="<?= $homeMainImage['image_alt'] ?>">
+                                <img class="sc-border-radius" src="<?= base_url($homeMainImage['image_path']) ?>" alt="<?= $homeMainImage['image_alt'] ?>" srcset="<?= base_url($homeMainImage['image_path']) ?> 372w, <?= base_url($homeMainImage['image_path']) ?> 651w" sizes="(max-width: 768px) 100vw, 372px">
                             <?php else: ?>
                                 <img class="sc-border-radius" src="images/home/img-home.svg" alt="">
                             <?php endif; ?>
@@ -292,7 +292,7 @@
                             </div>
                             <div class="titan-box">
                                 <?php if (!empty($product['fld_video_url'])): ?>
-                                    <iframe src="<?= esc($product['fld_video_url']) ?>" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" title="<?= esc($product['fld_title']) ?>" width="100%" height="350"></iframe>
+                                    <iframe src="<?= esc($product['fld_video_url']) ?>" loading="lazy" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" title="<?= esc($product['fld_title']) ?>" width="100%" height="350"></iframe>
                                 <?php endif; ?>
                             </div>
                             <div class="titan-box hgt-900" style="display: flex; align-items: center; justify-content: center;">
@@ -378,7 +378,7 @@
                                 
                                 <!-- Video -->
                                 <?php if (!empty($product['fld_video_url'])): ?>
-                                    <iframe src="<?= esc($product['fld_video_url']) ?>" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" title="<?= esc($product['fld_title']) ?>" width="100%" height="350"></iframe>
+                                    <iframe src="<?= esc($product['fld_video_url']) ?>" loading="lazy" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" title="<?= esc($product['fld_title']) ?>" width="100%" height="350"></iframe>
                                 <?php endif; ?>
                                 
                                 <!-- Features -->
@@ -393,9 +393,9 @@
                                                 <div class="sc-service-text text-center">
                                                     <div class="sc-services-icon d-flex align-items-center">
                                                         <?php if (!empty($feature['fld_image'])): ?>
-                                                            <img src="<?= base_url($feature['fld_image']) ?>" style="width:72px;">
+                                                            <img src="<?= base_url($feature['fld_image']) ?>" style="width:72px;" alt="<?= base_url($feature['fld_title']) ?>" />
                                                         <?php else: ?>
-                                                            <img src="images/product/default-feature-icon.svg" style="width:72px;">
+                                                            <img src="images/product/default-feature-icon.svg" style="width:72px;" alt="<?= base_url($feature['fld_title']) ?>" />
                                                         <?php endif; ?>
                                                         <h4 class="font-lg-20-bold font-18-semibold text-start">
                                                             <?= esc($feature['fld_title']) ?>
@@ -493,6 +493,7 @@
                                     <iframe width="560" height="315" 
                                         src="https://www.youtube-nocookie.com/embed/<?= esc($video['video_id']) ?>" 
                                         title="<?= esc($video['fld_title']) ?>" 
+                                        loading="lazy" 
                                         frameborder="0" 
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                                         referrerpolicy="strict-origin-when-cross-origin" 
