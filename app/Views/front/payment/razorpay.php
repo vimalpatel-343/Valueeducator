@@ -11,6 +11,8 @@ $(document).ready(function() {
 
         // Check login (PHP condition)
         <?php if (!session()->get('isLoggedIn')): ?>
+
+            $('.modal.show').modal('hide');
             $('#authModal').modal('show');
             return;
         <?php endif; ?>
@@ -40,6 +42,7 @@ $(document).ready(function() {
         $('#payment-error').hide();
         $('#error-payment-message').text('');
 
+        $('.modal.show').modal('hide');
         $('#payment-modal').modal('show');
     });
 
@@ -231,7 +234,7 @@ $(document).ready(function() {
                                 <div class="container">
                                     <div class="row">
                                         <div class="left-content d-lg-flex d-flex">
-                                            <img src="images/icon-plan.svg" style="width:55px;">
+                                            <img src="/images/icon-plan.svg" style="width:55px;">
                                             <h2 class="sc-lg-ml-26">
                                                 <span class="font-lg-16-bold">${order.product_name}</span>
                                             </h2>
@@ -304,7 +307,7 @@ $(document).ready(function() {
                                 <div class="container">
                                     <div class="row">
                                         <div class="left-content d-lg-flex d-flex">
-                                            <img src="images/icon-plan.svg" style="width:55px;">
+                                            <img src="/images/icon-plan.svg" style="width:55px;">
                                             <h2 class="sc-lg-ml-26">
                                                 <span class="font-lg-16-bold">${subscription.product_name}</span>
                                             </h2>

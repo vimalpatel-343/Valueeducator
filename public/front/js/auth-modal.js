@@ -64,6 +64,7 @@
 
     // Store the signup token globally
     let signupToken = null;
+    let openForm = 'signup';
 
     // Phone patterns & examples (kept from your original)
     const phonePatterns = {
@@ -162,7 +163,12 @@
     // --- Modal events ---
     $authModalEl.on('show.bs.modal', function () {
         resetAllForms();
-        showFormById('loginForm');
+
+        if (openForm !== 'login') {
+            showFormById('loginForm');
+        } else {
+            showFormById('signupForm');
+        }
     });
 
     // --- Switch link handler (data-target contains ID like "signupForm") ---
@@ -171,6 +177,10 @@
         const target = $(this).data('target');
         if (!target) return;
         showFormById(target);
+    });
+
+    $('.auth-trigger').on('click', function () {
+        openForm = $(this).data('form');
     });
 
     // --- LOGIN form submit (send OTP) ---

@@ -251,7 +251,7 @@ $(document).ready(function() {
                                 <div class="container">
                                     <div class="row">
                                         <div class="left-content d-lg-flex d-flex">
-                                            <img src="images/icon-plan.svg" style="width:55px;">
+                                            <img src="/images/icon-plan.svg" style="width:55px;">
                                             <h2 class="sc-lg-ml-26">
                                                 <span class="font-lg-16-bold">${order.product_name}</span>
                                             </h2>

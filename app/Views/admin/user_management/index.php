@@ -187,6 +187,7 @@
                   <th>Contact</th>
                   <th>Status</th>
                   <th>KYC Status</th>
+                  <th>E-book Download</th>
                   <th>Emerging Titans</th>
                   <th>Tiny Titans</th>
                   <th>Actions</th>
@@ -243,18 +244,21 @@
                               </div>
                             </div>
                             <div class="kyc-dates small text-muted">
-                              <div>Start: <?= date('d M Y', strtotime($user['fld_kyc_start_date'])) ?></div>
-                              <div>End: <?= date('d M Y', strtotime($user['fld_kyc_end_date'])) ?></div>
-                              <?php 
-                              $kycEndDate = new \DateTime($user['fld_kyc_end_date']);
-                              $currentDate = new \DateTime();
-                              $daysUntilKycExpiry = $currentDate->diff($kycEndDate)->days;
-                              if ($daysUntilKycExpiry > 0) {
-                                  echo '<div class="text-warning">Expires in ' . $daysUntilKycExpiry . ' days</div>';
-                              } else {
-                                  echo '<div class="text-danger">Expired</div>';
-                              }
-                              ?>
+                                <div>Start: <?= date('d M Y', strtotime($user['fld_kyc_start_date'])) ?></div>
+                                <div>End: <?= date('d M Y', strtotime($user['fld_kyc_end_date'])) ?></div>
+
+                                <?php
+                                $kycEndDate  = new DateTime($user['fld_kyc_end_date']);
+                                $currentDate = new DateTime();
+
+                                $interval = $currentDate->diff($kycEndDate);
+
+                                if ($interval->invert === 0 && $interval->days > 0) {
+                                    echo '<div class="text-warning">KYC expires in ' . $interval->days . ' days</div>';
+                                } else {
+                                    echo '<div class="text-danger">KYC expired</div>';
+                                }
+                                ?>
                             </div>
                           </div>
                         <?php else: ?>
@@ -270,6 +274,26 @@
                         <?php endif; ?>
                       </td>
                       <td>
+                          <?php if ($user['has_downloaded_ebook']): ?>
+                              <div class="ebook-download-status">
+                                  <div class="d-flex align-items-center mb-1">
+                                      <i class="bx bx-check-circle text-success me-1"></i>
+                                      <span class="fw-bold">Downloaded</span>
+                                  </div>
+                                  <div class="small text-muted">
+                                      Downloads: <?= $user['ebook_download_count'] ?>
+                                  </div>
+                                  <?php if ($user['last_ebook_download_date']): ?>
+                                      <div class="small text-muted">
+                                          Last: <?= date('d M Y', strtotime($user['last_ebook_download_date'])) ?>
+                                      </div>
+                                  <?php endif; ?>
+                              </div>
+                          <?php else: ?>
+                              <span class="text-muted">Not downloaded</span>
+                          <?php endif; ?>
+                      </td>
+                      <td>
                         <?php if (isset($user['productSubscriptions']['emerging-titans'])): ?>
                           <?php $sub = $user['productSubscriptions']['emerging-titans']; ?>
                           <div class="subscription-info">
@@ -278,18 +302,22 @@
                               <span class="fw-bold">Subscribed</span>
                             </div>
                             <div class="subscription-dates small text-muted">
-                              <div>Start: <?= date('d M Y', strtotime($sub['start_date'])) ?></div>
-                              <div>End: <?= date('d M Y', strtotime($sub['end_date'])) ?></div>
-                              <?php 
-                              $endDate = new \DateTime($sub['end_date']);
-                              $currentDate = new \DateTime();
-                              $daysUntilExpiry = $currentDate->diff($endDate)->days;
-                              if ($daysUntilExpiry > 0) {
-                                  echo '<div class="text-warning">Expires in ' . $daysUntilExpiry . ' days</div>';
-                              } else {
-                                  echo '<div class="text-danger">Expired</div>';
-                              }
-                              ?>
+                                <div>Start: <?= date('d M Y', strtotime($sub['start_date'])) ?></div>
+                                <div>End: <?= date('d M Y', strtotime($sub['end_date'])) ?></div>
+
+                                <?php
+                                $endDate     = new DateTime($sub['end_date']);
+                                $currentDate = new DateTime();
+
+                                $interval = $currentDate->diff($endDate);
+                                $days     = $interval->days;
+
+                                if ($interval->invert === 0 && $days > 0) {
+                                    echo '<div class="text-warning">Expires in ' . $days . ' days</div>';
+                                } else {
+                                    echo '<div class="text-danger">Expired</div>';
+                                }
+                                ?>
                             </div>
                           </div>
                         <?php else: ?>
@@ -305,18 +333,21 @@
                               <span class="fw-bold">Subscribed</span>
                             </div>
                             <div class="subscription-dates small text-muted">
-                              <div>Start: <?= date('d M Y', strtotime($sub['start_date'])) ?></div>
-                              <div>End: <?= date('d M Y', strtotime($sub['end_date'])) ?></div>
-                              <?php 
-                              $endDate = new \DateTime($sub['end_date']);
-                              $currentDate = new \DateTime();
-                              $daysUntilExpiry = $currentDate->diff($endDate)->days;
-                              if ($daysUntilExpiry > 0) {
-                                  echo '<div class="text-warning">Expires in ' . $daysUntilExpiry . ' days</div>';
-                              } else {
-                                  echo '<div class="text-danger">Expired</div>';
-                              }
-                              ?>
+                                <div>Start: <?= date('d M Y', strtotime($sub['start_date'])) ?></div>
+                                <div>End: <?= date('d M Y', strtotime($sub['end_date'])) ?></div>
+
+                                <?php
+                                $endDate     = new DateTime($sub['end_date']);
+                                $currentDate = new DateTime();
+
+                                $interval = $currentDate->diff($endDate);
+
+                                if ($interval->invert === 0 && $interval->days > 0) {
+                                    echo '<div class="text-warning">Expires in ' . $interval->days . ' days</div>';
+                                } else {
+                                    echo '<div class="text-danger">Expired</div>';
+                                }
+                                ?>
                             </div>
                           </div>
                         <?php else: ?>
@@ -340,6 +371,9 @@
                             <a class="dropdown-item" href="javascript:void(0);" onclick="viewLoginHistory(<?= $user['id'] ?>, '<?= $user['fld_full_name'] ?>')">
                               <i class="bx bx-history me-1"></i> Login History
                             </a>
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="viewEbookDownloadHistory(<?= $user['id'] ?>, '<?= $user['fld_full_name'] ?>')">
+                                <i class="bx bx-download me-1"></i> Download History
+                            </a>
                             <?php if ($user['fld_role'] !== 'admin' && $user['fld_role'] !== 'superadmin'): ?>
                               <div class="dropdown-divider"></div>
                               <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="confirmDelete(<?= $user['id'] ?>)">
@@ -353,7 +387,7 @@
                   <?php endforeach; ?>
                 <?php else: ?>
                   <tr>
-                    <td colspan="7" class="text-center py-5">
+                    <td colspan="8" class="text-center py-5">
                       <div class="text-center">
                         <i class="bx bx-user-x" style="font-size: 48px; color: #ccc;"></i>
                         <h5 class="mt-3">No users found</h5>
@@ -489,6 +523,24 @@
     </div>
   </div>
 </div>
+
+<!-- Ebook Download History Modal -->
+<div class="modal fade" id="ebookDownloadHistoryModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">E-book Download History</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="ebookDownloadHistoryContent">
+          <!-- Download history will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -624,6 +676,40 @@
       }
     });
   }
+
+  function viewEbookDownloadHistory(userId, userName) {
+      $('#ebookDownloadHistoryModal .modal-title').text('E-book Download History - ' + userName);
+      $('#ebookDownloadHistoryContent').html('<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+      $('#ebookDownloadHistoryModal').modal('show');
+      
+      // Load download history via AJAX
+      $.ajax({
+          url: '<?= base_url('admin/users/get-ebook-download-history/') ?>' + userId,
+          type: 'GET',
+          dataType: 'json',
+          success: function(response) {
+              if (response.success && response.downloadHistory.length > 0) {
+                  let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Download Date & Time</th><th>Download Count</th></tr></thead><tbody>';
+                  
+                  response.downloadHistory.forEach(function(download) {
+                      html += '<tr>';
+                      html += '<td>' + download.fld_created_at + '</td>';
+                      html += '<td>' + download.fld_download_count + '</td>';
+                      html += '</tr>';
+                  });
+                  
+                  html += '</tbody></table></div>';
+                  $('#ebookDownloadHistoryContent').html(html);
+              } else {
+                  $('#ebookDownloadHistoryContent').html('<div class="text-center py-5"><i class="bx bx-download" style="font-size: 48px; color: #ccc;"></i><h5 class="mt-3">No download history found</h5></div>');
+              }
+          },
+          error: function() {
+              $('#ebookDownloadHistoryContent').html('<div class="alert alert-danger">Error loading download history. Please try again.</div>');
+          }
+      });
+  }
+
 </script>
 <style>
 /* Card styles */

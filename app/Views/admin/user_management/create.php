@@ -38,11 +38,15 @@
             
             <div class="row">
               <div class="col-md-6">
-                <div class="form-group mb-3">
-                  <label for="mobile" class="form-label">Mobile <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" id="mobile" name="mobile" value="<?= old('mobile') ?>" required>
-                </div>
-              </div>
+                  <div class="form-group mb-3">
+                      <label for="mobile" class="form-label">Mobile <span class="text-danger">*</span></label>
+                      <div class="input-group">
+                          <input type="tel" class="form-control" id="mobile" name="mobile" value="<?= old('mobile') ?>" required>
+                          <input type="hidden" name="country_code" id="country_code" value="<?= old('country_code', '+91') ?>">
+                      </div>
+                      <small class="text-muted">Enter mobile number with country code</small>
+                  </div>
+              </div> 
               <div class="col-md-6">
                 <div class="form-group mb-3">
                   <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
@@ -89,7 +93,49 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<!-- Add intl-tel-input CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+
+<!-- Add intl-tel-input JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"></script>
+
 <script>
-  // Add any JavaScript needed for this page
+document.addEventListener("DOMContentLoaded", function() {
+    const phoneInputField = document.querySelector("#mobile");
+    const countryCodeField = document.querySelector("#country_code");
+    
+    // Initialize the phone input
+    const iti = window.intlTelInput(phoneInputField, {
+        initialCountry: "in",
+        separateDialCode: true,
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        nationalMode: false,
+        autoPlaceholder: "aggressive",
+    });
+    
+    // Set initial country code
+    const initialCountryData = iti.getSelectedCountryData();
+    countryCodeField.value = '+' + initialCountryData.dialCode;
+    
+    // Update country code field when country changes
+    phoneInputField.addEventListener('countrychange', function() {
+        const countryData = iti.getSelectedCountryData();
+        countryCodeField.value = '+' + countryData.dialCode;
+    });
+    
+    // Format the phone number on form submission
+    const form = phoneInputField.closest('form');
+    form.addEventListener('submit', function(event) {
+        if (iti.isValidNumber()) {
+            // Get the full international number (e.g., +919876543210)
+            phoneInputField.value = iti.getNumber();
+        } else {
+            // Prevent form submission if phone number is invalid
+            alert('Please enter a valid phone number');
+            event.preventDefault();
+        }
+    });
+});
 </script>
 <?= $this->endSection() ?>

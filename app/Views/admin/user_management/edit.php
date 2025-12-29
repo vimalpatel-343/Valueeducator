@@ -150,7 +150,7 @@
                       <th>Start Date</th>
                       <th>End Date</th>
                       <th>Status</th>
-                      <th>Actions</th>
+                      <th class="text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -162,7 +162,7 @@
                         <td><?= $subscription['start_date'] ?></td>
                         <td><?= $subscription['end_date'] ?></td>
                         <td><?= $subscription['status'] ? 'Active' : 'Inactive' ?></td>
-                        <td>
+                        <td class="text-center">
                           <button type="button" class="btn btn-sm btn-info edit-subscription" 
                                   data-subscription-id="<?= $subscription['id'] ?>"
                                   data-start-date="<?= $subscription['start_date'] ?>"
@@ -170,6 +170,7 @@
                                   data-status="<?= $subscription['status'] ?>">
                             Edit Dates
                           </button>
+                          <button type="button" class="btn btn-sm btn-danger delete-subscription" data-subscription-id="<?= $subscription['id'] ?>" data-product-name="<?= $subscription['fld_title'] ?>">Cancel Subscription</button>
                         </td>
                       </tr>
                     <?php endforeach; ?>
@@ -284,6 +285,33 @@
     </div>
   </div>
 </div>
+
+<!-- Delete Subscription Modal -->
+<div class="modal fade" id="deleteSubscriptionModal" tabindex="-1" aria-labelledby="deleteSubscriptionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteSubscriptionModalLabel">Delete Subscription</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this subscription?</p>
+        <div class="alert alert-warning">
+          <strong>Product:</strong> <span id="deleteProductName"></span><br>
+          <strong>Action:</strong> This action cannot be undone.
+        </div>
+        <form id="deleteSubscriptionForm">
+          <input type="hidden" name="subscription_id" id="delete_subscription_id">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteSubscription">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -425,6 +453,47 @@
     .catch(error => {
       console.error('Error:', error);
       alert('An error occurred while updating subscription');
+    });
+  });
+
+  // Handle delete subscription button
+  document.querySelectorAll('.delete-subscription').forEach(button => {
+    button.addEventListener('click', function() {
+      const subscriptionId = this.getAttribute('data-subscription-id');
+      const productName = this.getAttribute('data-product-name');
+      
+      document.getElementById('delete_subscription_id').value = subscriptionId;
+      document.getElementById('deleteProductName').textContent = productName;
+      
+      const modal = new bootstrap.Modal(document.getElementById('deleteSubscriptionModal'));
+      modal.show();
+    });
+  });
+
+  // Handle confirm delete subscription
+  document.getElementById('confirmDeleteSubscription').addEventListener('click', function() {
+    const subscriptionId = document.getElementById('delete_subscription_id').value;
+    
+    // Create FormData object
+    const formData = new FormData();
+    formData.append('subscription_id', subscriptionId);
+    
+    fetch('<?= base_url('admin/users/deleteSubscription') ?>', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Subscription deleted successfully');
+        location.reload();
+      } else {
+        alert('Error: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while deleting subscription');
     });
   });
 </script>

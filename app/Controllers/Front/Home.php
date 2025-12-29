@@ -6,7 +6,7 @@ use App\Models\InvestmentPhilosophyModel;
 use App\Models\ProductModel;
 use App\Models\ProductFeatureModel;
 use App\Models\AppImageModel;
-use App\Models\YouTubeVideoModel;
+use App\Models\YoutubeVideoModel;
 use App\Models\SiteSettingsModel;
 
 class Home extends BaseController
@@ -26,7 +26,7 @@ class Home extends BaseController
         $this->productModel = new ProductModel();
         $this->productFeatureModel = new ProductFeatureModel();
         $this->appImageModel = new AppImageModel();
-        $this->youtubeVideoModel = new YouTubeVideoModel();
+        $this->youtubeVideoModel = new YoutubeVideoModel();
         $this->siteSettingsModel = new SiteSettingsModel();
     }
 

@@ -7,7 +7,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     
-    <link rel="apple-touch-icon" href="<?= base_url('apple-touch-icon.png') ?>">
+    <link rel="apple-touch-icon" href="<?= base_url('front/fav.svg') ?>">
     <link rel="shortcut icon" type="image/x-icon" href="<?= base_url('front/fav.svg') ?>">
     
     <link rel="stylesheet" href="<?= base_url('front/css/bootstrap.min.css') ?>">
@@ -15,7 +15,21 @@
     <link rel="stylesheet" href="<?= base_url('front/css/swiper.min.css') ?>">
     
     <link rel="stylesheet" type="text/css" href="<?= base_url('front/css/style-new.css') ?>">
+    <link rel="stylesheet" type="text/css" href="<?= base_url('front/css/softcoders.css') ?>">
     <link rel="stylesheet" href="<?= base_url('front/css/auth-modal.css') ?>">
+
+    <!-- Custom Media Queries -->
+    <link rel="stylesheet" href="<?= asset_versioned('front/css/custom-media.css') ?>">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-F6G7FWC4EQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-F6G7FWC4EQ');
+    </script>
     
 </head>
 <body>
@@ -32,7 +46,7 @@
                                     <?php else: ?>
                                         <img src="<?= base_url('front/logo.svg') ?>" alt="Logo">
                                     <?php endif; ?>
-                                    <span class="logo-txt">Value<br><span>Educator</span></span>
+                                    <!-- <span class="logo-txt d-lg-block d-md-block d-sm-none">Value<br><span>Educator</span></span> -->
                                 </a>
                             </div>
                             <div class="sc-main-menu d-lg-block d-none">
@@ -42,9 +56,26 @@
                                     <li><a href="<?= base_url('investment-philosophy') ?>" data-text="Investment Philosophy" class="">Investment Philosophy</a></li>
                                     <li class="menu-item-has-children">
                                         <a href="javascript:void(0);" class="">Products</a>
+                                        <?php
+                                            $dashboardLinks = [];
+                                            foreach ($userSubscriptions as $sub) {
+                                                if ($sub['product_id'] == 1) {
+                                                    $dashboardLinks['emerging-titans'] = base_url('dashboard-emerging-titan');
+                                                }
+                                                if ($sub['product_id'] == 2) {
+                                                    $dashboardLinks['tiny-titans'] = base_url('dashboard-tiny-titan');
+                                                }
+                                            }
+                                        ?>
                                         <ul class="list-gap sub-menu-list">
-                                            <li><a href="<?= base_url('emerging-titans') ?>" data-text="Emerging Titans">Emerging Titans</a></li>
-                                            <li><a href="<?= base_url('tiny-titans') ?>" data-text="Tiny Titans">Tiny Titans</a></li>
+                                            <li>
+                                                <a href="<?= $dashboardLinks['emerging-titans'] ?? base_url('emerging-titans'); ?>"
+                                                data-text="Emerging Titans">Emerging Titans</a>
+                                            </li>
+                                            <li>
+                                                <a href="<?= $dashboardLinks['tiny-titans'] ?? base_url('tiny-titans'); ?>"
+                                                data-text="Tiny Titans">Tiny Titans</a>
+                                            </li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -62,7 +93,7 @@
                                             <?php if (!empty(session()->get('userProfileImage'))): ?>
                                                 <img src="<?= base_url(session()->get('userProfileImage')) ?>">
                                             <?php else: ?>
-                                                <img src="images/no_image.png">
+                                                <img src="<?= base_url('images/no_image.png') ?>">
                                             <?php endif; ?>
                                         </a>
                                         <b class="d-none d-lg-block">
@@ -71,7 +102,7 @@
                                         </b>
 
                                         <a class="notification" data-target="box2" href="#">
-                                            <img src="images/notifications.png">
+                                            <img src="<?= base_url('images/notifications.png') ?>">
                                             <span class="action">1</span>
                                         </a>
                                     </div>
@@ -90,8 +121,8 @@
                         <div class="col-lg-3 col-5">
                             <div class="sc-menu-select-box d-flex align-items-center justify-content-end">
                                 <div class="header-btn d-block d-lg-none">
-                                    <a data-bs-target="#search-modal" data-bs-toggle="modal" href="#" id="accountIcon">
-                                        <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>" width="32" style="width:32px;">
+                                    <a data-bs-target="#authModal" data-bs-toggle="modal" href="#" id="accountIcon">
+                                        <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>" width="32" style="width:32px; pointer: cursor;">
                                     </a>
                                 </div>
                                 <div class="sc-hambagur-icon d-none sc-ml-20 sc-mt-0">
@@ -102,7 +133,7 @@
                                     </a>
                                 </div>
                                 <div class="header-btn d-none d-lg-block">
-                                    <a class="sc-primary-btn" data-bs-toggle="modal" data-bs-target="#authModal" href="#">
+                                    <a class="sc-primary-btn auth-trigger" data-bs-toggle="modal" data-bs-target="#authModal" href="#">
                                         <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>"> Sign Up
                                     </a>
                                     <a class="info" href="#" onmouseover="showDiv('content1')" onmouseout="hideDiv('content1')">
@@ -130,7 +161,8 @@
                         strpos($current_url, 'portfolio-emerging-titan') !== false || 
                         strpos($current_url, 'management-interviews-emerging-titan') !== false || 
                         strpos($current_url, 'quarterly-updates-emerging-titan') !== false ||
-                        strpos($current_url, 'knowledge-center') !== false ||
+                        strpos($current_url, 'knowledge-center-emerging-titan') !== false ||
+                        strpos($current_url, 'substack-updates') !== false ||
                         strpos($current_url, 'youtube-videos') !== false) {
                         
                         $activeProduct = 'emerging-titans';
@@ -140,6 +172,7 @@
                             strpos($current_url, 'dashboard-tiny-titan') !== false || 
                             strpos($current_url, 'portfolio-tiny-titan') !== false || 
                             strpos($current_url, 'management-interviews-tiny-titan') !== false || 
+                            strpos($current_url, 'knowledge-center-tiny-titan') !== false ||
                             strpos($current_url, 'quarterly-updates-tiny-titan') !== false) {
                         
                         $activeProduct = 'tiny-titans';

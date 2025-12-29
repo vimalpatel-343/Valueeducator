@@ -16,7 +16,8 @@
             <div class="col-lg-5 order-first order-md-0">
                 <div class="sc-statistics-left-content">                               
                     <div class="sc-ab-image sal-animate" data-sal="slide-up" data-sal-duration="800" data-sal-delay="250">
-                        <img class="sc-border-radius" src="images/product/Icon_1.png" alt="" style="margin:0px auto;">
+                        <?php $tinyTitansMainImage = $pageImages['tiny_titans']['main_image'] ?? null; ?>
+                        <img class="sc-border-radius" src="<?= base_url($tinyTitansMainImage['image_path'] ?? 'images/product/Icon_1.png') ?>" alt="<?= esc($tinyTitansMainImage['image_alt'] ?? '') ?>" style="margin:0px auto;" loading="lazy">
                     </div>								
                 </div>
             </div>
@@ -86,7 +87,8 @@
                                 </div>
                                 
                                 <div class="sc-mb-0" style="border:0px;">
-                                    <img src="images/product/img-notes.svg" style="width:100%">                                   
+                                    <?php $tinyTitansScuttlebuttNotesImage = $pageImages['tiny_titans']['scuttlebutt_notes'] ?? null; ?>
+                                    <img src="<?= base_url($tinyTitansScuttlebuttNotesImage['image_path'] ?? 'images/product/img-notes.svg') ?>" alt="<?= esc($tinyTitansScuttlebuttNotesImage['image_alt'] ?? '') ?>" style="width:100%" loading="lazy">
                                 </div>
                                 <ul class="liststyle1 mt-3">
                                     <li>Management Interaction & Insights</li>
@@ -105,11 +107,11 @@
                             <div class="white-box" style="padding:15px;">
                                 <div class="sc-heading-area sc-mb-10 text-left">
                                     <h3 class="font-lg-20-bold font-20-bold sc-mb-0" style="text-align:left;">Management interview</h3>
-                                </div>
-                                
+                                </div>                                
                                 <div class="sc-mb-0" style="border:0px;">
                                     <div class="video-container">
-                                        <img src="images/management_interview_tiny_titans.png">
+                                        <?php $tinyTitansManagementInterviewImage = $pageImages['tiny_titans']['management_interview'] ?? null; ?>
+                                        <img src="<?= base_url($tinyTitansManagementInterviewImage['image_path'] ?? 'images/management_interview_tiny_titans.png') ?>" alt="<?= esc($tinyTitansManagementInterviewImage['image_alt'] ?? '') ?>" loading="lazy">
                                     </div>
                                 </div>
                             </div>
@@ -306,7 +308,8 @@
                         </h5>
                     </div>	
                     
-                    <img src="images/product/empowering-01.svg">
+                    <?php $tinyTitansPricingImage1 = $pageImages['tiny_titans']['pricing_image_1'] ?? null; ?>
+                    <img src="<?= base_url($tinyTitansPricingImage1['image_path'] ?? 'images/product/empowering-01.svg') ?>" alt="<?= esc($tinyTitansPricingImage1['image_alt'] ?? '') ?>" loading="lazy">
                 </div>
                 
                 <h3 class="sc-mb-0 font-lg-36-bold font-36-bold text-md-center text-start">
@@ -317,7 +320,8 @@
             
             <div class="col-lg-8 col-md-12 dark-gray"> 
                 <div class="text-center sc-mt-40">
-                    <img src="images/product/black-titanium.svg">                   
+                    <?php $tinyTitansPricingImage2 = $pageImages['tiny_titans']['pricing_image_2'] ?? null; ?>
+                    <img src="<?= base_url($tinyTitansPricingImage2['image_path'] ?? 'images/product/black-titanium.svg') ?>" alt="<?= esc($tinyTitansPricingImage2['image_alt'] ?? '') ?>" loading="lazy">
                 </div>
             </div>
         </div>
@@ -697,7 +701,8 @@ color:#8D8D8D;
 /* Mobile view */
 @media (max-width: 768px) {
     .video-wrapper {
-        height: 250px !important;
+        height: 150px !important;
+        margin-top: 30px;
     }
 
     .video-wrapper iframe {

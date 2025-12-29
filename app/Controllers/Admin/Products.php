@@ -12,6 +12,7 @@ use App\Models\StockModel;
 use App\Models\StockUpdateModel;
 use App\Models\RebalanceTimelineModel;
 use App\Models\ScuttlebuttNotesModel;
+use App\Models\DashboardScuttlebuttModel;
 
 class Products extends BaseController
 {
@@ -26,6 +27,7 @@ class Products extends BaseController
     protected $stockUpdateModel;
     protected $rebalanceTimelineModel;
     protected $scuttlebuttNotesModel; 
+    protected $dashboardScuttlebuttModel;
 
     public function __construct()
     {
@@ -42,6 +44,7 @@ class Products extends BaseController
         $this->stockUpdateModel = new StockUpdateModel();
         $this->rebalanceTimelineModel = new RebalanceTimelineModel();
         $this->scuttlebuttNotesModel = new ScuttlebuttNotesModel();
+        $this->dashboardScuttlebuttModel = new DashboardScuttlebuttModel();
     }
 
     // List all products
@@ -119,7 +122,7 @@ class Products extends BaseController
                     // Handle feature image upload
                     $featureImage = $this->request->getFile('feature_images_' . $key);
                     if ($featureImage && $featureImage->isValid() && !$featureImage->hasMoved()) {
-                        $newName = $featureImage->getRandomName();
+                        $newName = $featureImage->getName();
                         $featureImage->move(FCPATH . 'uploads/products/features', $newName);
                         $featureData['fld_image'] = 'uploads/products/features/' . $newName;
                     }
@@ -134,7 +137,7 @@ class Products extends BaseController
             $appImages = $this->request->getFiles('app_images');
             foreach ($appImages['app_images'] as $key => $image) {
                 if ($image && $image->isValid() && !$image->hasMoved()) {
-                    $newName = $image->getRandomName();
+                    $newName = $image->getName();
                     $image->move(FCPATH . 'uploads/products/app_images', $newName);
                     
                     $imageData = [
@@ -160,6 +163,11 @@ class Products extends BaseController
             return redirect()->to('/admin/products')->with('error', 'Product not found');
         }
 
+        // Get all products except the current one for the copy modal
+        $allProductsExceptCurrent = $this->productModel->where('id !=', $id)->findAll();
+
+        $dashboardScuttlebutt = $this->dashboardScuttlebuttModel->getByProductId($id);
+
         $data = [
             'product' => $product,
             'features' => $this->productFeatureModel->where('fld_product_id', $id)->findAll(),
@@ -172,6 +180,8 @@ class Products extends BaseController
             'stockUpdates' => $this->stockUpdateModel->getStockUpdatesWithNames($id),
             'rebalanceTimelines' => $this->rebalanceTimelineModel->where('fld_product_id', $id)->findAll(),
             'scuttlebuttNotes' => $this->scuttlebuttNotesModel->where('fld_product_id', $id)->findAll(),
+            'allProductsExceptCurrent' => $allProductsExceptCurrent,
+            'dashboardScuttlebutt' => $dashboardScuttlebutt,
             'title' => 'Edit Product',
             'validation' => \Config\Services::validation()
         ];
@@ -243,7 +253,7 @@ class Products extends BaseController
                 // Handle feature image upload
                 $featureImage = $this->request->getFile('feature_images_' . $key);
                 if ($featureImage && $featureImage->isValid() && !$featureImage->hasMoved()) {
-                    $newName = $featureImage->getRandomName();
+                    $newName = $featureImage->getName();
                     $featureImage->move(FCPATH . 'uploads/products/features', $newName);
                     $featureData['fld_image'] = 'uploads/products/features/' . $newName;
                 } else if ($featureId && isset($existingFeaturesMap[$featureId])) {
@@ -292,7 +302,7 @@ class Products extends BaseController
             
             foreach ($appImages['app_images'] as $image) {
                 if ($image && $image->isValid() && !$image->hasMoved()) {
-                    $newName = $image->getRandomName();
+                    $newName = $image->getName();
                     $image->move(FCPATH . 'uploads/products/app_images', $newName);
                     
                     $imageData = [
@@ -429,7 +439,7 @@ class Products extends BaseController
                 if ($reportFiles && isset($reportFiles[$key])) {
                     $reportFile = $reportFiles[$key];
                     if ($reportFile && $reportFile->isValid() && !$reportFile->hasMoved()) {
-                        $newName = $reportFile->getRandomName();
+                        $newName = $reportFile->getName();
                         $reportFile->move(FCPATH . 'uploads/stocks/reports', $newName);
                         $stockData['fld_report_url'] = 'uploads/stocks/reports/' . $newName;
                     }
@@ -530,7 +540,7 @@ class Products extends BaseController
                 if ($factsheetFiles && isset($factsheetFiles[$key])) {
                     $factsheetFile = $factsheetFiles[$key];
                     if ($factsheetFile && $factsheetFile->isValid() && !$factsheetFile->hasMoved()) {
-                        $newName = $factsheetFile->getRandomName();
+                        $newName = $factsheetFile->getName();
                         $factsheetFile->move(FCPATH . 'uploads/rebalance/factsheets', $newName);
                         $rebalanceData['fld_factsheet_url'] = 'uploads/rebalance/factsheets/' . $newName;
                     }
@@ -606,6 +616,28 @@ class Products extends BaseController
             $this->scuttlebuttNotesModel->where('fld_product_id', $id)->delete();
         }
 
+        // Handle dashboard scuttlebutt update
+        $dashboardScuttlebutt = $this->dashboardScuttlebuttModel->getByProductId($id);
+        $dashboardScuttlebuttData = [
+            'fld_updated_date' => $this->request->getVar('dashboard_scuttlebutt[updated_date]') ?? null,
+            'fld_description' => $this->request->getVar('dashboard_scuttlebutt[description]') ?? null,
+            'fld_status' => 1
+        ];
+
+        // Handle dashboard scuttlebutt image upload
+        $dashboardImage = $this->request->getFile('dashboard_scuttlebutt_image');
+        if ($dashboardImage && $dashboardImage->isValid() && !$dashboardImage->hasMoved()) {
+            $newName = $dashboardImage->getName();
+            $dashboardImage->move(FCPATH . 'uploads/products/dashboard_scuttlebutt', $newName);
+            $dashboardScuttlebuttData['fld_image'] = 'uploads/products/dashboard_scuttlebutt/' . $newName;
+        } else if ($dashboardScuttlebutt) {
+            // Keep existing image if no new image is uploaded
+            $dashboardScuttlebuttData['fld_image'] = $dashboardScuttlebutt['fld_image'];
+        }
+
+        // Save or update dashboard scuttlebutt
+        $this->dashboardScuttlebuttModel->saveDashboardScuttlebutt($id, $dashboardScuttlebuttData);
+
         return redirect()->to('/admin/products')->with('success', 'Product updated successfully');
     }
 
@@ -634,5 +666,189 @@ class Products extends BaseController
         $this->productModel->delete($id);
 
         return redirect()->to('/admin/products')->with('success', 'Product deleted successfully');
+    }
+
+    public function copyInterview()
+    {
+        $interviewId = $this->request->getPost('interview_id');
+        $targetProductId = $this->request->getPost('target_product_id');
+
+        if (!$interviewId || !$targetProductId) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Missing required parameters'
+            ]);
+        }
+
+        // Get the original interview
+        $originalInterview = $this->managementInterviewModel->find($interviewId);
+        if (!$originalInterview) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Interview not found'
+            ]);
+        }
+
+        // Check if target product already has an interview with the same title
+        $existingInterview = $this->managementInterviewModel
+            ->where('fld_product_id', $targetProductId)
+            ->where('fld_title', $originalInterview['fld_title'])
+            ->first();
+
+        if ($existingInterview) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'An interview with the title "' . $originalInterview['fld_title'] . '" already exists in the target product'
+            ]);
+        }
+
+        // Prepare data for the new interview
+        $newInterviewData = [
+            'fld_product_id' => $targetProductId,
+            'fld_title' => $originalInterview['fld_title'],
+            'fld_video_url' => $originalInterview['fld_video_url'],
+            'fld_description' => $originalInterview['fld_description'],            
+        ];
+
+        // Insert the new interview
+        $newInterviewId = $this->managementInterviewModel->insert($newInterviewData);
+
+        if ($newInterviewId) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Interview copied successfully'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Failed to copy interview'
+            ]);
+        }
+    }
+
+    public function copyScuttlebutt()
+    {
+        $scuttlebuttId = $this->request->getPost('scuttlebutt_id');
+        $targetProductId = $this->request->getPost('target_product_id');
+        $copyAll = $this->request->getPost('copy_all');
+        $replaceOption = $this->request->getPost('replace_option');
+
+        if (!$targetProductId) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Target product is required'
+            ]);
+        }
+
+        // Check if target product already has scuttlebutt notes
+        $existingNotes = $this->scuttlebuttNotesModel->where('fld_product_id', $targetProductId)->findAll();
+        $hasExistingNotes = !empty($existingNotes);
+
+        $copiedCount = 0;
+
+        if ($copyAll == '1') {
+            // Copy ALL scuttlebutt notes from current product
+            $currentProductId = $this->request->getPost('current_product_id');
+            $allNotes = $this->scuttlebuttNotesModel->where('fld_product_id', $currentProductId)->findAll();
+            
+            // Only delete existing notes if user wants to replace ALL notes
+            if ($hasExistingNotes && $replaceOption === 'replace') {
+                $this->scuttlebuttNotesModel->where('fld_product_id', $targetProductId)->delete();
+            }
+            
+            foreach ($allNotes as $note) {
+                // Check if a note with the same title already exists (only if adding to existing)
+                if ($hasExistingNotes && $replaceOption === 'add') {
+                    $existingNote = $this->scuttlebuttNotesModel
+                        ->where('fld_product_id', $targetProductId)
+                        ->where('fld_title', $note['fld_title'])
+                        ->first();
+                    
+                    if ($existingNote) {
+                        continue; // Skip this note if it already exists
+                    }
+                }
+                
+                $newNoteData = [
+                    'fld_product_id' => $targetProductId,
+                    'fld_title' => $note['fld_title'],
+                    'fld_date' => $note['fld_date'],
+                    'fld_description' => $note['fld_description'],
+                    'fld_status' => 1
+                ];
+                
+                $this->scuttlebuttNotesModel->insert($newNoteData);
+                $copiedCount++;
+            }
+        } else {
+            // Copy a SINGLE scuttlebutt note
+            $originalNote = $this->scuttlebuttNotesModel->find($scuttlebuttId);
+            if (!$originalNote) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Scuttlebutt note not found'
+                ]);
+            }
+
+            // Check if target product already has a note with the same title
+            $existingNote = $this->scuttlebuttNotesModel
+                ->where('fld_product_id', $targetProductId)
+                ->where('fld_title', $originalNote['fld_title'])
+                ->first();
+
+            if ($existingNote) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'A scuttlebutt note with the title "' . $originalNote['fld_title'] . '" already exists in the target product'
+                ]);
+            }
+
+            // For single note copy, NEVER delete existing notes
+            // Just add the new note
+            
+            // Prepare data for the new note
+            $newNoteData = [
+                'fld_product_id' => $targetProductId,
+                'fld_title' => $originalNote['fld_title'],
+                'fld_date' => $originalNote['fld_date'],
+                'fld_description' => $originalNote['fld_description'],
+                'fld_status' => 1
+            ];
+
+            // Insert the new note
+            if ($this->scuttlebuttNotesModel->insert($newNoteData)) {
+                $copiedCount = 1;
+            }
+        }
+
+        if ($copiedCount > 0) {
+            $message = $copiedCount > 1 ? 
+                "$copiedCount scuttlebutt notes copied successfully" : 
+                "Scuttlebutt note copied successfully";
+                
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => $message,
+                'copied_count' => $copiedCount
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'No notes were copied. They may already exist in the target product.'
+            ]);
+        }
+    }
+
+    public function checkScuttlebuttExists()
+    {
+        $productId = $this->request->getPost('product_id');
+        
+        if (!$productId) {
+            return $this->response->setJSON(['exists' => false]);
+        }
+        
+        $notes = $this->scuttlebuttNotesModel->where('fld_product_id', $productId)->findAll();
+        
+        return $this->response->setJSON(['exists' => !empty($notes)]);
     }
 }

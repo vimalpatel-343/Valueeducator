@@ -6,6 +6,7 @@ use App\Models\UserModel;
 use App\Models\ProductModel;
 use App\Models\UserSubscriptionModel;
 use App\Models\PaymentModel;
+use App\Helpers\EmailHelper;
 use Razorpay\Api\Api;
 
 class Payment extends BaseController
@@ -172,6 +173,28 @@ class Payment extends BaseController
 
                 // Update payment record with subscription ID
                 $this->paymentModel->update($paymentId, ['subscription_id' => $subscriptionId]);
+
+                // Get user details for email
+                $user = $this->userModel->find(session()->get('userId'));
+                
+                // Generate PDF path (you need to implement this based on your requirements)
+                $pdfPath = null;
+                if (file_exists(FCPATH . 'uploads/Investor-Charter.pdf')) {
+                    $pdfPath = FCPATH . 'uploads/Investor-Charter.pdf';
+                }
+                
+                // Send subscription confirmation email
+                $emailSent = \App\Helpers\EmailHelper::sendSubscriptionConfirmationEmail(
+                    $user['fld_email'],
+                    $user['fld_full_name'],
+                    $product['fld_title'],
+                    $pdfPath
+                );
+                
+                if (!$emailSent) {
+                    // Log the error but don't fail the process
+                    log_message('error', 'Failed to send subscription confirmation email to user ID: ' . session()->get('userId'));
+                }
 
                 return $this->response->setJSON([
                     'status' => 'success',

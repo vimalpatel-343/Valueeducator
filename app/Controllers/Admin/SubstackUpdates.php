@@ -55,7 +55,7 @@ class SubstackUpdates extends BaseController
         $image = '';
         if ($file = $this->request->getFile('fld_image')) {
             if ($file->isValid() && !$file->hasMoved()) {
-                $newName = $file->getRandomName();
+                $newName = $file->getName();
                 $file->move('uploads/substack_images', $newName);
                 $image = 'uploads/substack_images/' . $newName;
             }
@@ -126,7 +126,7 @@ class SubstackUpdates extends BaseController
                     unlink($update['fld_image']);
                 }
                 
-                $newName = $file->getRandomName();
+                $newName = $file->getName();
                 $file->move('uploads/substack_images', $newName);
                 $image = 'uploads/substack_images/' . $newName;
             }

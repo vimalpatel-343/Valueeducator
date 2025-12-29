@@ -219,5 +219,12 @@
       </a>
     </li>
 
+    <li class="menu-item <?= (strpos(current_url(), 'page-images') !== false) ? 'active' : '' ?>">
+      <a href="<?= base_url('admin/page-images') ?>" class="menu-link">
+          <i class="menu-icon tf-icons bx bx-image"></i>
+          <div data-i18n="Page Images">Page Images</div>
+      </a>
+    </li>
+
   </ul>
 </aside>

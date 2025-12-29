@@ -8,9 +8,10 @@
 
         <div class="row d-flex justify-content-between align-items-center sc-pt-100 sc-md-pt-50"
             style="z-index:1; position:relative;">
-            <div class="col-lg-6 col-12 col-12 sc-pb-20"><img
-                    src="images/empowering.svg"></div>
-
+            <div class="col-lg-6 col-12 col-12 sc-pb-20">
+                <?php $investmentPhilosophyMainImage = $pageImages['investment_philosophy']['main_image'] ?? null; ?>
+                <img src="<?= base_url($investmentPhilosophyMainImage['image_path'] ?? 'images/empowering.svg') ?>" alt="<?= esc($investmentPhilosophyMainImage['image_alt'] ?? '') ?>" loading="lazy">
+            </div>
             <div class="col-lg-6 col-12 col-12 sc-pb-20 sc-md-pb-0">
                 <div class="sc-heading-area sc-mb-35 sc-md-mb-5 sc-md-pt-0 text-justify">
                     <h3 class="sc-mb-10 sc-mt-0 font-lg-32-bold font-20-bold">SPRINT Investment Philosophy: Sustainable

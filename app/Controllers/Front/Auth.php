@@ -251,7 +251,7 @@ class Auth extends BaseController
             }
             
             // Generate new file name
-            $newName = $file->getRandomName();
+            $newName = $file->getName();
             
             // Move file to uploads directory
             if (!$file->move(ROOTPATH . 'public/uploads/profile_pictures', $newName)) {
@@ -501,10 +501,13 @@ class Auth extends BaseController
             // Clear login session
             session()->remove('login_email');
             
+            // Check user subscriptions to determine redirect
+            $redirectUrl = $this->getUserRedirectUrl($user['id']);
+
             return $this->response->setJSON([
                 'success' => true,
                 'message' => 'Login successful',
-                'redirect' => base_url()
+                'redirect' => $redirectUrl
             ]);
         }
         
@@ -532,7 +535,7 @@ class Auth extends BaseController
             $mail->Host = 'smtp.hostinger.com';
             $mail->SMTPAuth = true;
             $mail->Username = 'noreply@valueeducator.com';
-            $mail->Password = 'Mailpass@0987';
+            $mail->Password = 'Value@100kk';
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $mail->Port = 465;
             
@@ -577,7 +580,7 @@ class Auth extends BaseController
             $mail->Host = 'smtp.hostinger.com';
             $mail->SMTPAuth = true;
             $mail->Username = 'noreply@valueeducator.com';
-            $mail->Password = 'Mailpass@0987';
+            $mail->Password = 'Value@100kk';
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $mail->Port = 465;
             
@@ -643,5 +646,303 @@ class Auth extends BaseController
         
         $db = \Config\Database::connect();
         $db->table('ve_user_logins')->insert($loginData);
+    }
+
+    // Helper method to determine redirect URL based on user subscriptions
+    private function getUserRedirectUrl($userId)
+    {
+        $db = \Config\Database::connect();
+        
+        // Get active subscriptions for the user
+        $subscriptions = $db->table('ve_user_subscriptions')
+            ->where('user_id', $userId)
+            ->where('status', 1) // Active subscriptions
+            ->where('end_date >=', date('Y-m-d')) // Not expired
+            ->get()
+            ->getResultArray();
+        
+        if (empty($subscriptions)) {
+            // No active subscriptions, redirect to emerging titan dashboard
+            return base_url('dashboard-emerging-titan');
+        }
+        
+        // Extract product IDs
+        $productIds = array_column($subscriptions, 'product_id');
+        
+        // Check if user has both product IDs 1 and 2
+        if (in_array(1, $productIds) && in_array(2, $productIds)) {
+            return base_url('dashboard-emerging-titan');
+        }
+        
+        // Check if user has only product ID 2 (Tiny Titans)
+        if (in_array(2, $productIds) && !in_array(1, $productIds)) {
+            return base_url('dashboard-tiny-titan');
+        }
+        
+        // Default fallback
+        return base_url('dashboard-emerging-titan');
+    }
+
+    // Update user profile
+    public function updateProfile()
+    {
+        if ($this->request->isAJAX()) {
+            // Check if user is logged in
+            if (!session()->get('isLoggedIn')) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'User not logged in'
+                ]);
+            }
+            
+            $userId = session()->get('userId');
+            
+            // Get form data
+            $name = $this->request->getPost('edit_name');
+            $email = $this->request->getPost('edit_email');
+            $mobile = $this->request->getPost('edit_mobile');
+            $day = $this->request->getPost('day');
+            $month = $this->request->getPost('month');
+            $year = $this->request->getPost('year');
+            $panNo = $this->request->getPost('edit_pan_no');
+            
+            // Validate inputs
+            $validation = \Config\Services::validation();
+            
+            $rules = [
+                'edit_name' => 'required|min_length[3]|max_length[100]',
+                'edit_email' => 'required|valid_email',
+                'edit_mobile' => 'required|min_length[10]|max_length[20]',
+                'edit_pan_no' => 'required|min_length[10]|max_length[10]|alpha_numeric'
+            ];
+            
+            if (!$this->validate($rules)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validation->getErrors()
+                ]);
+            }
+            
+            // Check if email is already taken by another user
+            $existingUser = $this->userModel->where('fld_email', $email)
+                                            ->where('id !=', $userId)
+                                            ->first();
+            if ($existingUser) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Email is already taken by another user'
+                ]);
+            }
+            
+            // Prepare date of birth
+            $dateOfBirth = null;
+            if (!empty($day) && !empty($month) && !empty($year)) {
+                // Validate date components
+                if (checkdate($month, $day, $year)) {
+                    $dateOfBirth = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT) . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+                } else {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'Invalid date of birth'
+                    ]);
+                }
+            }
+            
+            // Update user data
+            $userData = [
+                'fld_full_name' => $name,
+                'fld_email' => $email,
+                'fld_mobile' => $mobile,
+                'fld_date_of_birth' => $dateOfBirth,
+                'fld_pan_no' => strtoupper($panNo),
+                'fld_updated_at' => date('Y-m-d H:i:s')
+            ];
+            
+            // Update user in database
+            $this->userModel->update($userId, $userData);
+            
+            // Update session data
+            session()->set('userName', $name);
+            session()->set('userEmail', $email);
+            session()->set('userMobile', $mobile);
+            
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Profile updated successfully'
+            ]);
+        }
+        
+        return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Access denied']);
+    }
+
+    // Update profile picture
+    public function updateProfilePicture()
+    {
+        if ($this->request->isAJAX()) {
+            // Check if user is logged in
+            if (!session()->get('isLoggedIn')) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'User not logged in'
+                ]);
+            }
+            
+            $userId = session()->get('userId');
+            
+            $file = $this->request->getFile('imageUpload');
+            
+            // Check if file was uploaded
+            if (!$file || $file->getError() !== UPLOAD_ERR_OK) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'No file uploaded or upload error occurred'
+                ]);
+            }
+            
+            // Validate file
+            if (!$file->isValid()) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Invalid file uploaded'
+                ]);
+            }
+            
+            // Check file type
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!in_array($file->getMimeType(), $allowedTypes)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Only JPG, PNG, GIF, and WEBP images are allowed'
+                ]);
+            }
+            
+            // Check file size (5MB max)
+            if ($file->getSize() > 5 * 1024 * 1024) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'File size must be less than 5MB'
+                ]);
+            }
+            
+            // Get current user to check for existing profile picture
+            $currentUser = $this->userModel->find($userId);
+            
+            // Generate new file name
+            $newName = $userId . '_' . time() . '.' . $file->getExtension();
+            
+            // Move file to uploads directory
+            if (!$file->move(ROOTPATH . 'public/uploads/profile_pictures', $newName)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Failed to move uploaded file'
+                ]);
+            }
+            
+            // Delete old profile picture if exists
+            if (!empty($currentUser['fld_profile_image'])) {
+                $oldImagePath = ROOTPATH . 'public/' . $currentUser['fld_profile_image'];
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+            
+            // Update user profile picture in database using Query Builder
+            $db = \Config\Database::connect();
+            $updateData = [
+                'fld_profile_image' => 'uploads/profile_pictures/' . $newName,
+                'fld_updated_at' => date('Y-m-d H:i:s')
+            ];
+            
+            try {
+                $builder = $db->table('ve_users');
+                $builder->where('id', $userId);
+                $result = $builder->update($updateData);
+                
+                if (!$result) {
+                    // Delete the uploaded file if update failed
+                    @unlink(ROOTPATH . 'public/uploads/profile_pictures/' . $newName);
+                    
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'Failed to update profile picture in database'
+                    ]);
+                }
+                
+                // Update session data
+                session()->set('userProfileImage', 'uploads/profile_pictures/' . $newName);
+                
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Profile picture updated successfully',
+                    'image_path' => base_url('uploads/profile_pictures/' . $newName)
+                ]);
+            } catch (\Exception $e) {
+                // Delete the uploaded file if exception occurred
+                @unlink(ROOTPATH . 'public/uploads/profile_pictures/' . $newName);
+                
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Database error: ' . $e->getMessage()
+                ]);
+            }
+        }
+        
+        return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Access denied']);
+    }
+
+    // Get user profile data for the edit form
+    public function getProfileData()
+    {
+        if ($this->request->isAJAX()) {
+            // Check if user is logged in
+            if (!session()->get('isLoggedIn')) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'User not logged in'
+                ]);
+            }
+            
+            $userId = session()->get('userId');
+            $user = $this->userModel->find($userId);
+            
+            if (!$user) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'User not found'
+                ]);
+            }
+            
+            // Parse date of birth
+            $day = '';
+            $month = '';
+            $year = '';
+            
+            if (!empty($user['fld_date_of_birth'])) {
+                $dateParts = explode('-', $user['fld_date_of_birth']);
+                if (count($dateParts) === 3) {
+                    $year = $dateParts[0];
+                    $month = $dateParts[1];
+                    $day = $dateParts[2];
+                }
+            }
+            
+            return $this->response->setJSON([
+                'success' => true,
+                'user' => [
+                    'id' => $user['id'],
+                    'name' => $user['fld_full_name'],
+                    'email' => $user['fld_email'],
+                    'mobile' => $user['fld_mobile'],
+                    'pan_no' => $user['fld_pan_no'] ?? '',
+                    'profile_image' => $user['fld_profile_image'] ?? '',
+                    'day' => $day,
+                    'month' => $month,
+                    'year' => $year
+                ]
+            ]);
+        }
+        
+        return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Access denied']);
     }
 }

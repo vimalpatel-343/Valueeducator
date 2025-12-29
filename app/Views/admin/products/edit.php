@@ -246,6 +246,44 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Dashboard Scuttlebutt Section -->
+                                <div class="card mb-4">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Dashboard Scuttlebutt Notes</h5>
+                                        <small class="text-muted">This content will be displayed in the Scuttlebutt Notes section on the dashboard</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-3">
+                                            <label class="col-md-3 col-form-label">Updated Date</label>
+                                            <div class="col-md-9">
+                                                <input type="date" class="form-control" name="dashboard_scuttlebutt[updated_date]" value="<?= $dashboardScuttlebutt['fld_updated_date'] ?? '' ?>">
+                                                <small class="text-muted">This date will be displayed as "New Update on [date]"</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <label class="col-md-3 col-form-label">Image</label>
+                                            <div class="col-md-9">
+                                                <input type="file" class="form-control" name="dashboard_scuttlebutt_image" accept="image/*">
+                                                <?php if ($dashboardScuttlebutt && $dashboardScuttlebutt['fld_image']): ?>
+                                                    <div class="mt-2">
+                                                        <img src="<?= base_url($dashboardScuttlebutt['fld_image']) ?>" class="img-thumbnail" style="max-height: 150px;">
+                                                        <input type="hidden" name="dashboard_scuttlebutt[existing_image]" value="<?= $dashboardScuttlebutt['fld_image'] ?>">
+                                                    </div>
+                                                <?php endif; ?>
+                                                <small class="text-muted">Recommended size: 400x300px</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <label class="col-md-3 col-form-label">Description</label>
+                                            <div class="col-md-9">
+                                                <textarea class="form-control" id="dashboard_scuttlebutt_description" name="dashboard_scuttlebutt[description]" rows="5"><?= $dashboardScuttlebutt['fld_description'] ?? '' ?></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             
                             <!-- Stocks Tab -->
@@ -702,9 +740,14 @@
                                 <div class="card mb-4 border-0 shadow-sm">
                                     <div class="card-header bg-success text-white d-flex justify-content-between align-items-center p-3">
                                         <h5 class="mb-0 text-white"><i class="bx bx-note me-2"></i>Scuttlebutt Notes</h5>
-                                        <button type="button" class="btn btn-light btn-sm" id="addScuttlebuttBtn">
-                                            <i class="bx bx-plus me-1"></i> Add Note
-                                        </button>
+                                        <div>
+                                            <button type="button" class="btn btn-light btn-sm me-2" id="copyAllScuttlebuttBtn">
+                                                <i class="bx bx-copy me-1"></i> Copy All to Other Product
+                                            </button>
+                                            <button type="button" class="btn btn-light btn-sm" id="addScuttlebuttBtn">
+                                                <i class="bx bx-plus me-1"></i> Add Note
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class="card-body">
                                         <div class="accordion" id="scuttlebuttAccordion">
@@ -725,6 +768,7 @@
                                                                 </button>
                                                                 <ul class="dropdown-menu">
                                                                     <li><a class="dropdown-item edit-scuttlebutt" href="#"><i class="bx bx-edit me-2"></i>Edit</a></li>
+                                                                    <li><a class="dropdown-item copy-scuttlebutt" href="#" data-scuttlebutt-id="<?= $note['id'] ?>"><i class="bx bx-copy me-2"></i>Copy to Other Product</a></li>
                                                                     <li><a class="dropdown-item remove-scuttlebutt" href="#"><i class="bx bx-trash me-2"></i>Remove</a></li>
                                                                 </ul>
                                                             </div>
@@ -839,7 +883,7 @@
                                                         <th>Title</th>
                                                         <th>Video URL</th>
                                                         <th>Description</th>
-                                                        <th>Actions</th>
+                                                        <th class="w-px-350 text-center">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="interviewTableBody">
@@ -854,9 +898,12 @@
                                                         <td>
                                                             <textarea class="form-control" name="interviews[description][]"><?= $interview['fld_description'] ?></textarea>
                                                         </td>
-                                                        <td>
+                                                        <td class="w-px-350 text-center">
                                                             <button type="button" class="btn btn-danger btn-sm remove-interview">
                                                                 <i class="bx bx-trash"></i> Remove
+                                                            </button>
+                                                            <button type="button" class="btn btn-info btn-sm copy-interview" data-interview-id="<?= $interview['id'] ?>">
+                                                                <i class="bx bx-copy"></i> Copy to Other Product
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -886,6 +933,76 @@
                         </div>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Copy Interview Modal -->
+<div class="modal fade" id="copyInterviewModal" tabindex="-1" aria-labelledby="copyInterviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="copyInterviewModalLabel">Copy Interview to Other Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="copyInterviewForm">
+                    <input type="hidden" name="interview_id" id="copyInterviewId">
+                    <div class="form-group mb-3">
+                        <label for="targetProductId" class="form-label">Select Product</label>
+                        <select class="form-select" id="targetProductId" name="target_product_id" required>
+                            <option value="">Select a product</option>
+                            <?php foreach ($allProductsExceptCurrent as $prod): ?>
+                                <option value="<?= $prod['id'] ?>"><?= $prod['fld_title'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmCopyInterview">Copy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Copy Scuttlebutt Modal -->
+<div class="modal fade" id="copyScuttlebuttModal" tabindex="-1" aria-labelledby="copyScuttlebuttModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="copyScuttlebuttModalLabel">Copy Scuttlebutt Notes to Other Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="copyScuttlebuttForm">
+                    <input type="hidden" name="scuttlebutt_id" id="copyScuttlebuttId">
+                    <input type="hidden" name="copy_all" id="copyAllFlag" value="0">
+                    <div class="form-group mb-3">
+                        <label for="targetScuttlebuttProductId" class="form-label">Select Product</label>
+                        <select class="form-select" id="targetScuttlebuttProductId" name="target_product_id" required>
+                            <option value="">Select a product</option>
+                            <?php foreach ($allProductsExceptCurrent as $prod): ?>
+                                <option value="<?= $prod['id'] ?>"><?= $prod['fld_title'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="alert alert-info d-none" id="singleNoteInfo">
+                        <i class="bx bx-info-circle me-2"></i>
+                        <strong>Note:</strong> This will add the selected note to the target product without affecting existing notes.
+                    </div>
+                    <div class="alert alert-warning d-none" id="scuttlebuttExistsWarning">
+                        <i class="bx bx-error me-2"></i>
+                        <strong>Warning:</strong> The selected product already has scuttlebutt notes.
+                        <div id="warningMessage"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="confirmCopyScuttlebutt">Copy</button>
             </div>
         </div>
     </div>
@@ -1385,6 +1502,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         loadEditor('.stock-update-editor');
         loadEditor('.feature-description', 200);
+        loadEditor('#dashboard_scuttlebutt_description', 200);
 
         // Add rebalance
         $('#addRebalanceBtn').click(function() {
@@ -1594,6 +1712,167 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 alert('Total portfolio distribution must equal 100%. Current total: ' + totalPercentage + '%');
             }
+        });
+
+        // Handle copy interview button
+        $(document).on('click', '.copy-interview', function() {
+            const interviewId = $(this).data('interview-id');
+            $('#copyInterviewId').val(interviewId);
+            const modal = new bootstrap.Modal(document.getElementById('copyInterviewModal'));
+            modal.show();
+        });
+
+        // Handle confirm copy interview
+        $('#confirmCopyInterview').click(function() {
+            const interviewId = $('#copyInterviewId').val();
+            const targetProductId = $('#targetProductId').val();
+
+            if (!targetProductId) {
+                alert('Please select a product');
+                return;
+            }
+
+            $.ajax({
+                url: '<?= base_url('admin/products/copyInterview') ?>',
+                type: 'POST',
+                data: {
+                    interview_id: interviewId,
+                    target_product_id: targetProductId
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        alert('Interview copied successfully');
+                        $('#copyInterviewModal').modal('hide');
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while copying the interview');
+                }
+            });
+        });
+
+        // Handle copy scuttlebutt button (single note)
+        $(document).on('click', '.copy-scuttlebutt', function() {
+            const scuttlebuttId = $(this).data('scuttlebutt-id');
+            $('#copyScuttlebuttId').val(scuttlebuttId);
+            $('#copyAllFlag').val('0');
+            $('#scuttlebuttExistsWarning').addClass('d-none');
+            $('#singleNoteInfo').removeClass('d-none');
+            const modal = new bootstrap.Modal(document.getElementById('copyScuttlebuttModal'));
+            modal.show();
+        });
+
+        // Handle copy all scuttlebutt button
+        $('#copyAllScuttlebuttBtn').click(function() {
+            const currentProductId = '<?= $product['id'] ?>';
+            $('#copyScuttlebuttId').val('');
+            $('#copyAllFlag').val('1');
+            $('#scuttlebuttExistsWarning').addClass('d-none');
+            $('#singleNoteInfo').addClass('d-none');
+            const modal = new bootstrap.Modal(document.getElementById('copyScuttlebuttModal'));
+            modal.show();
+        });
+
+        // Check if target product has scuttlebutt notes when product is selected
+        $('#targetScuttlebuttProductId').change(function() {
+            const targetProductId = $(this).val();
+            const copyAll = $('#copyAllFlag').val();
+            
+            if (!targetProductId) {
+                $('#scuttlebuttExistsWarning').addClass('d-none');
+                return;
+            }
+            
+            // Check if target product has scuttlebutt notes
+            $.ajax({
+                url: '<?= base_url('admin/products/checkScuttlebuttExists') ?>',
+                type: 'POST',
+                data: {
+                    product_id: targetProductId
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.exists) {
+                        if (copyAll == '1') {
+                            // For copy all, show replace/add options
+                            $('#scuttlebuttExistsWarning').removeClass('d-none');
+                            $('#warningMessage').html(`
+                                Do you want to replace them or add to them?
+                                <div class="mt-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="replace_option" id="replaceScuttlebutt" value="replace">
+                                        <label class="form-check-label" for="replaceScuttlebutt">
+                                            Replace existing notes
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="replace_option" id="addToScuttlebutt" value="add" checked>
+                                        <label class="form-check-label" for="addToScuttlebutt">
+                                            Add to existing notes (skip duplicates)
+                                        </label>
+                                    </div>
+                                </div>
+                            `);
+                        } else {
+                            // For single note, just show warning
+                            $('#scuttlebuttExistsWarning').removeClass('d-none');
+                            $('#warningMessage').html('The note will be added without affecting existing notes.');
+                        }
+                    } else {
+                        $('#scuttlebuttExistsWarning').addClass('d-none');
+                    }
+                },
+                error: function() {
+                    $('#scuttlebuttExistsWarning').addClass('d-none');
+                }
+            });
+        });
+
+        // Handle confirm copy scuttlebutt
+        $('#confirmCopyScuttlebutt').click(function() {
+            const scuttlebuttId = $('#copyScuttlebuttId').val();
+            const targetProductId = $('#targetScuttlebuttProductId').val();
+            const copyAll = $('#copyAllFlag').val();
+            const replaceOption = $('input[name="replace_option"]:checked').val();
+
+            if (!targetProductId) {
+                alert('Please select a product');
+                return;
+            }
+
+            // For single note copy, replaceOption is not needed
+            const data = {
+                scuttlebutt_id: scuttlebuttId,
+                target_product_id: targetProductId,
+                copy_all: copyAll,
+                current_product_id: '<?= $product['id'] ?>'
+            };
+            
+            // Only add replace_option if copying all notes
+            if (copyAll == '1') {
+                data.replace_option = replaceOption;
+            }
+
+            $.ajax({
+                url: '<?= base_url('admin/products/copyScuttlebutt') ?>',
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        $('#copyScuttlebuttModal').modal('hide');
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while copying the scuttlebutt notes');
+                }
+            });
         });
 
     });

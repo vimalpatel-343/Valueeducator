@@ -5,7 +5,7 @@ use App\Controllers\BaseController;
 use App\Models\KnowledgeCategoryModel;
 use App\Models\KnowledgeItemModel;
 use App\Models\SiteSettingsModel;
-use App\Models\YouTubeVideoModel;
+use App\Models\YoutubeVideoModel;
 use App\Models\ProductModel;
 use App\Models\UserSubscriptionModel;
 use App\Models\UserModel;
@@ -32,7 +32,7 @@ class Knowledge extends BaseController
         $this->knowledgeCategoryModel = new KnowledgeCategoryModel();
         $this->knowledgeItemModel = new KnowledgeItemModel();
         $this->siteSettingsModel = new SiteSettingsModel();
-        $this->youtubeVideoModel = new YouTubeVideoModel();
+        $this->youtubeVideoModel = new YoutubeVideoModel();
         $this->productModel = new ProductModel();
         $this->userSubscriptionModel = new UserSubscriptionModel();
         $this->userModel = new UserModel();

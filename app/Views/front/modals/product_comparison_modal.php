@@ -1,5 +1,3 @@
-// C:\xampp\htdocs\valueeducator\app\Views\front\modals\product_comparison_modal.php
-
 <div id="titan-modal" class="modal fade titan-modal" role="dialog" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">

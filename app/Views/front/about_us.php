@@ -45,7 +45,8 @@
                 <div class="sc-team-item bdr-only text-left min-hgt-520">
                     <div class="item-img">
                         <div class="team-image sc-pb-20">
-                            <img alt="" src="images/about/img-choose-1.svg">
+                            <?php $aboutBeyondMainstreamImage = $pageImages['about_us']['beyond_mainstream'] ?? null; ?>
+                            <img alt="<?= esc($aboutBeyondMainstreamImage['image_alt'] ?? '') ?>" src="<?= base_url($aboutBeyondMainstreamImage['image_path'] ?? 'images/about/img-choose-1.svg') ?>" loading="lazy">
                         </div>
                         <div class="sc-team-content">
                             <h4 class="font-lg-20-bold font-20-bold">Beyond the Mainstream: Finding Hidden Investment Gems</h4>
@@ -59,7 +60,8 @@
                 <div class="sc-team-item bdr-only text-left min-hgt-520">
                     <div class="item-img">
                         <div class="team-image sc-pb-20">
-                            <img alt="" src="images/about/img-choose-2.svg">
+                            <?php $aboutScuttlebuttResearchImage = $pageImages['about_us']['scuttlebutt_research'] ?? null; ?>
+                            <img alt="<?= esc($aboutScuttlebuttResearchImage['image_alt'] ?? '') ?>" src="<?= base_url($aboutScuttlebuttResearchImage['image_path'] ?? 'images/about/img-choose-2.svg') ?>" loading="lazy">
                         </div>
                         <div class="sc-team-content">
                             <h4 class="font-lg-20-bold font-20-bold">Scuttlebutt Research: Authentic Insights That Matter</h4>
@@ -73,7 +75,8 @@
                 <div class="sc-team-item bdr-only text-left min-hgt-520">
                     <div class="item-img">
                         <div class="team-image sc-pb-20">
-                            <img alt="" src="images/about/img-choose-3.svg">
+                            <?php $aboutInvestingSmarterImage = $pageImages['about_us']['investing_smarter'] ?? null; ?>
+                            <img alt="<?= esc($aboutInvestingSmarterImage['image_alt'] ?? '') ?>" src="<?= base_url($aboutInvestingSmarterImage['image_path'] ?? 'images/about/img-choose-3.svg') ?>" loading="lazy">
                         </div>
                         <div class="sc-team-content">
                             <h4 class="font-lg-20-bold font-20-bold">Investing Smarter: Precise Valuations</h4>
@@ -87,7 +90,8 @@
                 <div class="sc-team-item bdr-only text-left min-hgt-520">
                     <div class="item-img">
                         <div class="team-image sc-pb-20">
-                            <img alt="" src="images/about/img-choose-4.svg">
+                            <?php $aboutNoFomoImage = $pageImages['about_us']['no_fomo'] ?? null; ?>
+                            <img alt="<?= esc($aboutNoFomoImage['image_alt'] ?? '') ?>" src="<?= base_url($aboutNoFomoImage['image_path'] ?? 'images/about/img-choose-4.svg') ?>" loading="lazy">
                         </div>
                         <div class="sc-team-content">
                             <h4 class="font-lg-20-bold font-20-bold">No FOMO, No Overheated Markets</h4>
@@ -101,7 +105,8 @@
                 <div class="sc-team-item bdr-only text-left min-hgt-520">
                     <div class="item-img">
                         <div class="team-image sc-pb-20">
-                            <img alt="" src="images/about/img-choose-5.svg">
+                            <?php $aboutPassionateTeamImage = $pageImages['about_us']['passionate_team'] ?? null; ?>
+                            <img alt="<?= esc($aboutPassionateTeamImage['image_alt'] ?? '') ?>" src="<?= base_url($aboutPassionateTeamImage['image_path'] ?? 'images/about/img-choose-5.svg') ?>" loading="lazy">
                         </div>
                         <div class="sc-team-content">
                             <h4 class="font-lg-20-bold font-20-bold">Passionate, Committed Team</h4>
@@ -115,7 +120,8 @@
                 <div class="sc-team-item bdr-only text-left min-hgt-520">
                     <div class="item-img">
                         <div class="team-image sc-pb-20">
-                            <img alt="" src="images/about/img-choose-6.svg">
+                            <?php $aboutIntegrityTransparencyImage = $pageImages['about_us']['integrity_transparency'] ?? null; ?>
+                            <img alt="<?= esc($aboutIntegrityTransparencyImage['image_alt'] ?? '') ?>" src="<?= base_url($aboutIntegrityTransparencyImage['image_path'] ?? 'images/about/img-choose-6.svg') ?>" loading="lazy">
                         </div>
                         <div class="sc-team-content">
                             <h4 class="font-lg-20-bold font-20-bold">Integrity & Transparency</h4>
@@ -234,7 +240,8 @@
                 <div class="sc-services-style3">
                     <div class="sc-service-text">
                         <div class="sc-services-icon">
-                            <img class="img-fluid" src="images/about/img-core-1.svg">
+                            <?php $aboutIntegrityFirstImage = $pageImages['about_us']['integrity_first'] ?? null; ?>
+                            <img class="img-fluid" src="<?= base_url($aboutIntegrityFirstImage['image_path'] ?? 'images/about/img-core-1.svg') ?>" alt="<?= esc($aboutIntegrityFirstImage['image_alt'] ?? '') ?>" loading="lazy">
                         </div>
                         <div class="service-text-right text-center text-lg-start sc-mt-0 sc-md-mt-0">
                             <h4 class="service-title font-lg-24-bold font-16-bold">Integrity First</h4>
@@ -248,7 +255,8 @@
                 <div class="sc-services-style3">
                     <div class="sc-service-text">
                         <div class="sc-services-icon">
-                            <img class="img-fluid" src="images/about/img-core-2.svg">
+                            <?php $aboutFocusedPrecisionImage = $pageImages['about_us']['focused_precision'] ?? null; ?>
+                            <img class="img-fluid" src="<?= base_url($aboutFocusedPrecisionImage['image_path'] ?? 'images/about/img-core-2.svg') ?>" alt="<?= esc($aboutFocusedPrecisionImage['image_alt'] ?? '') ?>" loading="lazy">
                         </div>
                         <div class="service-text-right text-center text-lg-start sc-mt-0 sc-md-mt-0">
                             <h4 class="service-title font-lg-24-bold font-16-bold">Focused Precision</h4>
@@ -262,7 +270,8 @@
                 <div class="sc-services-style3">
                     <div class="sc-service-text">
                         <div class="sc-services-icon">
-                            <img class="img-fluid" src="images/about/img-core-3.svg">
+                            <?php $aboutTeamSynergyImage = $pageImages['about_us']['team_synergy'] ?? null; ?>
+                            <img class="img-fluid" src="<?= base_url($aboutTeamSynergyImage['image_path'] ?? 'images/about/img-core-3.svg') ?>" alt="<?= esc($aboutTeamSynergyImage['image_alt'] ?? '') ?>" loading="lazy">
                         </div>
                         <div class="service-text-right text-center text-lg-start sc-mt-0 sc-md-mt-0">
                             <h4 class="service-title font-lg-24-bold font-16-bold">Team Synergy</h4>
@@ -276,7 +285,8 @@
                 <div class="sc-services-style3">
                     <div class="sc-service-text">
                         <div class="sc-services-icon">
-                            <img class="img-fluid" src="images/about/img-core-4.svg">
+                            <?php $aboutRelentlessDriveImage = $pageImages['about_us']['relentless_drive'] ?? null; ?>
+                            <img class="img-fluid" src="<?= base_url($aboutRelentlessDriveImage['image_path'] ?? 'images/about/img-core-4.svg') ?>" alt="<?= esc($aboutRelentlessDriveImage['image_alt'] ?? '') ?>" loading="lazy">
                         </div>
                         <div class="service-text-right text-center text-lg-start sc-mt-0 sc-md-mt-0">
                             <h4 class="service-title font-lg-24-bold font-16-bold">Relentless Drive</h4>
@@ -294,7 +304,8 @@
         <div class="row d-flex justify-content-between align-items-center">
             <div class="col-lg-6 col-md-12">
                 <div class="text-center">
-                    <img src="images/about/img-vision.svg">
+                    <?php $aboutVisionImage = $pageImages['about_us']['vision'] ?? null; ?>
+                    <img src="<?= base_url($aboutVisionImage['image_path'] ?? 'images/about/img-vision.svg') ?>" alt="<?= esc($aboutVisionImage['image_alt'] ?? '') ?>" loading="lazy">
                 </div>
             </div>
             <div class="col-lg-6 col-md-12">
@@ -316,7 +327,8 @@
             </div>
             <div class="col-lg-6 col-md-12 order-first order-md-0">
                 <div class="text-center">
-                    <img src="images/about/img-mission.svg">
+                    <?php $aboutMissionImage = $pageImages['about_us']['mission'] ?? null; ?>
+                    <img src="<?= base_url($aboutMissionImage['image_path'] ?? 'images/about/img-mission.svg') ?>" alt="<?= esc($aboutMissionImage['image_alt'] ?? '') ?>" loading="lazy">
                 </div>
             </div>
         </div>

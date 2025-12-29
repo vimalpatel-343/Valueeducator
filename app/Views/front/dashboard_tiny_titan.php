@@ -49,7 +49,7 @@
                                     <th class="table__th" style="padding:8px 8px!important;">Stock Name</th>
                                     <th class="table__th" style="padding:8px 8px!important;">Date of Recommendation</th>
                                     <th class="table__th" style="padding:8px 8px!important;">Price at Recommendation</th>
-                                    <th class="table__th" style="padding:8px 8px!important;">Allocation</th>
+                                    <th class="table__th" style="padding:8px 8px!important;">Rating</th>
                                     <th class="table__th text-center" style="padding:8px 8px!important;">Action</th>
                                     <th class="table__th text-center" style="padding:8px 8px!important;">Report</th>
                                 </tr>
@@ -69,7 +69,7 @@
                                                 <p class="table-row__p-status">Rs <?= format_price($stock['fld_price_at_recommendation']) ?></p>
                                             </td>
                                             <td data-column="Destination" class="table-row__td">
-                                                <p class="table-row__p-status status--purple"><?= format_price($stock['fld_allocation']) ?>%</p>
+                                                <p class="table-row__p-status status--purple"><?= render_stars($stock['fld_rating']) ?></p>
                                             </td>
                                             <td data-column="Status" class="table-row__td text-center">
                                                 <a class="sc-primary-btn less-pad btn-color-<?= strtolower($stock['fld_action']) == 'buy' ? '6' : '8' ?> text-center sc-mt-5 sc-mb-0" href="javascript:void(0);" style="cursor: auto;"><?= $stock['fld_action'] ?></a>
@@ -77,7 +77,7 @@
                                             <td class="table-row__td text-center">
                                                 <p class="table-row__progress status--blue">
                                                     <?php if (!empty($stock['fld_report_url'])): ?>
-                                                        <a href="#" class="open-pdf" data-pdf="<?= base_url($stock['fld_report_url']) ?>" data-stock="<?= $stock['fld_stock_name'] ?>">
+                                                        <a href="#" class="open-pdf" data-type="stock" data-file="<?= basename($stock['fld_report_url']) ?>" data-stock="<?= $stock['fld_stock_name'] ?>">
                                                             <img src="<?= base_url('images/icon-report.svg') ?>">
                                                         </a>
                                                     <?php endif; ?>
@@ -278,24 +278,34 @@
             
             <!-- Scuttlebutt Notes -->
             <div class="col-lg-4 col-12">
-                <div class="sidebar-popular-post sc-mb-20" style="height:450px;">
+                <div class="sidebar-popular-post sc-mb-20" style="height:400px;">
                     <div class="sidebar-title sc-mb-5 d-flex justify-content-between align-items-center">
                         <h3 class="font-lg-20-bold sc-mb-0">Scuttlebutt Notes</h3>
                         <?php if ($hasAccess): ?>
-                            <a href="javascript:void(0);" data-product="2" class="font-lg-16-bold font-purple scuttlebutt-trigger" data-bs-toggle="modal" data-bs-target="#scuttlebut-modal">See All</a>
+                            <a href="javascript:void(0);" data-product="<?= $product['id'] ?>" class="font-lg-16-bold font-purple scuttlebutt-trigger" data-bs-toggle="modal" data-bs-target="#scuttlebut-modal">See All</a>
                         <?php else: ?>
-                            <a href="#" class="font-lg-16-bold font-purple">See All</a>
+                            <a href="javascript:void(0);" class="font-lg-16-bold font-purple">See All</a>
                         <?php endif; ?>
                     </div>
                     <?php if (!$hasAccess): ?>
                         <img src="<?= base_url('uploads/blur/e6.png') ?>" alt="Subscribe to view content" style="width: 100%;">
                     <?php else: ?>
-                        <p class="font-lg-14-normal font-green sc-mt-0 sc-mb-10"><img src="images/icon-bell.svg"> New Update on 23/10/2025</p>
-                        <p class="font-lg-14-normal font-black sc-mt-0 sc-mb-10"><b></b></p>
-                        <div class="sc-mb-10 " style="border:0px;">
-                            <img src="images/scuttlebut_logo/scuttlebut2.jpg" class="bdr-radii" style="width:100%;">                                   
-                        </div>
-                        <p>On 15th of October, we had a plant visit and management meet for <strong>Munish Forge Ltd.</strong></p>
+                        <?php if ($dashboardScuttlebutt): ?>
+                            <p class="font-lg-14-normal font-green sc-mt-0 sc-mb-10"><img src="images/icon-bell.svg"> New Update on <?= date('d/m/Y', strtotime($dashboardScuttlebutt['fld_updated_date'])) ?></p>
+                            <p class="font-lg-14-normal font-black sc-mt-0 sc-mb-10"><b></b></p>
+                            <div class="sc-mb-10 " style="border:0px;">
+                                <img src="<?= base_url($dashboardScuttlebutt['fld_image']) ?>" class="bdr-radii" style="width:100%;">                                   
+                            </div>
+                            <p><?= $dashboardScuttlebutt['fld_description'] ?></p>
+                        <?php else: ?>
+                            <!-- Fallback to default content if no dashboard scuttlebutt is set -->
+                            <p class="font-lg-14-normal font-green sc-mt-0 sc-mb-10"><img src="images/icon-bell.svg"> New Update on 23/10/2025</p>
+                            <p class="font-lg-14-normal font-black sc-mt-0 sc-mb-10"><b></b></p>
+                            <div class="sc-mb-10 " style="border:0px;">
+                                <img src="images/scuttlebut_logo/scuttlebut1.nseindia.com.png" class="bdr-radii" style="width:100%;">                                   
+                            </div>
+                            <p>In April 2025, We had a management meet with <strong>Tara Chand Infralogistic Solutions Ltd</strong> attended by Himanshu Aggarwal, WTD & CFO.</p>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -322,9 +332,9 @@
                                 <div class="white-box d-flex gap-lg-3 justify-content-between align-items-center" style="margin-bottom:20px;">
                                     <div class="company-logo"><img src="<?= base_url($update['fld_image']) ?>"></div>
                                     <h3 class="font-lg-16-bold"><?= htmlspecialchars(strlen($update['fld_title']) > 30 ? substr($update['fld_title'], 0, 30) . '...' : $update['fld_title']) ?></h3>
-                                    <h3 class="font-lg-14-normal font-green chemical" style="margin:0; margin-left:auto; text-align:right;">
+                                    <a href="<?= $update['fld_url'] ?>" target="_blank" class="font-lg-14-normal font-green chemical" style="margin:0; margin-left:auto; text-align:right; cursor: pointer;">
                                         <img src="<?= base_url('images/blog.png') ?>">
-                                    </h3>
+                                    </a>
                                 </div>
                             <?php endforeach; ?>
                         <?php else: ?>

@@ -129,6 +129,20 @@ if (!function_exists('short_text')) {
     }
 }
 
+if (!function_exists('short_text_char')) {
+    function short_text_char(string $text, int $limit = 100, string $end = '...'): string
+    {
+        $text = strip_tags($text);
+
+        if (mb_strlen($text) <= $limit) {
+            return $text;
+        }
+
+        return mb_substr($text, 0, $limit) . $end;
+    }
+}
+
+
 if (!function_exists('checkUserKycStatus')) {
     function checkUserKycStatus($userId)
     {
@@ -149,5 +163,37 @@ if (!function_exists('checkUserKycStatus')) {
         }
         
         return false;
+    }
+}
+
+function render_stars($rating, $max = 5) {
+    $rating = min(max((int)$rating, 0), $max);
+
+    $html = '';
+    for ($i = 1; $i <= $max; $i++) {
+        $html .= $i <= $rating ? '⭐' : '';
+    }
+    return $html;
+}
+
+if (!function_exists('asset_versioned')) {
+
+    /**
+     * Return URL with file modification timestamp for cache busting
+     *
+     * @param string $path Relative path from /public folder, e.g., 'js/pdf-viewer.js'
+     * @return string Full URL with ?v=timestamp
+     */
+    function asset_versioned(string $path): string
+    {
+        $file = FCPATH . $path;
+
+        if (file_exists($file)) {
+            $version = filemtime($file);
+        } else {
+            $version = time(); // fallback to current time
+        }
+
+        return base_url($path) . '?v=' . $version;
     }
 }

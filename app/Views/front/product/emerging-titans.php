@@ -21,7 +21,8 @@
                     
                     <div class="col-md-6 col-6 sal-animate" data-sal="slide-up" data-sal-duration="400" data-sal-delay="400">
                         <div class="sc-statistics-service-box h-md-400 sc-mb-25 text-center">
-                            <img src="images/product/img-nutshell-1.svg" class="sc-pb-10 sc-md-pb-20">
+                            <?php $emergingTitansInvestmentHorizonImage = $pageImages['emerging_titans']['investment_horizon'] ?? null; ?>
+                            <img src="<?= base_url($emergingTitansInvestmentHorizonImage['image_path'] ?? 'images/product/img-nutshell-1.svg') ?>" class="sc-pb-10 sc-md-pb-20" alt="<?= esc($emergingTitansInvestmentHorizonImage['image_alt'] ?? '') ?>" loading="lazy">
                             <p class="sc-mb-0 sc-pb-0 sc-md-pb-10 font-lg-16-normal font-16-normal">Investment Horizon</p>
                             <h4 class="font-lg-20-bold font-20-bold"><?= esc($product['fld_holding_period']) ?></h4>
                         </div>
@@ -29,7 +30,8 @@
                     
                     <div class="col-md-6 col-6 sal-animate" data-sal="slide-up" data-sal-duration="500" data-sal-delay="500">
                         <div class="sc-statistics-service-box h-md-400 sc-mb-25 text-center">
-                            <img src="images/product/img-nutshell-2.svg" class="sc-pb-10 sc-md-pb-20">
+                            <?php $emergingTitansMinimumInvestmentImage = $pageImages['emerging_titans']['minimum_investment'] ?? null; ?>
+                            <img src="<?= base_url($emergingTitansMinimumInvestmentImage['image_path'] ?? 'images/product/img-nutshell-2.svg') ?>" class="sc-pb-10 sc-md-pb-20" alt="<?= esc($emergingTitansMinimumInvestmentImage['image_alt'] ?? '') ?>" loading="lazy">
                             <p class="sc-mb-0 sc-pb-0 sc-md-pb-10 font-lg-16-normal font-16-normal">Minimum Investment</p>
                             <h4 class="font-lg-20-bold font-20-bold"><i class="fa fa-inr"></i>&nbsp;<?= number_format($product['fld_minimum_investment'],0) ?></h4>
                         </div>
@@ -37,7 +39,8 @@
                     
                     <div class="col-md-6 col-6 sal-animate" data-sal="slide-up" data-sal-duration="600" data-sal-delay="600">
                         <div class="sc-statistics-service-box h-md-400 sc-mb-25 text-center">
-                            <img src="images/product/img-nutshell-3-new.svg" class="sc-pb-10 sc-md-pb-20">
+                            <?php $emergingTitansRebalanceFrequencyImage = $pageImages['emerging_titans']['rebalance_frequency'] ?? null; ?>
+                            <img src="<?= base_url($emergingTitansRebalanceFrequencyImage['image_path'] ?? 'images/product/img-nutshell-3-new.svg') ?>" class="sc-pb-10 sc-md-pb-20" alt="<?= esc($emergingTitansRebalanceFrequencyImage['image_alt'] ?? '') ?>" loading="lazy">
                             <p class="sc-mb-0 sc-pb-0 sc-md-pb-10 font-lg-16-normal font-16-normal">Rebalance Frequency</p>
                             <h4 class="font-lg-20-bold font-20-bold"><?= esc($product['fld_rebalance_frequency']) ?></h4>
                         </div>
@@ -45,7 +48,8 @@
                     
                     <div class="col-md-6 col-6 sal-animate" data-sal="slide-up" data-sal-duration="700" data-sal-delay="700">
                         <div class="sc-statistics-service-box h-md-400 sc-mb-25 text-center">
-                            <img src="images/product/img-nutshell-4.svg" class="sc-pb-10 sc-md-pb-20">
+                            <?php $emergingTitansNextRebalanceImage = $pageImages['emerging_titans']['next_rebalance'] ?? null; ?>
+                            <img src="<?= base_url($emergingTitansNextRebalanceImage['image_path'] ?? 'images/product/img-nutshell-4.svg') ?>" class="sc-pb-10 sc-md-pb-20" alt="<?= esc($emergingTitansNextRebalanceImage['image_alt'] ?? '') ?>" loading="lazy">
                             <p class="sc-mb-0 sc-pb-0 sc-md-pb-10 font-lg-16-normal font-16-normal">Next Rebalance</p>
                             <h4 class="font-lg-20-bold font-20-bold"><?= esc($product['fld_next_rebalance']) ?></h4>
                         </div>
@@ -56,7 +60,8 @@
             <div class="col-lg-5 order-first order-md-0">
                 <div class="sc-statistics-left-content">                               
                     <div class="sc-ab-image sal-animate" data-sal="slide-up" data-sal-duration="800" data-sal-delay="250">
-                        <img class="sc-border-radius" src="images/product/empowering-new.svg" alt="" style="margin:0px auto;">
+                        <?php $emergingTitansMainImage = $pageImages['emerging_titans']['main_image'] ?? null; ?>
+                        <img class="sc-border-radius" src="<?= base_url($emergingTitansMainImage['image_path'] ?? 'images/product/empowering-new.svg') ?>" alt="<?= esc($emergingTitansMainImage['image_alt'] ?? '') ?>" style="margin:0px auto;" loading="lazy">
                     </div>								
                 </div>
             </div>
@@ -80,28 +85,55 @@
 
 <div class="sc-testimonial-section-three sc-pt-30 sc-pb-20">
     <div class="container my-4">
-        <div class="row">
-            <?php if (!empty($appImages)): ?>
-                <?php 
-                    // limit max 5 images
-                    $images = array_slice($appImages, 0, 5); 
-                    $col = 12 / count($images); // auto column width
-                ?>
-                
+
+        <?php if (!empty($appImages)): ?>
+            <?php 
+                $images = array_slice($appImages, 0, 5);
+                $count  = count($images);
+                $desktopCol = floor(12 / $count);
+                if ($desktopCol < 2) $desktopCol = 2;
+            ?>
+
+            <!-- ================= MOBILE SLIDER ================= -->
+            <div class="d-block d-md-none">
+                <div class="swiper sc-swiper-slider">
+                    <div class="swiper-wrapper">
+                        <?php foreach ($images as $image): ?>
+                            <div class="swiper-slide text-center">
+                                <img src="<?= base_url($image['fld_image']) ?>"
+                                     class="img-fluid w-100"
+                                     style="object-fit: cover;"
+                                     alt="Product Image">
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <!-- Optional Pagination -->
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+
+            <!-- ================= DESKTOP GRID ================= -->
+            <div class="row d-none d-md-flex">
                 <?php foreach ($images as $image): ?>
-                    <div class="col-<?php echo $col; ?> text-center mb-3- p-5">
-                        <img src="<?= base_url($image['fld_image']) ?>" class="img-fluid w-100" style="object-fit: cover;" alt="Product Image">
+                    <div class="col-md-<?= $desktopCol ?> text-center mb-3 p-2 p-md-5">
+                        <img src="<?= base_url($image['fld_image']) ?>"
+                             class="img-fluid w-100"
+                             style="object-fit: cover;"
+                             alt="Product Image">
                     </div>
                 <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
+            </div>
+
+        <?php endif; ?>
+
     </div>
 </div>
 
 
 <div class="sc-team-section-area sc-pb-40 sc-md-pb-20 sc-md-mt-0">
     <div class="container">
-        <div class="row sc-pt-0 sc-md-pt-40">
+        <div class="row sc-pt-0 sc-md-pt-40 sc-sm-pt-0">
             <div class="col-lg-12 col-md-12 d-none d-lg-block">
                 <div class="sc-heading-area sc-mb-25 text-center">
                     <h3 class="font-lg-32-bold font-20-bold">Product Features</h3>
@@ -162,7 +194,9 @@
                         </h5>
                     </div>	
                     
-                    <img src="images/product/empowering-01.svg">
+                    <?php $emergingTitansPricingImage1 = $pageImages['emerging_titans']['pricing_image_1'] ?? null; ?>
+                    <img src="<?= base_url($emergingTitansPricingImage1['image_path'] ?? 'images/product/empowering-01.svg') ?>" alt="<?= esc($emergingTitansPricingImage1['image_alt'] ?? '') ?>" loading="lazy">
+
                 </div>
                 
                 <h3 class="sc-mb-0 font-lg-36-bold font-36-bold text-md-center text-start">
@@ -173,7 +207,8 @@
             
             <div class="col-lg-8 col-md-12 dark-gray"> 
                 <div class="text-center sc-mt-40">
-                    <img src="images/product/price-iphone.svg">                   
+                    <?php $emergingTitansPricingImage2 = $pageImages['emerging_titans']['pricing_image_2'] ?? null; ?>
+                    <img src="<?= base_url($emergingTitansPricingImage2['image_path'] ?? 'images/product/price-iphone.svg') ?>" alt="<?= esc($emergingTitansPricingImage2['image_alt'] ?? '') ?>" loading="lazy">                   
                 </div>
             </div>
         </div>
@@ -369,5 +404,19 @@ font-size:13px;
 }
 
 </style>
+
+<script src="<?= base_url('front/js/swiper.min.js') ?>"></script>
+<script>
+    var philosophySwiper = new Swiper('.sc-swiper-slider', {
+        slidesPerView: 1,
+        spaceBetween: 15,
+        loop: false,
+        autoplay: false,
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        }
+    });    
+</script>
 
 <?= $this->include('front/footer') ?>

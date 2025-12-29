@@ -101,7 +101,13 @@
                 <div class="col-lg-7">
                     <div class="sc-statistics-left-content">
                         <div class="sc-ab-image sal-animate" data-sal="slide-up" data-sal-duration="800" data-sal-delay="250">
-                            <img class="sc-border-radius" src="images/home/img-home.svg" alt="">
+                            <?php 
+                            $homeMainImage = isset($pageImages['home']['main_image']) ? $pageImages['home']['main_image'] : null;
+                            if ($homeMainImage): ?>
+                                <img class="sc-border-radius" src="<?= base_url($homeMainImage['image_path']) ?>" alt="<?= $homeMainImage['image_alt'] ?>">
+                            <?php else: ?>
+                                <img class="sc-border-radius" src="images/home/img-home.svg" alt="">
+                            <?php endif; ?>
                         </div>
                         <div class="sc-heading-area sc-mb-35">
                             <h1 class="text-md-start text-center sc-mt-20 font-lg-40-bold font-24-bold">
@@ -181,12 +187,24 @@
             <div class="col-lg-12 col-md-12">
                 <div class="offer-strip d-lg-flex justify-content-between align-items-center" style="background:#F0FFDF; border-radius:8px; padding:20px;border: none;">
                     <div class="left-content d-lg-flex d-inline-block">
-                        <img src="images/home/img-substack.svg" class="w-150 d-none d-md-block">
+                        <?php 
+                        $homeSubstackImage = isset($pageImages['home']['join_substack']) ? $pageImages['home']['join_substack'] : null;
+                        if ($homeSubstackImage): ?>
+                            <img src="<?= base_url($homeSubstackImage['image_path']) ?>" alt="<?= $homeSubstackImage['image_alt'] ?>" class="d-none d-md-block" style="text-align:center; margin:0px auto;">
+                        <?php else: ?>
+                            <img src="images/home/img-substack.svg" class="d-none d-md-block" style="text-align:center; margin:0px auto;">
+                        <?php endif; ?>
                         <h2 class="d-none d-md-block title-24 sc-lg-ml-26 font-lg-24-bold">
                             Stay ahead in small &amp; mid-cap investing.						
                             <p class="font-lg-16-normal">Join our Substack for exclusive research, insights,<br> and updates delivered straight to you.</p>
                         </h2>
-                        <img src="images/home/img-substack.svg" class="d-block d-md-none" style="width:100px; text-align:center; margin:0px auto;">  
+                        <?php 
+                        $homeSubstackImage = isset($pageImages['home']['join_substack']) ? $pageImages['home']['join_substack'] : null;
+                        if ($homeSubstackImage): ?>
+                            <img src="<?= base_url($homeSubstackImage['image_path']) ?>" alt="<?= $homeSubstackImage['image_alt'] ?>" class="d-block d-md-none" style="text-align:center; margin:0px auto;">
+                        <?php else: ?>
+                            <img src="images/home/img-substack.svg" class="d-block d-md-none" style="text-align:center; margin:0px auto;">
+                        <?php endif; ?>
                         <h2 class="d-block d-md-none text-center font-20-bold sc-pb-0 sc-md-pb-20">
                             Join our Substack
                             <span class="txt2 font-16-normal">Stay ahead with actionable insights and expert analysis to elevate your investment expertise.</span>
@@ -311,12 +329,12 @@
                                 ?>
                                     <img src="<?= base_url($appImages[$product['id']][0]['fld_image']) ?>" width="240">
                                 <?php else: ?>
-                                    <img src="images/product/default-product-image.png" width="240">
+                                    <img src="<?= base_url('images/product/default-product-image.png') ?>" width="240">
                                 <?php endif; ?>
                             </div>
                             <div class="titan-box">
                                 <div class="text-center">
-                                    <img src="images/product/empowering-01.svg">
+                                    <img src="<?= base_url('images/product/empowering-01.svg') ?>">
                                     <h3 class="sc-mb-0 font-lg-36-bold font-36-bold text-md-center text-start">₹<?= number_format($product['fld_pricing'], 0) ?></h3>
                                     <p class="font-lg-18-normal font-18-medium text-md-center text-start">(12 month subscription)</p>
                                 </div>
@@ -407,7 +425,7 @@
                             
                             <!-- Price -->
                             <div class="titan-box text-center">
-                                <img src="images/product/empowering-01.svg">
+                                <img src="<?= base_url('images/product/empowering-01.svg') ?>">
                                 <h3 class="sc-mb-0 font-lg-36-bold font-36-bold">₹<?= number_format($product['fld_pricing'], 2) ?></h3>
                                 <p class="font-lg-18-normal font-18-medium">(12 month subscription)</p>
                             </div>
@@ -435,8 +453,11 @@
                 <div class="col-lg-12 col-md-12">
                 <div class="offer-strip d-lg-flex justify-content-between align-items-center" style="background:#F7F7F7; border-radius:8px; padding:20px; border: none;">
                     <div class="left-content">
-                    <img src="images/shashank.jpeg" class="sc-md-mb-10 rounded-circle" style="width:84px; height:84px;">
-                
+                        
+                    <?php $shashankImageData = $pageImages['home']['shashank_image'] ?? null; ?>
+
+                        <img src="<?= base_url($shashankImageData['image_path'] ?? 'images/shashank.jpeg') ?>" alt="<?= esc($shashankImageData['image_alt'] ?? 'Shashank') ?>" class="sc-md-mb-10 rounded-circle border" loading="lazy">
+
                         <h2 class="title-24 font-20-bold" style="line-height:26px; margin-left:26px;">
                         Value Educator							
                         <span class="txt2 font-lg-16-normal font-14-normal">@Value Educator • 143k subscribers</span></h2>
@@ -475,9 +496,9 @@
                                     <div class="sc-auother-header sc-mt-20">
                                         <div class="min-hgt-70">
                                             <h5 class="font-lg-20-bold"><?= esc($video['fld_title']) ?></h5>
-                                            <p class="font-lg-16-normal"><?= character_limiter(strip_tags($video['fld_description']), 100) ?></p>
+                                            <p class="font-lg-16-normal"><?= short_text_char(strip_tags($video['fld_description']), 100) ?></p>
                                         </div>
-                                        <p class="views font-lg-16-normal"><?= shortNumber($video['fld_total_views']) ?> views • Posted <?= time_ago(strtotime($video['fld_created_at'])) ?></p>
+                                        <p class="views font-lg-16-normal"><?= shortNumber($video['fld_total_views']) ?> views • Posted <?= time_ago(strtotime($video['fld_posted_at'])) ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -498,7 +519,8 @@
                     <span class="sub-title sc-mb-0 font-16-normal"> Our Founder</span>
                     <h3 class="sc-mb-25 sc-mt-0 font-20-bold">Shashank Mahajan</h3>
                 </div>
-                <img class="sc-border-radius" src="images/home/founder.svg" alt="">
+                <?php $homeFounderImage = $pageImages['home']['founder_image'] ?? null; ?>
+                <img class="sc-border-radius" src="<?= base_url($homeFounderImage['image_path'] ?? 'images/home/founder.svg') ?>" alt="<?= esc($homeFounderImage['image_alt'] ?? '') ?>" loading="lazy">
             </div>
             <div class="col-lg-7 col-md-6">
                 <div class="sc-heading-area sc-mb-35 sc-md-pt-50 text-justify">
@@ -574,7 +596,7 @@
 
 <?= $this->include('front/footer') ?>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/themes/odometer-theme-default.min.css" />
+<link rel="stylesheet" href="<?= base_url('front/css/odometer-theme-default.css') ?>" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.js"></script>
 
 <script>

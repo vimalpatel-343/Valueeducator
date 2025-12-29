@@ -54,7 +54,7 @@ class SiteSettings extends BaseController
                     unlink($this->request->getPost('current_header_logo'));
                 }
                 
-                $newName = $file->getRandomName();
+                $newName = $file->getName();
                 $file->move('uploads/site', $newName);
                 $headerLogo = 'uploads/site/' . $newName;
             }
@@ -69,7 +69,7 @@ class SiteSettings extends BaseController
                     unlink($this->request->getPost('current_footer_logo'));
                 }
                 
-                $newName = $file->getRandomName();
+                $newName = $file->getName();
                 $file->move('uploads/site', $newName);
                 $footerLogo = 'uploads/site/' . $newName;
             }
@@ -84,7 +84,7 @@ class SiteSettings extends BaseController
                     unlink($this->request->getPost('current_ebook'));
                 }
                 
-                $newName = $file->getRandomName();
+                $newName = $file->getName();
                 $file->move('uploads/ebooks', $newName);
                 $ebook = 'uploads/ebooks/' . $newName;
             }

@@ -1,328 +1,170 @@
-/**
- * Reusable PDF Viewer
- * Prevents downloading, copying, and right-clicking
- */
-class PDFViewer {
-    constructor() {
-        this.modal = null;
-        this.pdfViewer = null;
-        this.pdfTitle = null;
-        this.initialized = false;
-        this.init();
-    }
-
-    init() {
-        // Add polyfill for closest if not available
-        if (!Element.prototype.closest) {
-            Element.prototype.closest = function(s) {
-                var el = this;
-                do {
-                    if (el.matches && el.matches(s)) return el;
-                    el = el.parentElement || el.parentNode;
-                } while (el !== null && el.nodeType === 1);
-                return null;
-            };
-        }
+document.querySelectorAll('.open-pdf').forEach(el => {
+    el.addEventListener('click', function (e) {
+        e.preventDefault();
         
-        // Create modal if it doesn't exist
-        this.createModal();
+        const file = this.dataset.file;
+        const type = this.dataset.type;
+        const stock = this.dataset.stock || '';
         
-        // Initialize modal after a short delay to ensure DOM is ready
-        setTimeout(() => {
-            this.initializeModal();
-        }, 100);
-    }
-
-    createModal() {
-        // Check if modal already exists
-        if (document.getElementById('pdfModal')) {
-            return;
-        }
-
-        const modalHTML = `
-            <div class="modal fade" id="pdfModal" tabindex="-1" aria-hidden="true" style="z-index: 99999999 !important;">
-                <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 98%;">
-                    <div class="modal-content p-0" style="border-radius: 6px;">
-                        <!-- Title Bar -->
-                        <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                            <h5 class="m-0" id="pdfTitle"></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <!-- PDF Body -->
-                        <div class="modal-body p-0">
-                            <div id="pdfViewer" style="width:100%; height:88vh; overflow:auto; background:#f0f0f0; position: relative; text-align: center;">
-                                <div class="pdf-loading text-center py-5">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Loading...</span>
+        // Show loading indicator
+        const originalHtml = this.innerHTML;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        
+        // Function to open PDF with token
+        const openPdf = () => {
+            fetch('/pdf/generate-token/' + type + '/' + file, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const viewerUrl = '/pdfjs/web/viewer.html?file=' + 
+                        encodeURIComponent('/pdf/view-with-token/' + data.token);
+                    
+                    // Open in new tab
+                    const newWindow = window.open(viewerUrl, '_blank');
+                    
+                    // Focus on new window
+                    if (newWindow) {
+                        newWindow.focus();
+                        
+                        // Set up a timer to refresh the token before it expires
+                        setTimeout(() => {
+                            // Check if the window is still open
+                            if (!newWindow.closed) {
+                                // Generate a new token silently
+                                fetch('/pdf/generate-token/' + type + '/' + file, {
+                                    method: 'GET',
+                                    headers: {
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    }
+                                }).catch(error => {
+                                    console.log('Token refresh failed:', error);
+                                });
+                            }
+                        }, 240000); // Refresh at 4 minutes (before 5 minute expiry)
+                    }
+                } else {
+                    this.showErrorMessage(data.message, data.error_type);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.showErrorMessage('An error occurred while loading the PDF', 'network_error');
+            })
+            .finally(() => {
+                // Restore original HTML
+                this.innerHTML = originalHtml;
+            });
+        };
+        
+        // Open PDF immediately
+        openPdf();
+    });
+    
+    // Method to show error message
+    this.showErrorMessage = function(message, errorType) {
+        // Create a modal or alert based on error type
+        let modalHtml = '';
+        
+        switch(errorType) {
+            case 'auth_required':
+                modalHtml = `
+                    <div class="modal fade" id="pdfErrorModal" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-warning">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-user-lock me-2"></i>Authentication Required
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>${message}</p>
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="/auth" class="btn btn-primary">
+                                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                                        </a>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     </div>
-                                    <p class="mt-2">Loading PDF...</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-    }
-
-    initializeModal() {
-        // Get modal elements
-        const modalElement = document.getElementById('pdfModal');
-        if (!modalElement) {
-            console.error('PDF Modal not found');
-            return;
-        }
-
-        // Initialize Bootstrap modal
-        this.modal = new bootstrap.Modal(modalElement);
-        this.pdfViewer = document.getElementById('pdfViewer');
-        this.pdfTitle = document.getElementById('pdfTitle');
-
-        // Check if elements exist
-        if (!this.pdfViewer || !this.pdfTitle) {
-            console.error('PDF Viewer elements not found');
-            return;
-        }
-
-        // Bind events
-        this.bindEvents();
-        this.initialized = true;
-    }
-
-    bindEvents() {
-        // Handle PDF links
-        document.addEventListener('click', (e) => {
-            // Use a safe method to find the closest element
-            let target = e.target;
-            while (target && target !== document) {
-                if (target.classList && target.classList.contains('open-pdf')) {
-                    e.preventDefault();
-                    const pdfUrl = target.getAttribute('data-pdf');
-                    const stockName = target.getAttribute('data-stock') || 'PDF Viewer';
-                    
-                    // Ensure modal is initialized before opening
-                    if (!this.initialized) {
-                        this.initializeModal();
-                    }
-                    
-                    this.openPDF(pdfUrl, stockName);
-                    break;
-                }
-                target = target.parentElement || target.parentNode;
-            }
-        });
-
-        // Disable right-click on modal
-        document.addEventListener('contextmenu', (e) => {
-
-            const target = (e.target.nodeType === 1) ? e.target : e.target.parentElement;
-            if (target && (target.closest('#pdfModal') || target.closest('#pdfViewer'))) {
-
-                e.preventDefault();
-                return false;
-            }
-        });
-
-        // Disable keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            // Check if modal is open
-            const modal = document.getElementById('pdfModal');
-            if (modal && modal.classList.contains('show')) {
-                // Ctrl+S (Save)
-                if (e.ctrlKey && e.keyCode === 83) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Ctrl+P (Print)
-                if (e.ctrlKey && e.keyCode === 80) {
-                    e.preventDefault();
-                    return false;
-                }
-                // F12 (Developer Tools)
-                if (e.keyCode === 123) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Ctrl+Shift+I (Developer Tools)
-                if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Ctrl+Shift+J (Console)
-                if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
-                    e.preventDefault();
-                    return false;
-                }
-            }
-        });
-
-        // Disable text selection in PDF viewer
-        document.addEventListener('selectstart', (e) => {
-            let el = e.target.nodeType === 1 ? e.target : e.target.parentElement;
-            if (el && el.closest('#pdfViewer')) {
-                e.preventDefault();
-                return false;
-            }
-        });
-
-        // Disable drag and drop
-        document.addEventListener('dragstart', (e) => {
-            let el = e.target.nodeType === 1 ? e.target : e.target.parentElement;
-            if (el && el.closest('#pdfViewer')) {
-                e.preventDefault();
-                return false;
-            }
-        });
-    }
-
-    async openPDF(url, title) {
-        // Ensure modal is initialized
-        if (!this.initialized) {
-            this.initializeModal();
-        }
-
-        // Set title
-        if (this.pdfTitle) {
-            this.pdfTitle.textContent = title;
-        }
-        
-        // Show loading indicator
-        if (this.pdfViewer) {
-            this.pdfViewer.innerHTML = `
-                <div class="pdf-loading text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-2">Loading PDF...</p>
-                </div>
-            `;
-        }
-        
-        // Show modal
-        if (this.modal) {
-            this.modal.show();
-        }
-        
-        try {
-            // Load PDF.js if not already loaded
-            if (typeof pdfjsLib === 'undefined') {
-                await this.loadPDFJS();
-            }
-            
-            // Set worker source
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-            
-            // Load PDF document
-            const loadingTask = pdfjsLib.getDocument(url);
-            const pdf = await loadingTask.promise;
-            
-            // Clear loading indicator
-            if (this.pdfViewer) {
-                this.pdfViewer.innerHTML = '';
-            }
-            
-            // Render all pages
-            const renderScale = 3; // Adjust scale for better quality
-            
-            for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-                const page = await pdf.getPage(pageNumber);
+                `;
+                break;
                 
-                // Create viewport
-                const viewport = page.getViewport({ scale: renderScale });
-                
-                // Create canvas
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                
-                // Create container for canvas
-                const container = document.createElement('div');
-                container.className = 'pdf-page-container';
-                container.style.marginBottom = '20px';
-                container.style.textAlign = 'center';
-                
-                // Render PDF page
-                const renderContext = {
-                    canvasContext: context,
-                    viewport: viewport
-                };
-                
-                await page.render(renderContext).promise;
-                
-                // Add canvas to container
-                container.appendChild(canvas);
-                
-                // Add watermark
-                this.addWatermark(container);
-                
-                // Add page number
-                const pageNum = document.createElement('div');
-                pageNum.className = 'pdf-page-number';
-                pageNum.textContent = `Page ${pageNumber} of ${pdf.numPages}`;
-                pageNum.style.marginTop = '10px';
-                pageNum.style.fontSize = '12px';
-                pageNum.style.color = '#666';
-                container.appendChild(pageNum);
-                
-                // Add container to viewer
-                if (this.pdfViewer) {
-                    this.pdfViewer.appendChild(container);
-                }
-            }
-            
-            // Scroll to top
-            if (this.pdfViewer) {
-                this.pdfViewer.scrollTop = 0;
-            }
-            
-        } catch (error) {
-            console.error('Error loading PDF:', error);
-            if (this.pdfViewer) {
-                this.pdfViewer.innerHTML = `
-                    <div class="alert alert-danger m-3">
-                        Failed to load PDF. Please try again later.
+            case 'no_subscription':
+            case 'product_access_denied':
+                modalHtml = `
+                    <div class="modal fade" id="pdfErrorModal" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-lock me-2"></i>Access Denied
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>${message}</p>
+                                    <p class="text-muted small">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        PDF links are valid for 5 minutes and can be refreshed.
+                                    </p>
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="/emerging-titans" class="btn btn-primary">
+                                            <i class="fas fa-crown me-2"></i>View Plans
+                                        </a>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 `;
-            }
+                break;
+                
+            default:
+                modalHtml = `
+                    <div class="modal fade" id="pdfErrorModal" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-info">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>Unable to Load PDF
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>${message}</p>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
         }
-    }
-
-    addWatermark(container) {
-        const watermark = document.createElement('div');
-        watermark.style.position = 'absolute';
-        watermark.style.top = '50%';
-        watermark.style.left = '50%';
-        watermark.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
-        watermark.style.fontSize = '48px';
-        watermark.style.color = 'rgba(200, 200, 200, 0.3)';
-        watermark.style.fontWeight = 'bold';
-        watermark.style.pointerEvents = 'none';
-        watermark.style.userSelect = 'none';
-        watermark.style.zIndex = '1000';
-        watermark.textContent = 'CONFIDENTIAL';
-        container.style.position = 'relative';
-        container.appendChild(watermark);
-    }
-
-    async loadPDFJS() {
-        return new Promise((resolve, reject) => {
-            if (typeof pdfjsLib !== 'undefined') {
-                resolve();
-                return;
-            }
-            
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
+        
+        // Remove existing modal if any
+        const existingModal = document.getElementById('pdfErrorModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // Add modal to body and show it
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const modal = new bootstrap.Modal(document.getElementById('pdfErrorModal'));
+        modal.show();
+        
+        // Clean up modal after hidden
+        document.getElementById('pdfErrorModal').addEventListener('hidden.bs.modal', function () {
+            this.remove();
         });
-    }
-}
-
-// Initialize PDF Viewer when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    window.pdfViewer = new PDFViewer();
+    };
 });

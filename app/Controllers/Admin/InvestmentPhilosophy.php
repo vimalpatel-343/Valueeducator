@@ -50,7 +50,7 @@ class InvestmentPhilosophy extends BaseController
         $image = '';
         if ($file = $this->request->getFile('image')) {
             if ($file->isValid() && !$file->hasMoved()) {
-                $newName = $file->getRandomName();
+                $newName = $file->getName();
                 $file->move('uploads/investment_philosophy', $newName);
                 $image = 'uploads/investment_philosophy/' . $newName;
             }
@@ -62,7 +62,7 @@ class InvestmentPhilosophy extends BaseController
             if (isset($files['images']) && is_array($files['images'])) {
                 foreach ($files['images'] as $file) {
                     if ($file->isValid() && !$file->hasMoved()) {
-                        $newName = $file->getRandomName();
+                        $newName = $file->getName();
                         $file->move('uploads/investment_philosophy', $newName);
                         $multipleImages[] = 'uploads/investment_philosophy/' . $newName;
                     }
@@ -146,7 +146,7 @@ class InvestmentPhilosophy extends BaseController
                     unlink($philosophy['fld_image']);
                 }
                 
-                $newName = $file->getRandomName();
+                $newName = $file->getName();
                 $file->move('uploads/investment_philosophy', $newName);
                 $image = 'uploads/investment_philosophy/' . $newName;
             }
@@ -167,7 +167,7 @@ class InvestmentPhilosophy extends BaseController
             if (isset($files['images']) && is_array($files['images'])) {
                 foreach ($files['images'] as $file) {
                     if ($file->isValid() && !$file->hasMoved()) {
-                        $newName = $file->getRandomName();
+                        $newName = $file->getName();
                         $file->move('uploads/investment_philosophy', $newName);
                         $multipleImages[] = 'uploads/investment_philosophy/' . $newName;
                     }

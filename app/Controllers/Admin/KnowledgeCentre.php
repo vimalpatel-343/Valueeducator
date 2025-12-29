@@ -53,7 +53,7 @@ class KnowledgeCentre extends BaseController
         // Handle image upload
         $image = $this->request->getFile('fld_image');
         if ($image && $image->isValid() && !$image->hasMoved()) {
-            $newName = $image->getRandomName();
+            $newName = $image->getName();
             $image->move(FCPATH . 'uploads/knowledge/categories', $newName);
             $imageName = 'uploads/knowledge/categories/' . $newName;
         } else {
@@ -122,7 +122,7 @@ class KnowledgeCentre extends BaseController
                 unlink(FCPATH . $category['fld_image']);
             }
             
-            $newName = $image->getRandomName();
+            $newName = $image->getName();
             $image->move(FCPATH . 'uploads/knowledge/categories', $newName);
             $imageName = 'uploads/knowledge/categories/' . $newName;
         } else {

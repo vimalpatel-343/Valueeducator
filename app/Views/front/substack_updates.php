@@ -37,7 +37,7 @@
                                 </a>
                                 <div class="substack-content">
                                     <h3 class="font-lg-24-bold sc-mt-10"><?= $item['fld_title'] ?></h3>
-                                    <p class="font-lg-16-normal"><?= $item['fld_description'] ?></p>
+                                    <p class="font-lg-16-normal"><?= short_text_char($item['fld_description'],200) ?></p>
                                 </div>
                                 <div class="substack-footer">
                                     <span class="arrow">

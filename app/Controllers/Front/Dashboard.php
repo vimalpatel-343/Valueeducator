@@ -52,22 +52,42 @@ class Dashboard extends BaseController
             return [
                 'hasAccess' => false,
                 'reason' => 'not_logged_in',
-                'showKycModal' => false
+                'showKycModal' => false,
+                'showSubscriptionExpiredModal' => false,
+                'expiredProducts' => []
             ];
         }
 
         $userId = session()->get('userId');
         $userSubscriptionModel = new \App\Models\UserSubscriptionModel();
         
-        // Check subscription status
-        $hasSubscription = $userSubscriptionModel->hasActiveSubscription($userId, $productId);
+        // Check subscription status for the requested product
+        $hasActiveSubscription = $userSubscriptionModel->hasActiveSubscription($userId, $productId);
         
-        // If no subscription, no need to check KYC
-        if (!$hasSubscription) {
+        // Check for expired subscriptions for both products
+        $db = \Config\Database::connect();
+        $expiredSubscriptions = $db->table('user_subscriptions')
+            ->where('user_id', $userId)
+            ->where('end_date <', date('Y-m-d'))
+            ->get()
+            ->getResultArray();
+        
+        $expiredProducts = [];
+        foreach ($expiredSubscriptions as $sub) {
+            $expiredProducts[] = $sub['product_id'];
+        }
+        
+        // If no active subscription for requested product
+        if (!$hasActiveSubscription) {
+            // Check if user has an expired subscription for this specific product
+            $showExpiredModal = in_array($productId, $expiredProducts);
+            
             return [
                 'hasAccess' => false,
                 'reason' => 'subscription',
-                'showKycModal' => false
+                'showKycModal' => false,
+                'showSubscriptionExpiredModal' => $showExpiredModal,
+                'expiredProducts' => $expiredProducts
             ];
         }
         
@@ -88,7 +108,9 @@ class Dashboard extends BaseController
         return [
             'hasAccess' => $hasKyc,
             'reason' => $hasKyc ? 'none' : 'kyc',
-            'showKycModal' => !$hasKyc
+            'showKycModal' => !$hasKyc,
+            'showSubscriptionExpiredModal' => false,
+            'expiredProducts' => $expiredProducts
         ];
     }
 
@@ -112,7 +134,9 @@ class Dashboard extends BaseController
         $accessStatus = $this->checkAccess($productId);
         $hasAccess = $accessStatus['hasAccess'];
         $showKycModal = $accessStatus['showKycModal'];
-        
+        $showSubscriptionExpiredModal = $accessStatus['showSubscriptionExpiredModal'];
+        $expiredProducts = $accessStatus['expiredProducts'];
+
         // Get product pricing
         $productPricing = $product['fld_pricing'] ?? 0;
 
@@ -183,11 +207,17 @@ class Dashboard extends BaseController
         // Get all products for comparison section
         $allProducts = $this->productModel->getAllActiveProducts();
 
+        $dashboardScuttlebuttModel = new \App\Models\DashboardScuttlebuttModel();
+        $dashboardScuttlebutt = $dashboardScuttlebuttModel->getByProductId($productId);
+
         $data = [
             'siteSettings' => $siteSettings,
             'product' => $product,
             'hasAccess' => $hasAccess,
             'showKycModal' => $showKycModal,
+            'showSubscriptionExpiredModal' => $showSubscriptionExpiredModal,
+            'expiredProducts' => $expiredProducts,
+            'currentProduct' => 'emerging-titans',
             'productPricing' => $productPricing,
             'latestRecommendations' => $latestRecommendations,
             'stockUpdates' => $stockUpdates,
@@ -197,6 +227,7 @@ class Dashboard extends BaseController
             'substackUpdates' => $substackUpdates,
             'youtubeVideos' => $youtubeVideos,
             'allProducts' => $allProducts,
+            'dashboardScuttlebutt' => $dashboardScuttlebutt,
             'meta' => [
                 'title' => 'Emerging Titans Dashboard - Value Educator',
                 'description' => 'Access your Emerging Titans dashboard with latest recommendations, stock updates, and more.'
@@ -286,6 +317,8 @@ class Dashboard extends BaseController
         $accessStatus = $this->checkAccess($productId);
         $hasAccess = $accessStatus['hasAccess'];
         $showKycModal = $accessStatus['showKycModal'];
+        $showSubscriptionExpiredModal = $accessStatus['showSubscriptionExpiredModal'];
+        $expiredProducts = $accessStatus['expiredProducts'];
         
         // Get product pricing
         $productPricing = $product['fld_pricing'] ?? 0;
@@ -357,11 +390,17 @@ class Dashboard extends BaseController
         // Get all products for comparison section
         $allProducts = $this->productModel->getAllActiveProducts();
 
+        $dashboardScuttlebuttModel = new \App\Models\DashboardScuttlebuttModel();
+        $dashboardScuttlebutt = $dashboardScuttlebuttModel->getByProductId($productId);
+
         $data = [
             'siteSettings' => $siteSettings,
             'product' => $product,
             'hasAccess' => $hasAccess,
             'showKycModal' => $showKycModal,
+            'showSubscriptionExpiredModal' => $showSubscriptionExpiredModal,
+            'expiredProducts' => $expiredProducts,
+            'currentProduct' => 'tiny-titans',
             'productPricing' => $productPricing,
             'latestRecommendations' => $latestRecommendations,
             'stockUpdates' => $stockUpdates,
@@ -371,6 +410,7 @@ class Dashboard extends BaseController
             'substackUpdates' => $substackUpdates,
             'youtubeVideos' => $youtubeVideos,
             'allProducts' => $allProducts,
+            'dashboardScuttlebutt' => $dashboardScuttlebutt,
             'meta' => [
                 'title' => 'Tiny Titans Dashboard - Value Educator',
                 'description' => 'Access your Tiny Titans dashboard with latest recommendations, stock updates, and more.'
@@ -400,6 +440,8 @@ class Dashboard extends BaseController
         $accessStatus = $this->checkAccess($productId);
         $hasAccess = $accessStatus['hasAccess'];
         $showKycModal = $accessStatus['showKycModal'];
+        $showSubscriptionExpiredModal = $accessStatus['showSubscriptionExpiredModal'];
+        $expiredProducts = $accessStatus['expiredProducts'];
         
         // Get product pricing
         $productPricing = $product['fld_pricing'] ?? 0;
@@ -497,7 +539,6 @@ class Dashboard extends BaseController
             ->where('su.fld_product_id', $productId)
             ->where('su.fld_status', 1)
             ->orderBy('su.fld_update_date', 'DESC')
-            ->limit(3)
             ->get()
             ->getResultArray();
         
@@ -512,6 +553,9 @@ class Dashboard extends BaseController
             'product' => $product,
             'hasAccess' => $hasAccess,
             'showKycModal' => $showKycModal,
+            'showSubscriptionExpiredModal' => $showSubscriptionExpiredModal,
+            'expiredProducts' => $expiredProducts,
+            'currentProduct' => 'emerging-titans',
             'productPricing' => $productPricing,
             'portfolioOverview' => $portfolioOverview,
             'portfolioDistribution' => $portfolioDistribution,
@@ -550,6 +594,8 @@ class Dashboard extends BaseController
         $accessStatus = $this->checkAccess($productId);
         $hasAccess = $accessStatus['hasAccess'];
         $showKycModal = $accessStatus['showKycModal'];
+        $showSubscriptionExpiredModal = $accessStatus['showSubscriptionExpiredModal'];
+        $expiredProducts = $accessStatus['expiredProducts'];
         
         // Get product pricing
         $productPricing = $product['fld_pricing'] ?? 0;
@@ -647,7 +693,6 @@ class Dashboard extends BaseController
             ->where('su.fld_product_id', $productId)
             ->where('su.fld_status', 1)
             ->orderBy('su.fld_update_date', 'DESC')
-            ->limit(3)
             ->get()
             ->getResultArray();
         
@@ -662,6 +707,9 @@ class Dashboard extends BaseController
             'product' => $product,
             'hasAccess' => $hasAccess,
             'showKycModal' => $showKycModal,
+            'showSubscriptionExpiredModal' => $showSubscriptionExpiredModal,
+            'expiredProducts' => $expiredProducts,
+            'currentProduct' => 'tiny-titans',
             'productPricing' => $productPricing,
             'portfolioOverview' => $portfolioOverview,
             'portfolioDistribution' => $portfolioDistribution,
@@ -700,6 +748,8 @@ class Dashboard extends BaseController
         $accessStatus = $this->checkAccess($productId);
         $hasAccess = $accessStatus['hasAccess'];
         $showKycModal = $accessStatus['showKycModal'];
+        $showSubscriptionExpiredModal = $accessStatus['showSubscriptionExpiredModal'];
+        $expiredProducts = $accessStatus['expiredProducts'];
                 
         if (!$hasAccess) {
             return redirect()->to('/');
@@ -722,6 +772,9 @@ class Dashboard extends BaseController
             'product' => $product,
             'hasAccess' => $hasAccess,
             'showKycModal' => $showKycModal,
+            'showSubscriptionExpiredModal' => $showSubscriptionExpiredModal,
+            'expiredProducts' => $expiredProducts,
+            'currentProduct' => 'emerging-titans',
             'managementInterviews' => $managementInterviews,
             'allProducts' => $allProducts,
             'meta' => [
@@ -753,6 +806,8 @@ class Dashboard extends BaseController
         $accessStatus = $this->checkAccess($productId);
         $hasAccess = $accessStatus['hasAccess'];
         $showKycModal = $accessStatus['showKycModal'];
+        $showSubscriptionExpiredModal = $accessStatus['showSubscriptionExpiredModal'];
+        $expiredProducts = $accessStatus['expiredProducts'];
         
         if (!$hasAccess) {
             return redirect()->to('/');
@@ -775,6 +830,9 @@ class Dashboard extends BaseController
             'product' => $product,
             'hasAccess' => $hasAccess,
             'showKycModal' => $showKycModal,
+            'showSubscriptionExpiredModal' => $showSubscriptionExpiredModal,
+            'expiredProducts' => $expiredProducts,
+            'currentProduct' => 'tiny-titans',
             'managementInterviews' => $managementInterviews,
             'allProducts' => $allProducts,
             'meta' => [
@@ -806,6 +864,8 @@ class Dashboard extends BaseController
         $accessStatus = $this->checkAccess($productId);
         $hasAccess = $accessStatus['hasAccess'];
         $showKycModal = $accessStatus['showKycModal'];
+        $showSubscriptionExpiredModal = $accessStatus['showSubscriptionExpiredModal'];
+        $expiredProducts = $accessStatus['expiredProducts'];
         
         if (!$hasAccess) {
             return redirect()->to('/');
@@ -829,6 +889,9 @@ class Dashboard extends BaseController
             'product' => $product,
             'hasAccess' => $hasAccess,
             'showKycModal' => $showKycModal,
+            'showSubscriptionExpiredModal' => $showSubscriptionExpiredModal,
+            'expiredProducts' => $expiredProducts,
+            'currentProduct' => 'emerging-titans',
             'quarterlyUpdates' => $quarterlyUpdates,
             'allProducts' => $allProducts,
             'meta' => [
@@ -860,6 +923,8 @@ class Dashboard extends BaseController
         $accessStatus = $this->checkAccess($productId);
         $hasAccess = $accessStatus['hasAccess'];
         $showKycModal = $accessStatus['showKycModal'];
+        $showSubscriptionExpiredModal = $accessStatus['showSubscriptionExpiredModal'];
+        $expiredProducts = $accessStatus['expiredProducts'];
         
         if (!$hasAccess) {
             return redirect()->to('/');
@@ -883,6 +948,9 @@ class Dashboard extends BaseController
             'product' => $product,
             'hasAccess' => $hasAccess,
             'showKycModal' => $showKycModal,
+            'showSubscriptionExpiredModal' => $showSubscriptionExpiredModal,
+            'expiredProducts' => $expiredProducts,
+            'currentProduct' => 'tiny-titans',
             'quarterlyUpdates' => $quarterlyUpdates,
             'allProducts' => $allProducts,
             'meta' => [

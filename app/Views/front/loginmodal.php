@@ -53,12 +53,12 @@
                     <form id="loginOtpFormElement">
                         <div class="mb-4">
                             <div class="otp-input-group d-flex justify-content-center gap-2">
-                                <input type="text" class="form-control otp-input" maxlength="1" data-index="0">
-                                <input type="text" class="form-control otp-input" maxlength="1" data-index="1">
-                                <input type="text" class="form-control otp-input" maxlength="1" data-index="2">
-                                <input type="text" class="form-control otp-input" maxlength="1" data-index="3">
-                                <input type="text" class="form-control otp-input" maxlength="1" data-index="4">
-                                <input type="text" class="form-control otp-input" maxlength="1" data-index="5">
+                                <input type="text" class="form-control otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="0">
+                                <input type="text" class="form-control otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="1">
+                                <input type="text" class="form-control otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="2">
+                                <input type="text" class="form-control otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="3">
+                                <input type="text" class="form-control otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="4">
+                                <input type="text" class="form-control otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="5">
                             </div>
                             <div class="invalid-feedback" id="loginOtpError"></div>
                         </div>
@@ -116,12 +116,12 @@
                     <form id="signupOtpFormElement">
                         <div class="mb-4">
                             <div class="otp-input-group d-flex justify-content-center gap-2">
-                                <input type="text" class="form-control otp-input" maxlength="1" data-index="0">
-                                <input type="text" class="form-control otp-input" maxlength="1" data-index="1">
-                                <input type="text" class="form-control otp-input" maxlength="1" data-index="2">
-                                <input type="text" class="form-control otp-input" maxlength="1" data-index="3">
-                                <input type="text" class="form-control otp-input" maxlength="1" data-index="4">
-                                <input type="text" class="form-control otp-input" maxlength="1" data-index="5">
+                                <input type="text" class="form-control otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="0">
+                                <input type="text" class="form-control otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="1">
+                                <input type="text" class="form-control otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="2">
+                                <input type="text" class="form-control otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="3">
+                                <input type="text" class="form-control otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="4">
+                                <input type="text" class="form-control otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="5">
                             </div>
                             <div class="invalid-feedback" id="signupOtpError"></div>
                         </div>
@@ -253,7 +253,7 @@
                     </div>
 
                     <div class="text-center mb-4">
-                        <img src="images/product/empowering-01.svg">
+                        <img src="<?= base_url('images/product/empowering-01.svg') ?>">
                     </div>
 
                     <div class="d-grid">

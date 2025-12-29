@@ -39,7 +39,7 @@
                     <img src="<?= base_url('uploads/blur/p1.png') ?>" alt="Subscribe to view content" style="width: 100%;">
                 <?php else: ?>
                     <div id="faqAccordion" class="accordion">
-                        <div class="accordion-item" style="margin-bottom:20px;">
+                        <div class="accordion-item sc-xs-mt-20" style="margin-bottom:20px;">
                             <h2 class="accordion-header" id="headingOne">
                                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                                     Disclaimer
@@ -63,8 +63,8 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-6 col-12">
-                <div class="d-lg-flex align-items-center">
-                    <img src="<?= base_url('images/icon-plan.svg') ?>" style="width:65px;" />
+                <div class="d-flex align-items-center">
+                    <img src="<?= base_url('images/icon-plan.svg') ?>" style="width:10%;" />
                     <h2 style="margin-left:10px;"><span class="font-lg-20-bold"><?= $product['fld_title'] ?></span></h2>
                 </div>
                 
@@ -145,7 +145,7 @@
                 <div class="d-flex justify-content-between align-items-center sc-mb-0 sc-md-mb-0">
                     <h3 class="font-lg-20-bold font-20-bold sc-mb-0">Tiny Titans Portfolio Updates</h3>
                     <?php if ($hasAccess): ?>
-                        <a href="<?= base_url('quarterlyModel') ?>" class="more font-lg-16-bold">See All</a>
+                        <a href="<?= base_url('quarterly-updates-tiny-titan') ?>" class="more font-lg-16-bold">See All</a>
                     <?php else: ?>
                         <a href="#" class="more font-lg-16-bold">See All</a>
                     <?php endif; ?>
@@ -205,7 +205,7 @@
                                     <th class="table__th">Stock Name</th>
                                     <th class="table__th">Date of Recommendation</th>
                                     <th class="table__th">Price at Recommendation</th>
-                                    <th class="table__th">Allocation</th>
+                                    <th class="table__th">Rating</th>
                                     <th class="table__th text-center">Action</th>
                                     <th class="table__th text-center">Report</th>
                                 </tr>
@@ -224,14 +224,14 @@
                                             <p class="table-row__p-status">Rs <?= format_price($stock['fld_price_at_recommendation']) ?></p>
                                         </td>
                                         <td class="table-row__td" data-column="Destination">
-                                            <p class="table-row__p-status status--purple"><?= format_price($stock['fld_allocation']) ?>%</p>
+                                            <p class="table-row__p-status status--purple"><?= render_stars($stock['fld_rating']) ?></p>
                                         </td>
                                         <td class="table-row__td text-center" data-column="Status">
                                             <a class="sc-primary-btn less-pad btn-color-<?= strtolower($stock['fld_action']) == 'buy' ? '6' : '8' ?> text-center sc-mt-5 sc-mb-0" href="javascript:void(0);" style="cursor: auto;"><?= $stock['fld_action'] ?></a>
                                         </td>
                                         <td class="table-row__td text-center" data-column="Progress">
                                             <?php if (!empty($stock['fld_report_url'])): ?>
-                                                <a href="#" class="open-pdf" data-pdf="<?= base_url($stock['fld_report_url']) ?>" data-stock="<?= $stock['fld_stock_name'] ?>">
+                                                <a href="#" class="open-pdf" data-type="stock" data-file="<?= basename($stock['fld_report_url']) ?>" data-stock="<?= $stock['fld_stock_name'] ?>">
                                                     <img src="<?= base_url('images/icon-report.svg') ?>" />
                                                 </a>
                                             <?php endif; ?>
@@ -273,7 +273,7 @@
                                     <th class="table__th" style="width: 15%;">Stock Name</th>
                                     <th class="table__th" style="width: 13%;">Date of Recommendation</th>
                                     <th class="table__th" style="width: 13%;">Price at Recommendation</th>
-                                    <th class="table__th" style="width: 8%;">Allocation</th>
+                                    <th class="table__th" style="width: 8%;">Rating</th>
                                     <th class="table__th text-center" style="width: 8%;">Action</th>
                                     <th class="table__th" style="width: 8%;">CMP</th>
                                     <th class="table__th">Sector</th>
@@ -296,7 +296,7 @@
                                             <p class="table-row__p-status" style="text-align: center;">Rs <?= format_price($stock['fld_price_at_recommendation']) ?></p>
                                         </td>
                                         <td class="table-row__td" data-column="Destination">
-                                            <p class="table-row__p-status status--purple"><?= format_price($stock['fld_allocation']) ?>%</p>
+                                            <p class="table-row__p-status status--purple"><?= render_stars($stock['fld_rating']) ?></p>
                                         </td>
                                         <td class="table-row__td text-center" data-column="Status">
                                             <a class="sc-primary-btn less-pad btn-color-<?= strtolower($stock['fld_action']) == 'buy' ? '6' : '8' ?> text-center sc-mt-5 sc-mb-0" href="javascript:void(0);" style="cursor: auto;"><?= $stock['fld_action'] ?></a>
@@ -312,7 +312,7 @@
                                         </td>
                                         <td class="table-row__td" data-column="Progress">
                                             <?php if (!empty($stock['fld_report_url'])): ?>
-                                                <a href="#" class="open-pdf" data-pdf="<?= base_url($stock['fld_report_url']) ?>" data-stock="<?= $stock['fld_stock_name'] ?>">
+                                                <a href="#" class="open-pdf" data-type="stock" data-file="<?= basename($stock['fld_report_url']) ?>" data-stock="<?= $stock['fld_stock_name'] ?>">
                                                     <img src="<?= base_url('images/icon-report.svg') ?>" />
                                                 </a>
                                             <?php endif; ?>
@@ -389,10 +389,11 @@
                             <div class="accordion-content">
                                 <div class="accordion-left">
                                     <?php if (!empty($timeline['fld_factsheet_url'])): ?>
-                                        <a href="#" class="open-pdf" data-pdf="<?= base_url($timeline['fld_factsheet_url']) ?>" data-stock="<?= date('j M, Y', strtotime($timeline['fld_date'])) ?>" style="color:#444;">
-                                            <span class="factsheet-icon">📄</span>
+                                        <a href="#" class="open-pdf" data-type="rebalance" data-file="<?= basename($timeline['fld_factsheet_url']) ?>" data-stock="<?= date('j M, Y', strtotime($timeline['fld_date'])) ?>" style="color:#444;">
+                                            <?php $otherFactsheetIconImage = $pageImages['other']['factsheet_icon'] ?? null; ?>
+                                            <img src="<?= base_url($otherFactsheetIconImage['image_path'] ?? 'images/other/factsheet-icon.svg') ?>" alt="<?= esc($otherFactsheetIconImage['image_alt'] ?? 'Factsheet Icon') ?>" class="other-icon" loading="lazy">
                                         </a>
-                                        <a href="#" class="open-pdf" data-pdf="<?= base_url($timeline['fld_factsheet_url']) ?>" data-stock="<?= date('j M, Y', strtotime($timeline['fld_date'])) ?>" style="color:#444;">
+                                        <a href="#" class="open-pdf ms-2" data-type="rebalance" data-file="<?= basename($timeline['fld_factsheet_url']) ?>" data-stock="<?= date('j M, Y', strtotime($timeline['fld_date'])) ?>" style="color:#444;">
                                             <span class="factsheet-text">Factsheet</span>
                                         </a>
                                     <?php endif; ?>

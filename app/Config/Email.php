@@ -28,7 +28,7 @@ class Email extends BaseConfig
     /**
      * SMTP Server Address
      */
-    public $SMTPHost = 'smtp.example.com';
+    public $SMTPHost = 'smtp.hostinger.com';
     
     /**
      * SMTP Username
@@ -38,7 +38,7 @@ class Email extends BaseConfig
     /**
      * SMTP Password
      */
-    public $SMTPPass = 'your-password';
+    public $SMTPPass = 'Value@100kk';
     
     /**
      * SMTP Port
@@ -48,12 +48,12 @@ class Email extends BaseConfig
     /**
      * SMTP Timeout (in seconds)
      */
-    public $SMTPTimeout = 5;
+    public $SMTPTimeout = 30;
     
     /**
      * Enable persistent SMTP connections
      */
-    public $SMTPKeepAlive = false;
+    public $SMTPKeepAlive = true;
     
     /**
      * SMTP Encryption. Either tls or ssl
@@ -73,7 +73,7 @@ class Email extends BaseConfig
     /**
      * Type of mail, either 'text' or 'html'
      */
-    public $mailType = 'text';
+    public $mailType = 'html';
     
     /**
      * Character set (utf-8, iso-8859-1, etc.)

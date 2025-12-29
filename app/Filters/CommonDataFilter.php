@@ -13,13 +13,17 @@ class CommonDataFilter implements FilterInterface
         // Load models
         $siteSettingsModel = new \App\Models\SiteSettingsModel();
         $productModel = new \App\Models\ProductModel();
+        $pageImageModel = new \App\Models\PageImageModel();
         
         // Get site settings
         $siteSettings = $siteSettingsModel->first();
         
         // Get all active products
         $allProducts = $productModel->getAllActiveProducts();
-        //echo "<pre>"; print_R($allProducts); die;
+
+        // Get page images grouped by page
+        $pageImages = $pageImageModel->getImagesGroupedByPage();
+        //echo "<pre>"; print_R($pageImages); die;
         
         // Get user subscriptions if logged in
         $userSubscriptions = [];
@@ -32,6 +36,7 @@ class CommonDataFilter implements FilterInterface
         service('renderer')->setData([
             'siteSettings' => $siteSettings,
             'allProducts' => $allProducts,
+            'pageImages' => $pageImages,
             'userSubscriptions' => $userSubscriptions
         ]);
         

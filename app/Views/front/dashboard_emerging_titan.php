@@ -77,7 +77,7 @@
                                             <td class="table-row__td text-center">
                                                 <p class="table-row__progress status--blue">
                                                     <?php if (!empty($stock['fld_report_url'])): ?>
-                                                        <a href="#" class="open-pdf" data-pdf="<?= base_url($stock['fld_report_url']) ?>" data-stock="<?= $stock['fld_stock_name'] ?>">
+                                                        <a href="#" class="open-pdf" data-type="stock" data-file="<?= basename($stock['fld_report_url']) ?>" data-stock="<?= $stock['fld_stock_name'] ?>">
                                                             <img src="<?= base_url('images/icon-report.svg') ?>">
                                                         </a>
                                                     <?php endif; ?>
@@ -282,7 +282,7 @@
                     <div class="sidebar-title sc-mb-5 d-flex justify-content-between align-items-center">
                         <h3 class="font-lg-20-bold sc-mb-0">Scuttlebutt Notes</h3>
                         <?php if ($hasAccess): ?>
-                            <a href="javascript:void(0);" data-product="1" class="font-lg-16-bold font-purple scuttlebutt-trigger" data-bs-toggle="modal" data-bs-target="#scuttlebut-modal">See All</a>
+                            <a href="javascript:void(0);" data-product="<?= $product['id'] ?>" class="font-lg-16-bold font-purple scuttlebutt-trigger" data-bs-toggle="modal" data-bs-target="#scuttlebut-modal">See All</a>
                         <?php else: ?>
                             <a href="javascript:void(0);" class="font-lg-16-bold font-purple">See All</a>
                         <?php endif; ?>
@@ -290,12 +290,22 @@
                     <?php if (!$hasAccess): ?>
                         <img src="<?= base_url('uploads/blur/e6.png') ?>" alt="Subscribe to view content" style="width: 100%;">
                     <?php else: ?>
-                        <p class="font-lg-14-normal font-green sc-mt-0 sc-mb-10"><img src="images/icon-bell.svg"> New Update on 23/10/2025</p>
-                        <p class="font-lg-14-normal font-black sc-mt-0 sc-mb-10"><b></b></p>
-                        <div class="sc-mb-10 " style="border:0px;">
-                            <img src="images/scuttlebut_logo/scuttlebut1.nseindia.com.png" class="bdr-radii" style="width:100%;">                                   
-                        </div>
-                        <p>In April&nbsp;2025, We had a management meet with&nbsp;<strong>Tara Chand Infralogistic Solutions Ltd</strong> attended by Himanshu Aggarwal,&nbsp;WTD&nbsp;&amp; CFO.</p>
+                        <?php if ($dashboardScuttlebutt): ?>
+                            <p class="font-lg-14-normal font-green sc-mt-0 sc-mb-10"><img src="images/icon-bell.svg"> New Update on <?= date('d/m/Y', strtotime($dashboardScuttlebutt['fld_updated_date'])) ?></p>
+                            <p class="font-lg-14-normal font-black sc-mt-0 sc-mb-10"><b></b></p>
+                            <div class="sc-mb-10 " style="border:0px;">
+                                <img src="<?= base_url($dashboardScuttlebutt['fld_image']) ?>" class="bdr-radii" style="width:100%;">                                   
+                            </div>
+                            <p><?= $dashboardScuttlebutt['fld_description'] ?></p>
+                        <?php else: ?>
+                            <!-- Fallback to default content if no dashboard scuttlebutt is set -->
+                            <p class="font-lg-14-normal font-green sc-mt-0 sc-mb-10"><img src="images/icon-bell.svg"> New Update on 23/10/2025</p>
+                            <p class="font-lg-14-normal font-black sc-mt-0 sc-mb-10"><b></b></p>
+                            <div class="sc-mb-10 " style="border:0px;">
+                                <img src="images/scuttlebut_logo/scuttlebut1.nseindia.com.png" class="bdr-radii" style="width:100%;">                                   
+                            </div>
+                            <p>In April 2025, We had a management meet with <strong>Tara Chand Infralogistic Solutions Ltd</strong> attended by Himanshu Aggarwal, WTD & CFO.</p>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>

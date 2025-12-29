@@ -71,6 +71,13 @@
     pointer-events: none;
 }
 
+#download,
+#print,
+#secondaryDownload,
+#secondaryPrint {
+    display: none !important;
+}
+
 /* Print prevention */
 @media print {
     #pdfModal {

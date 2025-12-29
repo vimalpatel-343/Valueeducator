@@ -18,12 +18,12 @@
                 // For Emerging Titans
                 $dashboard_link = base_url('dashboard-emerging-titan');
                 $portfolio_link = base_url('portfolio-emerging-titan');
-                $knowledge_link = base_url('knowledge-center');
+                $knowledge_link = base_url('knowledge-center-emerging-titan');
             } elseif (strpos($current_url, 'tiny-titans') !== false || strpos($current_url, 'dashboard-tiny-titan') !== false || strpos($current_url, 'portfolio-tiny-titan') !== false) {
                 // For Tiny Titans
                 $dashboard_link = base_url('dashboard-tiny-titan');
                 $portfolio_link = base_url('portfolio-tiny-titan');
-                $knowledge_link = base_url('knowledge-center');
+                $knowledge_link = base_url('knowledge-center-tiny-titan');
             } else {
                 // Default to Emerging Titans if not on a product page
                 $dashboard_link = base_url('dashboard-emerging-titan');
@@ -41,14 +41,37 @@
     <div class="floating-div w-60-percent gray-bg-color d-lg-flex">
         <?php if (session()->get('isLoggedIn')): ?>
             <!-- User is logged in - show Dashboard, Portfolio, Knowledge Centre -->
-            <div><a class="sc-primary-btn btn-color-white <?php echo $dashboard_active; ?>" href="<?php echo $dashboard_link; ?>"><img src="<?php echo base_url('images/icon-dashboard.png'); ?>"> Dashboard</a></div>
-            <div><a class="sc-primary-btn btn-color-white <?php echo $portfolio_active; ?>" href="<?php echo $portfolio_link; ?>"><img src="<?php echo base_url('images/icon-watchlist.png'); ?>"> Portfolio</a></div>
-            <div><a class="sc-primary-btn btn-color-white <?php echo $knowledge_active; ?>" href="<?php echo $knowledge_link; ?>"><img src="<?php echo base_url('images/knowledge.png'); ?>"> Knowledge Centre</a></div>
+            <?php 
+            $otherDashboardImage      = $pageImages['other']['dashboard'] ?? null;
+            $otherPortfolioImage      = $pageImages['other']['portfolio'] ?? null;
+            $otherKnowledgeCentreImage = $pageImages['other']['knowledge_centre'] ?? null;
+            ?>
+            <div>
+                <a class="sc-primary-btn btn-color-white <?= $dashboard_active ?>" href="<?= $dashboard_link ?>">
+                    <img src="<?= base_url($otherDashboardImage['image_path'] ?? 'images/icon-dashboard.png') ?>" alt="<?= esc($otherDashboardImage['image_alt'] ?? 'Dashboard') ?>"> Dashboard
+                </a>
+            </div>
+            <div>
+                <a class="sc-primary-btn btn-color-white <?= $portfolio_active ?>" href="<?= $portfolio_link ?>">
+                    <img src="<?= base_url($otherPortfolioImage['image_path'] ?? 'images/icon-watchlist.png') ?>" alt="<?= esc($otherPortfolioImage['image_alt'] ?? 'Portfolio') ?>"> Portfolio
+                </a>
+            </div>
+            <div>
+                <a class="sc-primary-btn btn-color-white <?= $knowledge_active ?>" href="<?= $knowledge_link ?>">
+                    <img src="<?= base_url($otherKnowledgeCentreImage['image_path'] ?? 'images/knowledge.png') ?>" alt="<?= esc($otherKnowledgeCentreImage['image_alt'] ?? 'Knowledge Centre') ?>"> Knowledge Centre
+                </a>
+            </div>
         <?php else: ?>
             <!-- User is not logged in - show Product Offerings, Call, Chat -->
             <div><a class="sc-primary-btn btn-color-1" data-bs-target="#titan-modal" data-bs-toggle="modal" href="#">Product Offerings</a></div>
-            <div><a class="sc-primary-btn btn-color-2" href="tel:<?php echo $siteSettings['fld_mobile']; ?>"><img src="<?php echo base_url('front/icon-call.svg'); ?>"> <span>Call Our Experts</span></a><p>Call Us</p></div>
-            <div><a class="sc-primary-btn btn-color-2" href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $siteSettings['fld_mobile']); ?>?text=Hello%20I%20am%20interested%20in%20your%20services" target="_blank"><img src="<?php echo base_url('front/icon-chat.svg'); ?>"> <span>Chat With Us</span></a><p>Chat</p></div>
+            <div><a class="sc-primary-btn btn-color-2" href="tel:<?php echo $siteSettings['fld_mobile']; ?>">
+                <?php $otherCallOurExpertsImage = $pageImages['other']['call_our_experts'] ?? null; ?>
+                <img src="<?= base_url($otherCallOurExpertsImage['image_path'] ?? 'front/icon-call.svg') ?>" alt="<?= esc($otherCallOurExpertsImage['image_alt'] ?? 'Call Our Experts') ?>" class="other-icon" loading="lazy"> <span>Call Our Experts</span></a><p>Call Us</p>
+            </div>
+            <div><a class="sc-primary-btn btn-color-2" href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $siteSettings['fld_mobile']); ?>?text=Hello%20I%20am%20interested%20in%20your%20services" target="_blank">
+                <?php $otherChatWithUsImage = $pageImages['other']['chat_with_us'] ?? null; ?>
+                <img src="<?= base_url($otherChatWithUsImage['image_path'] ?? 'front/icon-chat.svg') ?>" alt="<?= esc($otherChatWithUsImage['image_alt'] ?? 'Chat With Us') ?>" class="other-icon" loading="lazy"> <span>Chat With Us</span></a><p>Chat</p>
+            </div>
         <?php endif; ?>
     </div>
 
@@ -176,15 +199,17 @@
                             <div class="col-lg-9 col-8">
                                 <div class="sc-menu-inner d-flex align-items-center">
                                     <div class="sc-header-logo sc-pr-100  d-flex align-items-center">
-                                        <a href="https://valueeducator.com/new/index.php"><img src="https://valueeducator.com/new/images/home/logo.svg"> <span class="logo-txt">Value<br><span>Educator</span></span></a>
+                                        <a href="https://valueeducator.com/new/index.php"><img src="<?= base_url($siteSettings['fld_header_logo']) ?>" alt="Logo"></a>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-4">
                                 <div class="sc-menu-select-box d-flex align-items-center justify-content-end">                        
-                                    <div class="header-btn d-block d-lg-none">                                
-                                        <img class="hover-image" src="https://valueeducator.com/new/images/home/account_circle.svg" width="32" style="width:32px;">
-                                    </div>
+                                    <!-- <div class="header-btn d-block d-lg-none">
+                                        <a data-bs-target="#authModal" data-bs-toggle="modal" href="#" id="accountIcon">
+                                            <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>" width="32" style="width:32px; pointer: cursor;">
+                                        </a>
+                                    </div> -->
                                     <div class="offcanvas-icon sc-ml-20 sc-mr-0 sc-mt-10">            
                                         <a id="canva_close" href="#">
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="25px" height="25px">
@@ -234,7 +259,7 @@
             <h3 class="font-lg-16-bold">Welcome to Value Educator</h3>
             <p class="font-lg-14-normal">Download your exclusive guide and explore insights to elevate your investment strategy.</p>
             <p class="font-lg-16-bold sc-mb-0">
-                <a target="_blank" href="<?= $siteSettings['fld_ebook'] ?>" class="font-purple" id="downloadEbookLink">Download E-book</a>
+                <a href="<?= base_url('download-ebook') ?>" class="font-purple" id="downloadEbookLink">Download E-book</a>
             </p>
         </div>
     </div>
@@ -242,7 +267,7 @@
     <!-- Add this where you want the profile box to appear -->
     <div class="box" id="box1" style="display: none;">
         <div class="welc-user d-flex justify-content align-items-center">
-            <img src="<?= !empty(session()->get('userProfileImage')) ? base_url(session()->get('userProfileImage')) : 'images/no_image.png' ?>" style="width:60px;height:60px;">
+            <img src="<?= !empty(session()->get('userProfileImage')) ? base_url(session()->get('userProfileImage')) : base_url('images/no_image.png') ?>" style="width:60px;height:60px;">
             <h2 class="d-lg-block">
                 <?= session()->get('userName') ?><br>
                 <span><a href=""><?= session()->get('userEmail') ?></a></span><br>
@@ -256,7 +281,7 @@
             <?php foreach ($userSubscriptions as $subscription): ?>
                 <div class="setting-link-box light-green sc-mt-5 sc-mb-5 d-flex justify-content-between align-items-center">
                     <div class="d-flex flex-column flex-sm-row">
-                        <span class="fixed-span font-lg-14-normal"><?= $subscription['product_name'] ?></span>
+                        <span class="fixed-span font-lg-14-normal plan-name"><?= $subscription['product_name'] ?></span>
                         <span class="font-lg-16-bold status--green ms-sm-5">
                             <?php 
                                 $endDate = new \DateTime($subscription['end_date']);
@@ -267,7 +292,7 @@
                             ?>
                         </span>
                     </div>
-                    <a class="sc-primary-btn less-pad btn-color-5 font-lg-16-bold" href="#">Renew</a>
+                    <a class="sc-primary-btn less-pad btn-color-5 font-lg-16-bold buy-now-btn" href="javascript:void(0);" data-bs-target="#payment-search-modal" data-bs-toggle="modal" data-product-id="<?= $subscription['product_id'] ?>" data-product-name="<?= $subscription['product_name'] ?>" data-amount="<?= $subscription['amount'] ?>" data-sub-title="12 month subscription" data-expired-month="12">Renew</a>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
@@ -277,10 +302,10 @@
         <div class="setting-link-box sc-mb-5">
             <ul class="sidebar-info">
                 <li>
-                    <a data-bs-target="#search-modal-orders" data-bs-toggle="modal" href="#"><img src="images/cart.svg"> Orders <span><i class="fa fa-angle-right"></i></span></a>
+                    <a data-bs-target="#search-modal-orders" data-bs-toggle="modal" href="#"><img src="<?= base_url('images/cart.svg') ?>"> Orders <span><i class="fa fa-angle-right"></i></span></a>
                 </li>
                 <li>
-                    <a data-bs-target="#search-modal-subscription" data-bs-toggle="modal" href="#"><img src="images/payment.svg"> Subscription <span><i class="fa fa-angle-right"></i></span></a>
+                    <a data-bs-target="#search-modal-subscription" data-bs-toggle="modal" href="#"><img src="<?= base_url('images/payment.svg') ?>"> Subscription <span><i class="fa fa-angle-right"></i></span></a>
                 </li>
             </ul>
         </div>
@@ -288,7 +313,7 @@
         <div class="setting-link-box sc-mb-5">
             <ul class="sidebar-info">
                 <li>
-                    <a href="#"><img src="images/share.svg"> Share with friends <span><i class="fa fa-angle-right"></i></span></a>
+                    <a href="#"><img src="<?= base_url('images/share.svg') ?>"> Share with friends <span><i class="fa fa-angle-right"></i></span></a>
                 </li>
             </ul>
         </div>
@@ -303,13 +328,13 @@
             </ul>
         </div>
         <br>
-        <a href="<?= base_url('auth/logout') ?>" class="logout"><img src="images/logout.svg"> Logout</a>
+        <a href="<?= base_url('auth/logout') ?>" class="logout"><img src="<?= base_url('images/logout.svg') ?>"> Logout</a>
         <br>
     </div>
 
     
     <?= $this->include('front/modals/product_comparison_modal') ?>
-
+    
     <script>
         const base_url = '<?= base_url() ?>';
     </script>
@@ -325,9 +350,9 @@
             strpos($current_url, 'dashboard-tiny-titan') !== false
         ) {
     ?>
-        <script src="<?= base_url('assets/js/pdf-viewer.js') ?>"></script>
-        <script src="<?= base_url('assets/js/scuttlebutt.js') ?>"></script>
-        <script src="<?= base_url('assets/js/stockupdate.js') ?>"></script>
+        <script src="<?= asset_versioned('assets/js/pdf-viewer.js') ?>"></script>
+        <script src="<?= asset_versioned('assets/js/scuttlebutt.js') ?>"></script>
+        <script src="<?= asset_versioned('assets/js/stockupdate.js') ?>"></script>
         <link rel="stylesheet" href="<?= base_url('assets/css/pdf-viewer.css') ?>">
         <link rel="stylesheet" href="<?= base_url('assets/css/updatemodal.css') ?>">
     <?php } ?>
@@ -335,54 +360,121 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <!-- KYC Modal -->
-    <div class="modal fade" id="kycModal" tabindex="-1" aria-labelledby="kycModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title" id="kycModalLabel">KYC Verification Required</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-user-check fa-4x text-warning"></i>
+    <?php if (!empty($showSubscriptionExpiredModal)): ?>
+        <?php 
+            // Determine which product's expired modal to show
+            $showEmergingTitanModal = in_array(1, $expiredProducts) && 
+                (strpos(current_url(), 'emerging-titans') !== false || 
+                strpos(current_url(), 'dashboard-emerging-titan') !== false || 
+                strpos(current_url(), 'portfolio-emerging-titan') !== false || 
+                strpos(current_url(), 'management-interviews-emerging-titan') !== false || 
+                strpos(current_url(), 'quarterly-updates-emerging-titan') !== false ||
+                strpos(current_url(), 'knowledge-center-emerging-titan') !== false ||
+                strpos(current_url(), 'youtube-videos') !== false);
+                
+            $showTinyTitanModal = in_array(2, $expiredProducts) && 
+                (strpos(current_url(), 'tiny-titans') !== false || 
+                strpos(current_url(), 'dashboard-tiny-titan') !== false || 
+                strpos(current_url(), 'portfolio-tiny-titan') !== false || 
+                strpos(current_url(), 'management-interviews-tiny-titan') !== false || 
+                strpos(current_url(), 'knowledge-center-tiny-titan') !== false ||
+                strpos(current_url(), 'quarterly-updates-tiny-titan') !== false);
+        ?>
+        
+        <?php if ($showEmergingTitanModal): ?>
+            <!-- Emerging Titans Subscription Expired Modal -->
+            <div class="modal fade" id="subscriptionExpiredModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content subscription-expired-modal">
+                        <div class="modal-body text-center p-4">
+                            <h3 class="fw-bold mb-3">Subscription ended</h3>
+                            <p class="text-black mb-4">
+                                Your Emerging Titans subscription expired. Renew again to continue using our services.
+                            </p>
+                            <a href="javascript:void(0);" class="btn subscription-expired-btn sc-primary-btn bg-black text-white cursor-pointer buy-now-btn" data-bs-target="#payment-search-modal" data-bs-toggle="modal" href="#" data-product-id="<?= $product['id'] ?>" data-product-name="<?= $product['fld_title'] ?>" data-amount="<?= $productPricing ?>" data-sub-title="12 month subscription" data-expired-month="12">Renew subscription</a>
+                        </div>
                     </div>
-                    <h4 class="mb-3">Complete Your KYC Verification</h4>
-                    <p class="text-muted">
-                        You have an active subscription but KYC verification is required to access this content.
-                        Please complete your KYC to continue accessing all premium features.
-                    </p>
-                    <div class="alert alert-info mt-3">
-                        <i class="fas fa-info-circle me-2"></i>
-                        KYC verification is a one-time process and helps us comply with regulatory requirements.
+                </div>
+            </div>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var subscriptionModal = new bootstrap.Modal(document.getElementById('subscriptionExpiredModal'));
+                subscriptionModal.show();
+                
+                // Prevent closing modal by clicking outside
+                document.getElementById('subscriptionExpiredModal').addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                });
+            });
+            </script>
+        <?php elseif ($showTinyTitanModal): ?>
+            <!-- Tiny Titans Subscription Expired Modal -->
+            <div class="modal fade" id="subscriptionExpiredModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content subscription-expired-modal">
+                        <div class="modal-body text-center p-4">
+                            <h3 class="fw-bold mb-3">Subscription ended</h3>
+                            <p class="text-black mb-4">
+                                Your Tiny Titans subscription expired. Renew again to continue using our services.
+                            </p>
+                            <a href="javascript:void(0);" class="btn subscription-expired-btn sc-primary-btn bg-black text-white cursor-pointer buy-now-btn" data-bs-target="#payment-search-modal" data-bs-toggle="modal" href="#" data-product-id="<?= $product['id'] ?>" data-product-name="<?= $product['fld_title'] ?>" data-amount="<?= $productPricing ?>" data-sub-title="12 month subscription" data-expired-month="12">Renew subscription</a>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 justify-content-center">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Maybe Later</button>
-                    <a href="https://kyc-third-party-site.com" target="_blank" class="btn btn-primary">
-                        <i class="fas fa-external-link-alt me-2"></i>Complete KYC Now
-                    </a>
+            </div>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var subscriptionModal = new bootstrap.Modal(document.getElementById('subscriptionExpiredModal'));
+                subscriptionModal.show();
+                
+                // Prevent closing modal by clicking outside
+                document.getElementById('subscriptionExpiredModal').addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                });
+            });
+            </script>
+        <?php endif; ?>
+    <?php endif; ?>
+
+    <?php if (!empty($showKycModal) && empty($showSubscriptionExpiredModal)): ?>
+        <!-- Existing KYC Modal code here -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show KYC modal when page loads
+            var kycModal = new bootstrap.Modal(document.getElementById('kycModal'));
+            kycModal.show();
+            
+            // Prevent closing modal by clicking outside
+            document.getElementById('kycModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+        });
+        </script>
+        <!-- KYC Modal -->
+        <div class="modal fade" id="kycModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content kyc-modal">
+                    <div class="modal-body text-center p-4">
+                        <h3 class="fw-bold mb-3">KYC is pending</h3>
+                        <p class="text-black mb-4">
+                            As per SEBI regulations, all users are mandated to complete the KYC process.
+                            Without KYC, you will not be able to access any product features.
+                        </p>
+                        <a href="https://onboarding.dashboardfinreport.com/SNM/Login3.aspx?a=dB3PRvGG3NSoxvlY1C3epQ6ET+IyHkpmdlpHz7jmk54=&p="
+                        target="_blank" class="btn kyc-btn sc-primary-btn bg-black text-white cursor-pointer">Retake KYC</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <?php if (!empty($showKycModal)): ?>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Show KYC modal when page loads
-        var kycModal = new bootstrap.Modal(document.getElementById('kycModal'));
-        kycModal.show();
-        
-        // Prevent closing modal by clicking outside
-        document.getElementById('kycModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        });
-    });
-    </script>
     <?php endif; ?>
 
     <script>
@@ -459,19 +551,19 @@
         });
     </script>
     <script>
-        let lastScrollTop = 0;
-        $(window).on("scroll", function () {
-            const scrollTop = $(this).scrollTop();
-            const header = $("#sc-header-sticky");
+        // let lastScrollTop = 0;
+        // $(window).on("scroll", function () {
+        //     const scrollTop = $(this).scrollTop();
+        //     const header = $("#sc-header-sticky");
 
-            if (scrollTop > lastScrollTop) {
-                header.css("top", "-150px");
-            } else {
-                header.css("top", "0");
-            }
+        //     if (scrollTop > lastScrollTop) {
+        //         header.css("top", "-150px");
+        //     } else {
+        //         header.css("top", "0");
+        //     }
 
-            lastScrollTop = scrollTop;
-        });
+        //     lastScrollTop = scrollTop;
+        // });
 
         $(document).ready(function() {
             $(".notification").on("click", function(e) {
@@ -531,6 +623,7 @@
 
     <?= $this->include('front/payment/paymentmodal.php') ?>
     <?= $this->include('front/payment/razorpay.php') ?>
+    <?= $this->include('front/modals/editprofilemodal.php') ?>
 
 </body>
 </html>

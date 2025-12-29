@@ -8,7 +8,7 @@
                     <h3 class="font-lg-24-bold font-20-bold">Required Details</h3>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background: none;">
                         Close
-                        <img src="images/cancel.png">
+                        <img src="<?= base_url('images/cancel.png') ?>">
                     </button>
                 </div>
                 
@@ -37,7 +37,7 @@
             
             <!-- Payment Loader -->
             <div id="payment-loader" class="text-center py-5" style="display: none;">
-                <img src="images/loading.gif" alt="Processing..." style="width:40px;">
+                <img src="<?= base_url('images/loading.gif') ?>" alt="Processing..." style="width:40px;">
                 <p class="mt-2 font-lg-14-normal">Processing payment...</p>
             </div>
 
@@ -47,7 +47,7 @@
                     <h3 class="font-lg-24-bold font-16-bold">Payment Successful!</h3>
                     <p class="font-lg-16-normal font-dark-grey">Your subscription to <span id="success-product-name">Emerging Titans</span> is now active. Let's explore the features and get you started.</p>
                     <div style="width:300px; margin:0px auto;">
-                        <img src="images/empowering.png">
+                        <img src="<?= base_url('images/empowering.png') ?>">
                     </div>
                 </div>
 
@@ -62,7 +62,7 @@
                     <h3 class="font-lg-24-bold font-16-bold">Payment Failed!</h3>
                     <p class="font-lg-16-normal font-dark-grey">We're sorry, but there was an issue processing your payment. Please try again or contact support if the problem persists.</p>
                     <div style="width:300px; margin:0px auto;">
-                        <img src="images/payment-failed.png">
+                        <img src="<?= base_url('images/payment-failed.png') ?>">
                     </div>
                 </div>
 
@@ -84,7 +84,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div id="order-loading" class="text-center py-5" style="display: none;">
-                <img src="images/loading.gif" alt="Loading..." style="width:40px;">
+                <img src="<?= base_url('images/loading.gif') ?>" alt="Loading..." style="width:40px;">
                 <p class="mt-2 font-lg-14-normal">Fetching your orders...</p>
             </div>		
             
@@ -93,11 +93,11 @@
                     <h3 class="font-lg-24-bold font-16-bold">Orders</h3>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background: none;">
                         Close
-                        <img src="images/cancel.png">
+                        <img src="<?= base_url('images/cancel.png') ?>">
                     </button>
                 </div>
                 <div class="subscription-box dark-gray">
-                    <img src="images/order.svg">
+                    <img src="<?= base_url('images/order.svg') ?>">
                     <p class="font-lg-16-bold sc-mt-20 sc-mb-10">No Order History</p>
                     <p class="font-lg-14-normal sc-mt-10">Orders for your invested products appear here. Start discovering our products</p>
                 </div>
@@ -109,7 +109,7 @@
                         <h3 class="font-lg-24-bold font-16-bold">Orders</h3>
                         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background: none;">
                             Close
-                            <img src="images/cancel.png">
+                            <img src="<?= base_url('images/cancel.png') ?>">
                         </button>
                     </div>
                     <div class="hoz-scroll">
@@ -126,7 +126,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div id="subscription-loading" class="text-center py-5" style="display: none;">
-                <img src="images/loading.gif" alt="Loading..." style="width:40px;">
+                <img src="<?= base_url('images/loading.gif') ?>" alt="Loading..." style="width:40px;">
                 <p class="mt-2 font-lg-14-normal">Fetching your subscription...</p>
             </div>	
             
@@ -135,12 +135,12 @@
                     <h3 class="font-lg-24-bold font-16-bold">Subscriptions</h3>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background: none;">
                         Close
-                        <img src="images/cancel.png">
+                        <img src="<?= base_url('images/cancel.png') ?>">
                     </button>
                 </div>
                 
                 <div class="subscription-box dark-gray">
-                    <img src="images/subscription.svg">
+                    <img src="<?= base_url('images/subscription.svg') ?>">
                     <p class="font-lg-16-bold sc-mt-20 sc-mb-10">No Subscriptions</p>
                     <p class="font-lg-14-normal sc-mt-10"><a href="#" class="">Subscribe to our products and manage it here</a></p>
                 </div>
@@ -152,7 +152,7 @@
                         <h3 class="font-lg-24-bold font-16-bold">Subscriptions</h3>
                         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background: none;">
                             Close
-                            <img src="images/cancel.png">
+                            <img src="<?= base_url('images/cancel.png') ?>">
                         </button>
                     </div>
                     <div class="hoz-scroll">

@@ -56,7 +56,8 @@ $routes->get('get-scuttlebutt-notes/(:num)', 'Front\Dashboard::getScuttlebuttNot
 $routes->get('get-stock-updates/(:num)/(:num)', 'Front\Dashboard::getStockUpdates/$1/$2');
 
 // Knowledge Centre routes
-$routes->get('knowledge-center', 'Front\Knowledge::index');
+$routes->get('knowledge-center-emerging-titan', 'Front\Knowledge::index');
+$routes->get('knowledge-center-tiny-titan', 'Front\Knowledge::index');
 $routes->get('knowledge-center/(:any)', 'Front\Knowledge::category/$1');
 
 // Front Auth Routes
@@ -71,6 +72,10 @@ $routes->get('auth/logout', 'Front\Auth::logout');
 $routes->get('download-ebook', 'Front\Download::ebook');
 $routes->post('track/ebook-download', 'Front\Track::ebookDownload');
    
+$routes->post('auth/update-profile', 'Front\Auth::updateProfile');
+$routes->post('auth/update-profile-picture', 'Front\Auth::updateProfilePicture');
+$routes->get('auth/get-profile-data', 'Front\Auth::getProfileData');
+
 // Add these payment routes
 $routes->get('payment/success', 'Front\Payment::success');
 $routes->get('payment/failed', 'Front\Payment::failed');
@@ -81,6 +86,9 @@ $routes->post('payment/verifyPayment', 'Front\Payment::verifyPayment');
 $routes->post('user-account/getOrders', 'Front\UserAccount::getOrders');
 $routes->post('user-account/getSubscriptions', 'Front\UserAccount::getSubscriptions');
 $routes->get('user/checkKycStatus', 'Front\UserAccount::checkKycStatus');
+
+$routes->get('pdf/generate-token/(:segment)/(:any)', 'Pdf::generateToken/$1/$2');
+$routes->get('pdf/view-with-token/(:segment)', 'Pdf::viewWithToken/$1');
 
 // Add these routes
  $routes->get('/auth', 'Auth::index');
@@ -99,7 +107,7 @@ $routes->group('/admin', ['filter' => 'adminauth'], function($routes) {
    $routes->get('investment-philosophy/edit/(:num)', 'Admin\InvestmentPhilosophy::edit/$1');
    $routes->post('investment-philosophy/update/(:num)', 'Admin\InvestmentPhilosophy::update/$1');
    $routes->get('investment-philosophy/delete/(:num)', 'Admin\InvestmentPhilosophy::delete/$1');
-   $routes->get('admin/investment-philosophy/delete-image/(:num)/(:num)', 'Admin\InvestmentPhilosophy::deleteImage/$1/$2');
+   $routes->get('investment-philosophy/delete-image/(:num)/(:num)', 'Admin\InvestmentPhilosophy::deleteImage/$1/$2');
 
    // FAQ routes
    $routes->get('faqs', 'Admin\FAQ::index');
@@ -182,7 +190,9 @@ $routes->group('/admin', ['filter' => 'adminauth'], function($routes) {
    $routes->post('users/addSubscription', 'Admin\UserManagement::addSubscription');
    $routes->post('users/updateSubscription', 'Admin\UserManagement::updateSubscription');
    $routes->get('users/getProductPrice/(:num)', 'Admin\UserManagement::getProductPrice/$1');
-
+   $routes->post('users/deleteSubscription', 'Admin\UserManagement::deleteSubscription');
+   $routes->get('users/get-ebook-download-history/(:num)', 'Admin\UserManagement::getEbookDownloadHistory/$1');
+   
    // Product Management Routes
    $routes->get('products', 'Admin\Products::index');
    $routes->get('products/create', 'Admin\Products::create');
@@ -190,6 +200,9 @@ $routes->group('/admin', ['filter' => 'adminauth'], function($routes) {
    $routes->get('products/edit/(:num)', 'Admin\Products::edit/$1');
    $routes->post('products/update/(:num)', 'Admin\Products::update/$1');
    $routes->get('products/delete/(:num)', 'Admin\Products::delete/$1');
+   $routes->post('products/copyInterview', 'Admin\Products::copyInterview');
+   $routes->post('products/copyScuttlebutt', 'Admin\Products::copyScuttlebutt');
+   $routes->post('products/checkScuttlebuttExists', 'Admin\Products::checkScuttlebuttExists');
     
    // Knowledge Centre Routes
    $routes->get('knowledge-centre/categories', 'Admin\KnowledgeCentre::categories');
@@ -213,5 +226,7 @@ $routes->group('/admin', ['filter' => 'adminauth'], function($routes) {
    $routes->get('substack-updates/edit/(:num)', 'Admin\SubstackUpdates::edit/$1');
    $routes->post('substack-updates/update/(:num)', 'Admin\SubstackUpdates::update/$1');
    $routes->get('substack-updates/delete/(:num)', 'Admin\SubstackUpdates::delete/$1');
-});
 
+   $routes->get('page-images', 'Admin\PageImage::index');
+   $routes->post('page-images/update', 'Admin\PageImage::update');
+});

@@ -45,8 +45,7 @@
                             Beyond the Radar
                             <span class="txt2 font-lg-18-normal font-16-normal" style="font-weight:600;">Mastering
                                 Micro-Cap Investing</span>
-                            <p class="font-lg-16-normal font-14-normal">Our tailor-made micro-cap investing handbook,
-                                exclusively designed for you.</p>
+                            <p class="font-lg-16-normal font-14-normal">Our tailor-made micro-cap investing handbook, <br/>exclusively designed for you.</p>
                         </h2>
 
                     </div>
@@ -201,7 +200,7 @@
                                             <h5 class="font-lg-20-bold"><?= esc($video['fld_title']) ?></h5>
                                             <p class="font-lg-16-normal"><?= character_limiter(strip_tags($video['fld_description']), 100) ?></p>
                                         </div>
-                                        <p class="views font-lg-16-normal"><?= $video['fld_total_views'] ?> views • Posted <?= time_ago(strtotime($video['fld_created_at'])) ?></p>
+                                        <p class="views font-lg-16-normal"><?= $video['fld_total_views'] ?> views • Posted <?= time_ago(strtotime($video['fld_posted_at'])) ?></p>
                                     </div>
                                 </div>
                             </div>

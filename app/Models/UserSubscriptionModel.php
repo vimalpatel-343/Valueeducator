@@ -73,4 +73,34 @@ class UserSubscriptionModel extends Model
         $productModel = new ProductModel();
         return $productModel->where('fld_slug', $productSlug)->first();
     }
+
+    // Get all active subscriptions for a user
+    public function getUserActiveSubscriptions($userId)
+    {
+        return $this->where('user_id', $userId)
+                    ->where('status', 1)
+                    ->where('end_date >=', date('Y-m-d'))
+                    ->findAll();
+    }
+    
+    // Check if user has active subscription for a specific product
+    public function hasActiveSubscriptionForProduct($userId, $productId)
+    {
+        return $this->where('user_id', $userId)
+                    ->where('product_id', $productId)
+                    ->where('status', 1)
+                    ->where('end_date >=', date('Y-m-d'))
+                    ->first();
+    }
+    
+    // Check if user has any active subscription
+    public function hasAnyActiveSubscription($userId)
+    {
+        $count = $this->where('user_id', $userId)
+                      ->where('status', 1)
+                      ->where('end_date >=', date('Y-m-d'))
+                      ->countAllResults();
+        
+        return $count > 0;
+    }
 }

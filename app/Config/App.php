@@ -202,10 +202,10 @@ class App extends BaseConfig
 
     public $sessionDriver = 'CodeIgniter\Session\Handlers\FileHandler';
     public $sessionCookieName = 'ci_session';
-    public $sessionExpiration = 7200;
+    public $sessionExpiration = 43200;
     public $sessionSavePath = WRITEPATH . 'session';
     public $sessionMatchIP = false;
-    public $sessionTimeToUpdate = 300;
+    public $sessionTimeToUpdate = 3600;
     public $sessionRegenerateDestroy = false;
 
     public $CSRFTokenName    = 'csrf_test_name';
@@ -219,4 +219,5 @@ class App extends BaseConfig
     public string $cookiePath   = '/';
     public bool $cookieSecure = false; // Set to true if using HTTPS
     public bool $cookieHTTPOnly = true;
+    public int $cookieExpires = 43200;
 }

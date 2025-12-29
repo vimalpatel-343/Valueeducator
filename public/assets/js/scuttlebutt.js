@@ -18,14 +18,18 @@ class ScuttlebuttModal {
         });
     }
 
+    isMobile() {
+        return window.innerWidth < 992;
+    }
+
     createModal() {
         const modalHTML = `
-            <div id="${this.modalId}" class="modal fade search-modal w-90" role="dialog" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="d-flex gap-2 justify-content align-items-center">
-                            <h3 class="font-lg-16-bold">Scuttlebutt notes</h3>
-                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background: none;">
+            <div id="${this.modalId}" class="modal fade search-modal- w-90" role="dialog" tabindex="-1">
+                <div class="modal-dialog modal-xl p-2">
+                    <div class="modal-content p-4">
+                        <div class="d-flex gap-2 justify-content-between align-items-center">
+                            <h3 class="font-lg-20-bold">Scuttlebutt notes</h3>
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background: none; border: 0px; color: #000000;">
                                 Close
                                 <img src="${base_url || ''}/images/cancel.svg">
                             </button>
@@ -85,49 +89,80 @@ class ScuttlebuttModal {
         return `${day} ${month} ${year}`;
     }
 
+    initializeAccordion() {
+        $(".sc-accordion-header").off("click").on("click", function () {
+            const body = $(this).next(".sc-accordion-body");
+
+            // Close others
+            $(".sc-accordion-body").not(body).slideUp();
+            $(".sc-accordion-header").not(this).removeClass("active");
+
+            // Toggle current
+            body.slideToggle();
+            $(this).toggleClass("active");
+        });
+    }
+
     renderContent(notes, tabsList, tabContainer) {
-        // Clear loading indicator
         tabsList.empty();
-        
+        tabContainer.empty();
+
         if (!notes || notes.length === 0) {
-            tabsList.html('<li class="no-data">No scuttlebutt notes available</li>');
+            tabContainer.html('<p>No scuttlebutt notes available</p>');
             return;
         }
-        
-        // Sort notes by date in descending order (newest first)
-        const sortedNotes = [...notes].sort((a, b) => new Date(b.fld_date) - new Date(a.fld_date));
-        
-        // Generate tabs and content
-        sortedNotes.forEach((note, index) => {
-            const tabId = `tab${index + 1}`;
-            const isActive = index === 0 ? 'active' : '';
-            const isDisplayed = index === 0 ? 'style="display: block;"' : '';
-            const isHeadingActive = index === 0 ? 'd_active' : '';
-            
-            // Format the date
-            const formattedDate = this.formatDate(note.fld_date);
-            
-            // Create tab
-            const tab = $(`
-                <li class="${isActive}" rel="${tabId}">
-                    ${note.fld_title}<br>
-                    ${formattedDate}
-                </li>
-            `);
-            tabsList.append(tab);
-            
-            // Create tab content
-            const tabContent = $(`
-                <div id="${tabId}" class="tab_content" ${isDisplayed}>
-                    <h3 class="tab_drawer_heading ${isHeadingActive}" rel="${tabId}">${formattedDate}</h3>
-                    ${note.fld_description}
-                </div>
-            `);
-            tabContainer.append(tabContent);
-        });
-        
-        // Initialize tab functionality
-        this.initializeTabs();
+
+        const sortedNotes = [...notes].sort(
+            (a, b) => new Date(b.fld_date) - new Date(a.fld_date)
+        );
+
+        if (this.isMobile()) {
+            // 🔹 MOBILE → ACCORDION
+            sortedNotes.forEach((note, index) => {
+                const formattedDate = this.formatDate(note.fld_date);
+                const accordionItem = `
+                    <div class="sc-accordion-item">
+                        <button class="sc-accordion-header">
+                            <span>${note.fld_title}</span>
+                            <small>${formattedDate}</small>
+                        </button>
+                        <div class="sc-accordion-body" style="display:none;">
+                            ${note.fld_description}
+                        </div>
+                    </div>
+                `;
+                tabContainer.append(accordionItem);
+            });
+
+            this.initializeAccordion();
+
+        } else {
+            // 🔹 DESKTOP → TABS (existing behavior)
+            sortedNotes.forEach((note, index) => {
+                const tabId = `tab${index + 1}`;
+                const isActive = index === 0 ? 'active' : '';
+                const isDisplayed = index === 0 ? 'style="display:block;"' : '';
+                const isHeadingActive = index === 0 ? 'd_active' : '';
+                const formattedDate = this.formatDate(note.fld_date);
+
+                tabsList.append(`
+                    <li class="${isActive}" rel="${tabId}">
+                        ${note.fld_title}<br>${formattedDate}
+                    </li>
+                `);
+
+                tabContainer.append(`
+                    <div id="${tabId}" class="tab_content" ${isDisplayed}>
+                        <h3 class="tab_drawer_heading ${isHeadingActive}" rel="${tabId}">
+                            ${formattedDate}
+                        </h3>
+                        ${note.fld_description}
+                    </div>
+                `);
+            });
+
+            this.initializeTabs();
+        }
     }
 
     initializeTabs() {

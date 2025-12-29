@@ -7,6 +7,7 @@ use App\Models\UserModel;
 use App\Models\UserSubscriptionModel;
 use App\Models\ProductModel;
 use App\Models\UserLoginModel;
+use App\Models\UserEbookDownloadModel;
 use App\Helpers\EmailHelper;
 
 class UserManagement extends BaseController
@@ -14,6 +15,7 @@ class UserManagement extends BaseController
     protected $userModel;
     protected $userSubscriptionModel;
     protected $productModel;
+    protected $userEbookDownloadModel;
     
     public function __construct()
     {
@@ -21,6 +23,7 @@ class UserManagement extends BaseController
         $this->userSubscriptionModel = new UserSubscriptionModel();
         $this->productModel = new ProductModel();
         $this->userLoginModel = new UserLoginModel();
+        $this->userEbookDownloadModel = new UserEbookDownloadModel();
         helper('text');
     }
     
@@ -39,7 +42,7 @@ class UserManagement extends BaseController
         // Get filter parameters
         $search = $this->request->getGet('search');
         $status = $this->request->getGet('status');
-        $subscription = $this->request->getGet('subscription');
+        $subscription_filter = $this->request->getGet('subscription');
         $perPage = $this->request->getGet('per_page') ?? 50;
         
         // Validate per_page options
@@ -99,14 +102,14 @@ class UserManagement extends BaseController
                     ->groupEnd();
         }
         
-        if ($status !== '' && $status > 0) {
-            $builder->where('fld_status', $status);
+        if ($status === '0' || $status === '1') {
+            $builder->where('fld_status', (int)$status);
         }
         
         // Apply subscription filter
-        if ($subscription === 'subscribed') {
+        if ($subscription_filter === 'subscribed') {
             $builder->whereIn('id', $subscribedUserIds);
-        } elseif ($subscription === 'not_subscribed') {
+        } elseif ($subscription_filter === 'not_subscribed') {
             $builder->whereNotIn('id', $subscribedUserIds);
         }
         
@@ -127,6 +130,20 @@ class UserManagement extends BaseController
                         ->get()
                         ->getResultArray();
         
+        // Get user ebook download information
+        $ebookDownloads = $this->userEbookDownloadModel
+            ->select('fld_user_id, COUNT(*) as download_count, MAX(fld_created_at) as last_download_date')
+            ->groupBy('fld_user_id')
+            ->findAll();
+
+        $downloadData = [];
+        foreach ($ebookDownloads as $download) {
+            $downloadData[$download['fld_user_id']] = [
+                'count' => $download['download_count'],
+                'last_download_date' => $download['last_download_date']
+            ];
+        }
+
         // Get subscription details and login history for each user
         foreach ($users as &$user) {
             // Get all subscriptions for this user
@@ -158,6 +175,11 @@ class UserManagement extends BaseController
             
             // Get login history
             $user['login_history'] = $this->userLoginModel->getUserLoginHistory($user['id'], 3);
+
+            // Get ebook download status
+            $user['has_downloaded_ebook'] = isset($downloadData[$user['id']]);
+            $user['ebook_download_count'] = $downloadData[$user['id']]['count'] ?? 0;
+            $user['last_ebook_download_date'] = $downloadData[$user['id']]['last_download_date'] ?? null;
         }
         
         // Calculate pagination data
@@ -188,7 +210,7 @@ class UserManagement extends BaseController
             'filters' => [
                 'search' => $search,
                 'status' => $status,
-                'subscription' => $subscription
+                'subscription' => $subscription_filter
             ]
         ];
         
@@ -223,6 +245,7 @@ class UserManagement extends BaseController
         $data = [
             'fld_email' => $this->request->getPost('email'),
             'fld_mobile' => $this->request->getPost('mobile'),
+            'fld_country_code' => $this->request->getPost('country_code'),
             'fld_full_name' => $this->request->getPost('full_name'),
             'fld_address' => $this->request->getPost('address'),
             'fld_password' => md5($this->request->getPost('password')),
@@ -471,5 +494,39 @@ class UserManagement extends BaseController
                 'message' => 'Product not found'
             ]);
         }
+    }
+    
+    public function deleteSubscription()
+    {
+        $subscriptionId = $this->request->getPost('subscription_id');
+        
+        if (!$subscriptionId) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Subscription ID is required']);
+        }
+        
+        // Check if subscription exists
+        $subscription = $this->userSubscriptionModel->find($subscriptionId);
+        
+        if (!$subscription) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Subscription not found']);
+        }
+        
+        // Delete the subscription
+        if ($this->userSubscriptionModel->delete($subscriptionId)) {
+            return $this->response->setJSON(['success' => true, 'message' => 'Subscription deleted successfully']);
+        } else {
+            return $this->response->setJSON(['success' => false, 'message' => 'Failed to delete subscription']);
+        }
+    }
+
+    // Get user ebook download history via AJAX
+    public function getEbookDownloadHistory($userId)
+    {
+        $downloadHistory = $this->userEbookDownloadModel->getUserDownloads($userId);
+        
+        return $this->response->setJSON([
+            'success' => true,
+            'downloadHistory' => $downloadHistory
+        ]);
     }
 }

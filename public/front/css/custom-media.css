@@ -1,0 +1,118 @@
+.plan-name {
+    min-width: 120px;
+    display: inline-block;
+}
+
+.offer-strip {
+    gap: 20px;
+}
+
+.sc-accordion-item {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.sc-accordion-header {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 12px 0;
+    font-weight: 600;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.sc-accordion-body {
+    padding: 10px 0;
+}
+
+#scuttlebut-modal .modal-xl, #stock-update-modal .modal-xl {
+    max-width: 95%;
+}
+
+/* Small devices (phones, <576px) */
+@media (max-width: 575.98px) {
+    
+    body .search-modal {
+        padding: 2% 1% !important;
+    }
+
+    .sidebar-popular-post {
+        height: auto !important;
+    }
+
+    #scrollUp {
+        bottom: 100px;
+        right: 10px;
+    }
+
+    .titan-modal {
+        width: 95% !important;
+        height: auto !important;
+    }
+
+    .sc-team-section-area iframe {
+        height: 170px;
+    }
+
+    .video-wrapper {
+        height: 150px !important;
+    }
+}
+
+/* Medium devices (tablets, ≥768px) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    
+    .sidebar-popular-post {
+        height: auto !important;
+    }
+
+    #scrollUp {
+        bottom: 100px;
+        right: 10px;
+    }
+
+    .titan-modal {
+        width: 95% !important;
+        height: auto !important;
+    }
+}
+
+/* Large devices (desktops, ≥992px) */
+@media (min-width: 992px) {
+    
+    .offer-strip {
+        gap: 40px;
+    }
+}
+
+/* Extra large devices (≥1200px) */
+@media (min-width: 1200px) {
+    
+    body .search-modal {
+        padding: 10px !important;
+    }
+}
+
+/* =================================
+   Device-Specific Adjustments
+   ================================= */
+
+/* Small phones (portrait) - max-width */
+@media (max-width: 359px) {
+  
+}
+
+/* Landscape mode - max-height */
+@media (max-height: 500px) and (orientation: landscape) {
+  
+}
+
+/* =================================
+   High-DPI Screens
+   ================================= */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  
+}

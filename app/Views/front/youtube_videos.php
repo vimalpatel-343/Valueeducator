@@ -35,9 +35,9 @@
                             </div>									
                             <div class="single-grid-overlay-blog-post__content">                                        
                                 <h3 class="post-title font-lg-16-bold sc-pt-10 sc-pb-0 sc-md-pb-0"><?= $video['fld_title'] ?></h3>
-                                <p class="font-lg-14-normal"><?= short_text($video['fld_description'], 50) ?></p>
+                                <p class="font-lg-14-normal"><?= short_text_char($video['fld_description'], 200) ?></p>
                                 <span class="post-date font-lg-16-normal font-dark-grey">
-                                    <?= shortNumber($video['fld_total_views']) ?> views • Posted <?= time_ago(strtotime($video['time_elapsed'])) ?>
+                                    <?= shortNumber($video['fld_total_views']) ?> views • Posted <?= time_ago(strtotime($video['fld_posted_at'])) ?>
                                 </span>
                             </div>
                         </div>
