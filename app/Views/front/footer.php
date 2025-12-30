@@ -224,7 +224,7 @@
             <ul class="nav-menu sc-mt-100 sc-pl-0">
                 <li class="list-gap hash-has-sub"><a href="<?= base_url() ?>" class="hash"> Home</a></li>	
                 <li class="list-gap hash-has-sub"><a href="<?= base_url('about-us') ?>" class="hash"> About Us</a></li>
-                <li class="list-gap hash-has-sub"><a href="<?= base_url('investment-philosophy') ?>" class="hash"> Investment Philosophy</a></li>
+                <li class="list-gap hash-has-sub"><a href="<?= base_url('investment-philosophy') ?>" class="hash"> Our Investment Philosophy</a></li>
                 <li class="list-gap hash-has-sub"><a href="<?= base_url('emerging-titans') ?>" class="hash"> Emerging Titans</a></li>
                 <li class="list-gap hash-has-sub"><a href="<?= base_url('tiny-titans') ?>" class="hash"> Tiny Titans</a></li>
             </ul>

@@ -23,6 +23,7 @@ class Auth extends BaseController
     {
         if ($this->request->isAJAX()) {
             $email = $this->request->getPost('email');
+            $ipAddress = $this->request->getIPAddress();
             
             // Validate email
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -41,9 +42,19 @@ class Auth extends BaseController
                 ]);
             }
             
+            // Check rate limit
+            $rateLimitCheck = $this->checkRateLimit($email);
+            if (!$rateLimitCheck['allowed']) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => $rateLimitCheck['message'],
+                    'rate_limit_exceeded' => true // Flag to identify rate limit errors
+                ]);
+            }
+            
             // Generate OTP
             $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-            $expiresAt = Time::now()->addMinutes(15); // OTP expires in 15 minutes
+            $expiresAt = Time::now()->addMinutes(OTP_EXPIRY_MINUTES); // OTP expires in 15 minutes
             
             // Save OTP to database
             $otpData = [
@@ -56,6 +67,13 @@ class Auth extends BaseController
             $db = \Config\Database::connect();
             $db->table('ve_otps')->insert($otpData);
             
+            // Record this OTP attempt with IP
+            $db->table('ve_otp_attempts')->insert([
+                'email' => $email,
+                'ip_address' => $ipAddress,
+                'request_time' => date('Y-m-d H:i:s')
+            ]);
+            
             // Send OTP email
             $emailSent = $this->sendOTPEmail($email, $otp);
             
@@ -65,6 +83,9 @@ class Auth extends BaseController
                     'message' => 'Failed to send OTP email. Please try again.'
                 ]);
             }
+            
+            // Clean up old records for this email
+            $this->cleanupOldOtpAttempts($email);
             
             // Store email in session for next steps
             session()->set('signup_email', $email);
@@ -78,6 +99,52 @@ class Auth extends BaseController
         return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Access denied']);
     }
     
+    // Check rate limit for OTP requests (10 per hour per email/IP)
+    private function checkRateLimit($email)
+    {
+        $db = \Config\Database::connect();
+        $ipAddress = $this->request->getIPAddress();
+        $maxRequestsPerHour = MAX_REQUESTS_PER_HOUR;
+        
+        // Get current time and 1 hour ago
+        $oneHourAgo = date('Y-m-d H:i:s', strtotime('-60 minutes'));
+        
+        // Check requests by email in the last hour
+        $emailAttempts = $db->table('ve_otp_attempts')
+            ->where('email', $email)
+            ->where('request_time >', $oneHourAgo)
+            ->countAllResults();
+        
+        // Check requests by IP in the last hour
+        $ipAttempts = $db->table('ve_otp_attempts')
+            ->where('ip_address', $ipAddress)
+            ->where('request_time >', $oneHourAgo)
+            ->countAllResults();
+        
+        // If either email or IP exceeds the limit
+        if ($emailAttempts >= $maxRequestsPerHour || $ipAttempts >= $maxRequestsPerHour) {
+            return [
+                'allowed' => false,
+                'message' => "You have reached the maximum number of OTP requests. Please try again after 1 hour."
+            ];
+        }
+        
+        return ['allowed' => true];
+    }
+
+    // Clean up old OTP attempts (call when successful)
+    private function cleanupOldOtpAttempts($email)
+    {
+        $db = \Config\Database::connect();
+        $oneHourAgo = date('Y-m-d H:i:s', strtotime('-1 hour'));
+        
+        // Delete records older than 1 hour for this email
+        $db->table('ve_otp_attempts')
+            ->where('email', $email)
+            ->where('request_time <', $oneHourAgo)
+            ->delete();
+    }
+
     // Verify OTP for signup
     public function verifySignupOTP()
     {
@@ -383,6 +450,7 @@ class Auth extends BaseController
     {
         if ($this->request->isAJAX()) {
             $email = $this->request->getPost('email');
+            $ipAddress = $this->request->getIPAddress();
             
             // Validate email
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -401,9 +469,19 @@ class Auth extends BaseController
                 ]);
             }
             
+            // Check rate limit
+            $rateLimitCheck = $this->checkRateLimit($email);
+            if (!$rateLimitCheck['allowed']) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => $rateLimitCheck['message'],
+                    'rate_limit_exceeded' => true // Flag to identify rate limit errors
+                ]);
+            }
+            
             // Generate OTP
             $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-            $expiresAt = Time::now()->addMinutes(15); // OTP expires in 15 minutes
+            $expiresAt = Time::now()->addMinutes(OTP_EXPIRY_MINUTES); // OTP expires in 15 minutes
             
             // Save OTP to database
             $otpData = [
@@ -416,6 +494,13 @@ class Auth extends BaseController
             $db = \Config\Database::connect();
             $db->table('ve_otps')->insert($otpData);
             
+            // Record this OTP attempt with IP
+            $db->table('ve_otp_attempts')->insert([
+                'email' => $email,
+                'ip_address' => $ipAddress,
+                'request_time' => date('Y-m-d H:i:s')
+            ]);
+            
             // Send OTP email
             $emailSent = $this->sendOTPEmail($email, $otp);
             
@@ -425,6 +510,9 @@ class Auth extends BaseController
                     'message' => 'Failed to send OTP email. Please try again.'
                 ]);
             }
+            
+            // Clean up old records for this email
+            $this->cleanupOldOtpAttempts($email);
             
             // Store email in session for next steps
             session()->set('login_email', $email);
@@ -549,7 +637,8 @@ class Auth extends BaseController
             
             $message = "Hi,<br><br>
                 Thank you for signing/login up with Value Educator! To complete your Login/Signup and verify your email address, please use the code below:<br><br>
-                Your Verification Code: $otp<br>
+                Your Verification Code: $otp<br><br/>
+                This code is valid for 30 minutes<br/>
                 Please enter this code on the verification page to confirm your email.<br><br>
                 If you did not request this code, please ignore this email or contact us at value.educator@gmail.com.<br><br>
                 Thank you for choosing Value Educator!<br><br>

@@ -65,6 +65,8 @@
     // Store the signup token globally
     let signupToken = null;
     let openForm = 'signup';
+    let loginOtpTimer = null;
+    let signupOtpTimer = null;
 
     // Phone patterns & examples (kept from your original)
     const phonePatterns = {
@@ -109,12 +111,27 @@
         signupToken = null;
     }
 
-    function showFormById(formId) {
+    function showFormById(formId) 
+    {
         // Hide all known forms
         Object.values(authForms).forEach(el => { if (el) el.classList.add('d-none'); });
+        
         // Show requested
         const el = authForms[formId];
         if (el) el.classList.remove('d-none');
+        
+        // If showing OTP forms, start countdown for resend links
+        if (formId === 'loginOtpForm') {
+            const $resendLink = $('#loginOtpForm').find('.resend-otp-link');
+            if ($resendLink.length && !$resendLink.hasClass('disabled')) {
+                startOtpCountdown($resendLink, 60, 'login');
+            }
+        } else if (formId === 'signupOtpForm') {
+            const $resendLink = $('#signupOtpForm').find('.resend-otp-link');
+            if ($resendLink.length && !$resendLink.hasClass('disabled')) {
+                startOtpCountdown($resendLink, 60, 'signup');
+            }
+        }
     }
 
     function showLoader() { $authLoader.removeClass('d-none').addClass('d-flex'); }
@@ -212,7 +229,16 @@
                 showFormById('loginOtpForm');
                 $('#loginOtpForm .otp-input:first').focus();
             } else {
-                showError($loginEmailError, (res && res.message) ? res.message : 'Could not send OTP.');
+                // Show error message in the UI (not alert)
+                if (res && res.rate_limit_exceeded) {
+                    // Show rate limit error in a more prominent way
+                    showError($loginEmailError, res.message);
+                    $loginEmailError.addClass('rate-limit-error');
+                } else if (res && res.message) {
+                    showError($loginEmailError, res.message);
+                } else {
+                    showError($loginEmailError, 'Could not send OTP.');
+                }
             }
         }).fail(function () {
             hideButtonLoading($sendLoginOtpBtn);
@@ -249,7 +275,16 @@
                 showFormById('signupOtpForm');
                 $('#signupOtpForm .otp-input:first').focus();
             } else {
-                showError($signupEmailError, (res && res.message) ? res.message : 'Could not send OTP.');
+                // Show error message in the UI (not alert)
+                if (res && res.rate_limit_exceeded) {
+                    // Show rate limit error in a more prominent way
+                    showError($signupEmailError, res.message);
+                    $signupEmailError.addClass('rate-limit-error');
+                } else if (res && res.message) {
+                    showError($signupEmailError, res.message);
+                } else {
+                    showError($signupEmailError, 'Could not send OTP.');
+                }
             }
         }).fail(function () {
             hideButtonLoading($sendSignupOtpBtn);
@@ -641,11 +676,16 @@
         const emailInput = formType === 'login' ? $loginEmail : $signupEmail;
         const email = (emailInput.val() || '').trim();
         const $successEl = formType === 'login' ? $loginOtpSuccess : $signupOtpSuccess;
+        const $resendLink = $(this);
+        const $errorEl = formType === 'login' ? $loginOtpError : $signupOtpError;
 
         if (!email) { 
-            alert('Email address is required'); 
+            showError($errorEl, 'Email address is required'); 
             return; 
         }
+        
+        // Disable the resend link temporarily
+        $resendLink.addClass('disabled');
         
         $.ajax({
             url: base_url + 'auth/send-' + formType + '-otp',
@@ -662,14 +702,85 @@
                 const formId = (formType === 'login') ? '#loginOtpForm' : '#signupOtpForm';
                 $(formId + ' .otp-input').val('');
                 $(formId + ' .otp-input:first').focus();
+                
+                // Simple disable for 60 seconds without countdown
+                setTimeout(function() {
+                    $resendLink.removeClass('disabled');
+                }, 60000);
             } else {
-                alert((res && res.message) ? res.message : 'Could not resend OTP.');
+                $resendLink.removeClass('disabled');
+                // Show error message in the UI (not alert)
+                if (res && res.rate_limit_exceeded) {
+                    showError($errorEl, res.message);
+                    $errorEl.addClass('rate-limit-error');
+                } else if (res && res.message) {
+                    showError($errorEl, res.message);
+                } else {
+                    showError($errorEl, 'Could not resend OTP. Please try again later.');
+                }
             }
         }).fail(function () {
-            alert('An error occurred. Please try again.');
+            $resendLink.removeClass('disabled');
+            showError($errorEl, 'An error occurred. Please try again.');
         });
     });
 
+    // Function to start countdown timer
+    function startOtpCountdown($element, seconds, formType) {
+        let remainingTime = seconds;
+        const originalText = $element.text();
+        
+        // Clear any existing timer
+        if (formType === 'login' && loginOtpTimer) {
+            clearInterval(loginOtpTimer);
+        } else if (formType === 'signup' && signupOtpTimer) {
+            clearInterval(signupOtpTimer);
+        }
+        
+        // Update the button text with countdown
+        $element.text(`Resend OTP (${remainingTime}s)`);
+        
+        // Create the countdown timer
+        const timer = setInterval(function() {
+            remainingTime--;
+            $element.text(`Resend OTP (${remainingTime}s)`);
+            
+            if (remainingTime <= 0) {
+                clearInterval(timer);
+                $element.text(originalText).removeClass('disabled');
+                
+                // Clear the timer reference
+                if (formType === 'login') {
+                    loginOtpTimer = null;
+                } else {
+                    signupOtpTimer = null;
+                }
+            }
+        }, 1000);
+        
+        // Store the timer reference
+        if (formType === 'login') {
+            loginOtpTimer = timer;
+        } else {
+            signupOtpTimer = timer;
+        }
+    }
+
+    // Function to show rate limit error with countdown
+    function showOtpRateLimitError($element, message, seconds, formType) {
+        const $errorContainer = $element.closest('.text-center');
+        const $errorElement = $('<div class="text-danger small mt-2"></div>');
+        
+        // Remove any existing error
+        $errorContainer.find('.text-danger').remove();
+        
+        // Add the error message
+        $errorElement.text(message);
+        $errorContainer.append($errorElement);
+        
+        // Start countdown
+        startOtpCountdown($element, seconds, formType);
+    }
     // Utility: prevent form submission on enter inside OTP (we submit via form) - allow normal handling
     // End of $(function)
 });

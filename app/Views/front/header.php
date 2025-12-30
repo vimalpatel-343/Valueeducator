@@ -38,12 +38,34 @@
     </noscript>
 
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-F6G7FWC4EQ"></script>
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-F6G7FWC4EQ');
+    (function () {
+        let gtmLoaded = false;
+
+        function loadGA() {
+            if (gtmLoaded) return;
+            gtmLoaded = true;
+
+            // Create script
+            var gtagScript = document.createElement('script');
+            gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-F6G7FWC4EQ';
+            gtagScript.async = true;
+            document.head.appendChild(gtagScript);
+
+            // Init GA
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){ dataLayer.push(arguments); }
+            window.gtag = gtag;
+
+            gtag('js', new Date());
+            gtag('config', 'G-F6G7FWC4EQ');
+        }
+
+        // Load on first interaction
+        ['scroll','mousemove','touchstart','keydown'].forEach(event => {
+            window.addEventListener(event, loadGA, { once: true });
+        });
+    })();
     </script>
 </head>
 <body>
@@ -148,7 +170,7 @@
                                 </div>
                                 <div class="header-btn d-none d-lg-block">
                                     <a class="sc-primary-btn auth-trigger" data-bs-toggle="modal" data-bs-target="#authModal" href="#">
-                                        <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>" alt="Sign Up Icon"> Sign Up
+                                        <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>" alt="Login Icon"> Login
                                     </a>
                                     <button type="button" class="info" aria-label="More information" aria-describedby="content1" nmouseenter="showDiv('content1')" onmouseleave="hideDiv('content1')" onfocus="showDiv('content1')" onblur="hideDiv('content1')" style="border: 0px; background: none;">
                                         <div class="image"></div>

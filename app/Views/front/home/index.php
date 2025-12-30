@@ -123,9 +123,7 @@
                             <div class="sc-statistics-service-box h-400 h-md-400 sc-mb-25 text-left sal-animate" data-sal="slide-up" data-sal-duration="200" data-sal-delay="200">
                                 <div class="sc-counter-number">
                                     <div class="sc-count">
-                                        <span class="font-lg-40-bold font-32-bold letter-space-1 odometer odometer-auto-theme" data-count="<?= !empty($siteSettings['fld_hidden_gems']) ? $siteSettings['fld_hidden_gems'] : '50' ?>">
-                                            <?= !empty($siteSettings['fld_hidden_gems']) ? $siteSettings['fld_hidden_gems'] : '50' ?>
-                                        </span>+
+                                        <span class="counter font-lg-40-bold font-32-bold letter-space-1" data-target="<?= !empty($siteSettings['fld_hidden_gems']) ? $siteSettings['fld_hidden_gems'] : '50' ?>">0</span>+
                                     </div>
                                     <span class="sc-title p-z-idex position-relative font-lg-20-normal font-16-normal">Hidden Gems Discovered</span>
                                 </div>
@@ -143,9 +141,7 @@
                                                 }
                                             }
                                         ?>
-                                        <span class="font-lg-40-bold font-32-bold letter-space-1 odometer odometer-auto-theme" data-count="<?= $youTubeSuscriber ?>">
-                                            <?= $youTubeSuscriber ?>
-                                        </span>K
+                                        <span class="counter font-lg-40-bold font-32-bold letter-space-1" data-target="<?= $youTubeSuscriber ?>">0</span>K
                                     </div>
                                     <span class="sc-title p-z-idex position-relative font-lg-20-normal font-16-normal">Youtube subscribers</span>
                                 </div>
@@ -155,9 +151,7 @@
                             <div class="sc-statistics-service-box h-200 h-md-200 sc-mb-25 text-left sal-animate" data-sal="slide-up" data-sal-duration="400" data-sal-delay="400">
                                 <div class="sc-counter-number">
                                     <div class="sc-count">
-                                        <span class="font-lg-40-bold font-32-bold letter-space-1 odometer odometer-auto-theme" data-count="<?= !empty($siteSettings['fld_investors_empowered']) ? $siteSettings['fld_investors_empowered'] : '2000' ?>">
-                                            <?= !empty($siteSettings['fld_investors_empowered']) ? $siteSettings['fld_investors_empowered'] : '2000' ?>
-                                        </span>+
+                                        <span class="counter font-lg-40-bold font-32-bold letter-space-1" data-target="<?= !empty($siteSettings['fld_investors_empowered']) ? $siteSettings['fld_investors_empowered'] : '2000' ?>">0</span>+
                                     </div>
                                     <span class="sc-title p-z-idex position-relative font-lg-20-normal font-16-normal">Investors Empowered</span>
                                 </div>
@@ -165,9 +159,7 @@
                             <div class="sc-statistics-service-box h-400 h-md-400 sc-mb-25 text-left sal-animate" data-sal="slide-up" data-sal-duration="500" data-sal-delay="500">
                                 <div class="sc-counter-number">
                                     <div class="sc-count">
-                                        <span class="font-lg-40-bold font-32-bold letter-space-1 odometer odometer-auto-theme" data-count="<?= !empty($siteSettings['fld_years_experience']) ? $siteSettings['fld_years_experience'] : '60' ?>">
-                                            <?= !empty($siteSettings['fld_years_experience']) ? $siteSettings['fld_years_experience'] : '60' ?>
-                                        </span>+
+                                        <span class="counter font-lg-40-bold font-32-bold letter-space-1" data-target="<?= !empty($siteSettings['fld_years_experience']) ? $siteSettings['fld_years_experience'] : '60' ?>">0</span>+
                                     </div>
                                     <span class="sc-title p-z-idex position-relative font-lg-20-normal font-16-normal">Years of Combined Experience</span>
                                 </div>
@@ -224,7 +216,7 @@
             <div class="col-lg-12 col-md-12">
                 <div class="sc-heading-area sc-mt-0 sc-mb-20 text-left">
                     <div class="d-flex justify-content-between align-items-center sc-mt-0 sc-md-mt-0 sc-mb-10 sc-md-mb-10">
-                        <h3 class="text-lg-start text-center mx-lg-0 mx-auto font-lg-32-bold font-20-bold sc-mt-0 sc-mb-0">Our Investment Philosophy</h3>
+                        <h3 class="text-lg-start text-center mx-lg-0 mx-auto font-lg-32-bold font-20-bold sc-sm-mt-40 sc-mt-0 sc-mb-0">Our Investment Philosophy</h3>
                         <a href="<?= base_url('investment-philosophy') ?>" class="more d-none d-md-inline-block" target="_blank">Learn More <span class="visually-hidden">about our investment philosophy</span></a>
                     </div>
                     <span class="sub-title d-none d-md-block font-lg-16-normal sc-mt-20"><span>SPRINT</span> represents a dynamic investment approach, centered on uncovering businesses with the potential for rapid and sustainable profitability, driven by scuttlebutt research at its core, and focused on seizing opportunities early to drive long-term wealth creation.</span>
@@ -262,7 +254,7 @@
             <div class="swiper-button-prev"></div>
             <div class="swiper-pagination"></div>
         </div>
-        <a class="sc-primary-btn d-block d-md-none text-center btn-color-white- font-18-medium sc-mt-30" href="investment-philosophy">Learn More <span class="visually-hidden">about our investment philosophy</span></a>
+        <a class="sc-primary-btn d-block d-md-none text-center btn-color-white- font-18-medium sc-mt-30" href="investment-philosophy">Our Investment Philosophy</a>
     </div>
 </div>
 
@@ -433,7 +425,7 @@
                             <!-- Buttons -->
                             <div class="row">
                                 <div class="col-lg-6 col-md-6">
-                                    <a class="w-100 sc-primary-btn btn-color-1 text-center" href="<?= base_url($product['fld_slug']) ?>">Learn More <span class="visually-hidden"> about <?= $product['fld_title'] ?> stocks</span></a>
+                                    <a class="w-100 sc-primary-btn btn-color-1 text-center" href="<?= base_url($product['fld_slug']) ?>">About <?= $product['fld_title'] ?></a>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <a class="w-100 sc-primary-btn btn-color-3 text-center buy-now-btn" href="#" data-product-name="<?= esc($product['fld_title']) ?>" data-amount="<?= esc($product['fld_pricing']) ?>" data-sub-title="12 month subscription" data-expired-month="12">Buy Now</a>
@@ -490,16 +482,7 @@
                         <div class="swiper-slide">
                             <div class="sc-test-item">
                                 <div class="video-container">
-                                    <iframe width="560" height="315" 
-                                        src="https://www.youtube-nocookie.com/embed/<?= esc($video['video_id']) ?>" 
-                                        title="<?= esc($video['fld_title']) ?>" 
-                                        loading="lazy" 
-                                        frameborder="0" 
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                        referrerpolicy="strict-origin-when-cross-origin" 
-                                        allowfullscreen>
-                                    </iframe>
-    
+                                    <lite-youtube videoid="<?= esc($video['video_id']) ?>"></lite-youtube>
                                 </div>
                                 <div class="sc-auother-text d-flex align-items-center">
                                     <div class="sc-auother-header sc-mt-20">
@@ -547,7 +530,10 @@
     </div>
 </div>
 
-<script src="<?= base_url('front/js/swiper.min.js') ?>"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lite-youtube-embed@0.3.2/src/lite-yt-embed.css" />
+<script src="https://cdn.jsdelivr.net/npm/lite-youtube-embed@0.3.2/src/lite-yt-embed.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/lite-vimeo-embed/+esm"></script>
+<script src="<?= asset_versioned('front/js/swiper.min.js') ?>"></script>
 <script>
     // Initialize Swiper for Investment Philosophy
     var philosophySwiper = new Swiper('.sc-swiper-slider', {
@@ -605,9 +591,6 @@
 
 <?= $this->include('front/footer') ?>
 
-<link rel="stylesheet" href="<?= base_url('front/css/odometer-theme-default.css') ?>" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.js"></script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -636,4 +619,28 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+document.querySelectorAll('.counter').forEach(counter => {
+  const target = +counter.dataset.target;
+  const duration = 4000; // ⏱️ 4 seconds (increase for more slow)
+  let startTime = null;
+
+  function update(time) {
+    if (!startTime) startTime = time;
+
+    const progress = Math.min((time - startTime) / duration, 1);
+    const value = Math.floor(progress * target);
+
+    counter.textContent = value;
+
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    } else {
+      counter.textContent = target;
+    }
+  }
+
+  requestAnimationFrame(update);
+});
+
 </script>

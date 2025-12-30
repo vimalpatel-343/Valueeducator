@@ -101,7 +101,7 @@
                         </div>
 
                         <div class="text-center mt-3">
-                            <p>Already have an account? <a href="#" class="auth-switch-link" data-target="loginForm">Log In</a></p>
+                            <p>Already have an account? <a href="#" class="auth-switch-link" data-target="loginForm">Login</a></p>
                         </div>
                     </form>
                 </div>

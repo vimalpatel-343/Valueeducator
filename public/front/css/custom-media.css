@@ -36,6 +36,16 @@
     min-height: 320px;
 }
 
+.rate-limit-error {
+    color: #dc3545 !important;
+    font-weight: bold !important;
+    background-color: #f8d7da !important;
+    border: 1px solid #f5c6cb !important;
+    padding: 10px !important;
+    border-radius: 4px !important;
+    margin-top: 10px !important;
+}
+
 /* Small devices (phones, <576px) */
 @media (max-width: 575.98px) {
     

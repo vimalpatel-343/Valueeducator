@@ -109,10 +109,10 @@
                         <?php else: ?>
                             <div class="video-container">
                                 <!-- Embed video here - assuming product has a video URL -->
-                                <?php if (!empty($product['fld_video_url'])): ?>
+                                <?php if (!empty($product['fld_how_to_use_url'])): ?>
                                     <div class="video-embed-container">
                                         <iframe 
-                                            src="<?= $product['fld_video_url'] ?>" 
+                                            src="<?= $product['fld_how_to_use_url'] ?>" 
                                             width="100%" 
                                             height="250" 
                                             frameborder="0" 
