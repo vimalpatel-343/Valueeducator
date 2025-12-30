@@ -97,12 +97,12 @@
                             <div class="row">
                                 <div class="col-lg-6 col-6" style="padding-right:0px;">
                                     <h3 class="font-lg-14-normal sc-mb-0" style="color:#8D8D8D;">Portfolio Allocation</h3>
-                                    <p class="font-lg-16-bold sc-mb-20"><?= $portfolioOverview['fld_portfolio_allocation'] ?? '96' ?>%</p>
+                                    <p class="font-lg-16-bold sc-mb-20"><?= $portfolioOverview['fld_overview_allocation'] ?? '96' ?>%</p>
                                 </div>
 
                                 <div class="col-lg-6 col-6" style="padding-right:0px;">
                                     <h3 class="font-lg-14-normal sc-mb-0" style="color:#8D8D8D;">Cash</h3>
-                                    <p class="font-lg-16-bold sc-mb-0"><?= $portfolioDistribution['fld_cash_percentage'] ?? '4' ?>%</p>
+                                    <p class="font-lg-16-bold sc-mb-0"><?= $portfolioOverview['fld_overview_cash'] ?? '4' ?>%</p>
                                 </div>
                             </div>
                         </div>

@@ -584,6 +584,20 @@
                                                 </select>
                                             </div>
                                         </div>
+
+                                        <div class="row mb-3">
+                                            <label class="col-md-3 col-form-label">Portfolio Allocation</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" name="portfolio[overview_allocation]" value="<?= $portfolioOverview['fld_overview_allocation'] ?? '' ?>">
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <label class="col-md-3 col-form-label">Cash (Portfolio Overview)</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" name="portfolio[overview_cash]" value="<?= $portfolioOverview['fld_overview_cash'] ?? '' ?>">
+                                            </div>
+                                        </div>
                                         
                                         <div class="row mb-3">
                                             <label class="col-md-3 col-form-label">Disclaimer</label>

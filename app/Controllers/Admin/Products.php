@@ -329,6 +329,8 @@ class Products extends BaseController
                 'fld_top_sectors' => $portfolioData['top_sectors'] ?? null,
                 'fld_upcoming_review' => $portfolioData['upcoming_review'] ?? null,
                 'fld_average_market_cap' => $portfolioData['average_market_cap'] ?? null,
+                'fld_overview_allocation' => $portfolioData['overview_allocation'] ?? null,
+                'fld_overview_cash' => $portfolioData['overview_cash'] ?? null,
                 'fld_dependency_on_us_economy' => $portfolioData['dependency_on_us_economy'] ?? null,
                 'fld_disclaimer' => $portfolioData['disclaimer'] ?? null
             ];
