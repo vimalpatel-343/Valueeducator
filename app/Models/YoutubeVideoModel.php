@@ -14,42 +14,205 @@ class YoutubeVideoModel extends Model
     protected $createdField = 'fld_created_at';
     protected $updatedField = 'fld_updated_at';
     
-    // Get all active YouTube videos
-    public function getActiveVideos($limit=3)
+    // Get all active YouTube videos with pagination
+    public function getActiveVideos($limit=3, $offset=0)
     {
         return $this->where('fld_status', 1)
                     ->orderBy('fld_posted_at', 'DESC')
-                    ->limit($limit)
-                    ->findAll();
+                    ->findAll($limit, $offset);
+    }
+    
+    // Get all videos with pagination for admin
+    public function getAllVideos($limit=20, $offset=0)
+    {
+        $videos = $this->orderBy('fld_posted_at', 'DESC')
+                      ->findAll($limit, $offset);
+        
+        // Process each video to get product titles and general status
+        foreach ($videos as &$video) {
+            $video['product_titles'] = $this->getProductTitles($video['fld_product_id']);
+            $video['is_general'] = $this->isGeneral($video['fld_product_id']);
+        }
+        
+        return $videos;
+    }
+    
+    // Count all videos for pagination
+    public function countAllVideos()
+    {
+        return $this->countAll();
     }
     
     // Get videos by product ID
-    public function getVideosByProduct($productId)
+    public function getVideosByProduct($productId, $limit=3)
     {
-        return $this->where('fld_product_id', $productId)->where('fld_status', 1)->findAll();
+        return $this->where("FIND_IN_SET('$productId', fld_product_id) > 0")
+                    ->where('fld_status', 1)
+                    ->orderBy('fld_posted_at', 'DESC')
+                    ->findAll($limit);
     }
     
-    // Get general videos (not associated with any product)
-    public function getGeneralVideos()
+    // Get general videos (marked with 0)
+    public function getGeneralVideos($limit=3)
     {
-        return $this->where('fld_product_id', NULL)->where('fld_status', 1)->findAll();
+        return $this->where('fld_product_id', '0')
+                    ->where('fld_status', 1)
+                    ->orderBy('fld_posted_at', 'DESC')
+                    ->findAll($limit);
     }
     
-    // Get video by ID
+    // Get video by ID with associated products
     public function getVideoById($id)
     {
-        return $this->find($id);
+        $video = $this->find($id);
+        
+        if ($video) {
+            // Convert comma-separated product IDs to array
+            $video['products'] = $this->getProductIds($video['fld_product_id']);
+            $video['is_general'] = $this->isGeneral($video['fld_product_id']);
+        }
+        
+        return $video;
+    }
+    
+    // Check if video is marked as general
+    private function isGeneral($productIds)
+    {
+        if ($productIds === '0' || strpos($productIds, '0,') === 0) {
+            return true;
+        }
+        return false;
+    }
+    
+    // Convert comma-separated product IDs to array
+    private function getProductIds($productIds)
+    {
+        if (empty($productIds)) {
+            return [];
+        }
+        
+        // Remove "0," prefix if it exists (for General + Products)
+        if (strpos($productIds, '0,') === 0) {
+            $productIds = substr($productIds, 2);
+        }
+        
+        // Skip if it's just "0"
+        if ($productIds === '0') {
+            return [];
+        }
+        
+        return $productIds ? explode(',', $productIds) : [];
+    }
+    
+    // Get product titles from comma-separated product IDs
+    private function getProductTitles($productIds)
+    {
+        if ($productIds === '0') {
+            return 'General';
+        }
+
+        if (empty($productIds)) {
+            return '';
+        }
+
+        $ids = explode(',', $productIds);
+
+        $hasGeneral = in_array('0', $ids);
+
+        // Remove 0 so DB query works
+        $ids = array_diff($ids, ['0']);
+
+        $titles = [];
+
+        if (!empty($ids)) {
+            $db = \Config\Database::connect();
+            $products = $db->table('ve_products')
+                ->select('fld_title')
+                ->whereIn('id', $ids)
+                ->get()
+                ->getResultArray();
+
+            $titles = array_column($products, 'fld_title');
+        }
+
+        // If only 0 existed
+        if ($hasGeneral && empty($titles)) {
+            return 'General';
+        }
+
+        // If 0 + products
+        if ($hasGeneral) {
+            array_unshift($titles, 'General');
+        }
+
+        return implode(', ', $titles);
     }
     
     // Create new video
-    public function createVideo($data)
+    public function createVideo($data, $assignments = [])
     {
+        // Process assignments
+        $productIds = [];
+        $isGeneral = false;
+        
+        foreach ($assignments as $assignment) {
+            if ($assignment === 'general') {
+                $isGeneral = true;
+            } else {
+                // It's a product ID
+                $productIds[] = $assignment;
+            }
+        }
+        
+        // Build the product_id string
+        if ($isGeneral && !empty($productIds)) {
+            // General + Products: prefix with "0,"
+            $data['fld_product_id'] = '0,' . implode(',', $productIds);
+        } elseif ($isGeneral) {
+            // General only
+            $data['fld_product_id'] = '0';
+        } elseif (!empty($productIds)) {
+            // Products only
+            $data['fld_product_id'] = implode(',', $productIds);
+        } else {
+            // Default to General
+            $data['fld_product_id'] = '0';
+        }
+        
         return $this->insert($data);
     }
     
     // Update video
-    public function updateVideo($id, $data)
+    public function updateVideo($id, $data, $assignments = [])
     {
+        // Process assignments
+        $productIds = [];
+        $isGeneral = false;
+        
+        foreach ($assignments as $assignment) {
+            if ($assignment === 'general') {
+                $isGeneral = true;
+            } else {
+                // It's a product ID
+                $productIds[] = $assignment;
+            }
+        }
+        
+        // Build the product_id string
+        if ($isGeneral && !empty($productIds)) {
+            // General + Products: prefix with "0,"
+            $data['fld_product_id'] = '0,' . implode(',', $productIds);
+        } elseif ($isGeneral) {
+            // General only
+            $data['fld_product_id'] = '0';
+        } elseif (!empty($productIds)) {
+            // Products only
+            $data['fld_product_id'] = implode(',', $productIds);
+        } else {
+            // Default to General
+            $data['fld_product_id'] = '0';
+        }
+        
         return $this->update($id, $data);
     }
     

@@ -969,24 +969,28 @@ class Dashboard extends BaseController
             return redirect()->to('/');
         }
 
-        // Get user subscription status (placeholder)
-        $hasAccess = true; // YouTube videos might be accessible to all users
+        // Get user subscription status
+        $hasAccess = true;
         
-        // Fetch all YouTube Videos
+        // Pagination parameters
+        $page = $this->request->getVar('page') ?? 1;
+        $perPage = 2; // Show 12 videos per page
+        $offset = ($page - 1) * $perPage;
+        
+        // Get total count for pagination
+        $totalVideos = $this->youtubeVideoModel
+            ->where('fld_status', 1)
+            ->countAllResults();
+        
+        // Fetch paginated YouTube Videos
         $youtubeVideos = $this->youtubeVideoModel
             ->where('fld_status', 1)
             ->orderBy('fld_posted_at', 'DESC')
-            ->findAll();
+            ->findAll($perPage, $offset);
         
-        // Pre-process YouTube videos to add formatted data
-        foreach ($youtubeVideos as &$video) {
-            // The video ID is already stored in fld_video_id
-            $video['video_id'] = $video['fld_video_id'];
-            // Format the time elapsed
-            $video['time_elapsed'] = $this->timeElapsedString(strtotime($video['fld_posted_at']));
-            // Format the view count
-            $video['formatted_views'] = number_format($video['fld_total_views']);
-        }
+        // Create pagination links
+        $pager = \Config\Services::pager();
+        $pagination = $pager->makeLinks($page, $perPage, $totalVideos, 'default_full');
         
         // Get site settings
         $siteSettings = $this->siteSettingsModel->first();
@@ -999,6 +1003,10 @@ class Dashboard extends BaseController
             'hasAccess' => $hasAccess,
             'youtubeVideos' => $youtubeVideos,
             'allProducts' => $allProducts,
+            'pagination' => $pagination,
+            'currentPage' => $page,
+            'totalVideos' => $totalVideos,
+            'perPage' => $perPage,
             'meta' => [
                 'title' => 'YouTube Videos - Value Educator',
                 'description' => 'Access all our educational YouTube videos on investing, market analysis, and more.'

@@ -56,7 +56,7 @@ class Home extends BaseController
         }
         
         // Get YouTube videos
-        $videos = $this->youtubeVideoModel->getActiveVideos(5);
+        $videos = $this->youtubeVideoModel->getVideosByProduct(0, 5);
         
         // Process videos to extract video ID and generate thumbnail URL
         foreach ($videos as &$video) {

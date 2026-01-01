@@ -18,12 +18,18 @@ class YoutubeVideo extends BaseController
         helper('text');
     }
     
-    // List all YouTube videos
+    // List all YouTube videos with pagination
     public function index()
     {
-        $data['videos'] = $this->videoModel->select('ve_youtube_videos.*, ve_products.fld_title as product_title')
-                                      ->join('ve_products', 've_products.id = ve_youtube_videos.fld_product_id', 'left')
-                                      ->findAll();
+        $page = $this->request->getVar('page') ?? 1;
+        $perPage = 20;
+        $offset = ($page - 1) * $perPage;
+        
+        $data['videos'] = $this->videoModel->getAllVideos($perPage, $offset);
+        $data['totalVideos'] = $this->videoModel->countAllVideos();
+        $data['pager'] = \Config\Services::pager();
+        $data['currentPage'] = $page;
+        $data['perPage'] = $perPage;
         $data['title'] = 'YouTube Videos';
         
         return view('admin/youtube_video/index', $data);
@@ -45,6 +51,7 @@ class YoutubeVideo extends BaseController
         
         $rules = [
             'video_id' => 'required|min_length[11]|max_length[11]',
+            'assignments' => 'required',
             'status' => 'required|in_list[0,1]'
         ];
         
@@ -62,7 +69,6 @@ class YoutubeVideo extends BaseController
         }
         
         $data = [
-            'fld_product_id' => $this->request->getPost('product_id') ? $this->request->getPost('product_id') : null,
             'fld_title' => $videoDetails['title'],
             'fld_description' => $videoDetails['description'],
             'fld_video_id' => $videoId,
@@ -71,7 +77,10 @@ class YoutubeVideo extends BaseController
             'fld_status' => $this->request->getPost('status')
         ];
         
-        $this->videoModel->createVideo($data);
+        // Get selected assignments (general and/or products)
+        $assignments = $this->request->getPost('assignments') ?? [];
+        
+        $this->videoModel->createVideo($data, $assignments);
         
         return redirect()->to('/admin/youtube-videos')->with('success', 'YouTube video added successfully');
     }
@@ -103,7 +112,9 @@ class YoutubeVideo extends BaseController
         $validation = \Config\Services::validation();
         
         $rules = [
-            'video_id' => 'required|min_length[11]|max_length[11]',
+            'title' => 'required|min_length[3]',
+            'description' => 'required',
+            'assignments' => 'required',
             'status' => 'required|in_list[0,1]'
         ];
         
@@ -111,26 +122,18 @@ class YoutubeVideo extends BaseController
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
         
-        $videoId = $this->request->getPost('video_id');
-        
-        // Get video details from YouTube API
-        $videoDetails = $this->videoModel->getVideoDetailsFromAPI($videoId);
-        
-        if (!$videoDetails) {
-            return redirect()->back()->withInput()->with('error', 'Invalid YouTube video ID or unable to fetch video details');
-        }
-        
         $data = [
-            'fld_product_id' => $this->request->getPost('product_id') ? $this->request->getPost('product_id') : null,
-            'fld_title' => $videoDetails['title'],
-            'fld_description' => $videoDetails['description'],
-            'fld_video_id' => $videoId,
-            'fld_total_views' => $videoDetails['total_views'],
-            'fld_posted_at' => $videoDetails['posted_at'],
+            'fld_title' => $this->request->getPost('title'),
+            'fld_description' => $this->request->getPost('description'),
+            'fld_total_views' => $this->request->getPost('total_views'),
+            'fld_posted_at' => $this->request->getPost('posted_at'),
             'fld_status' => $this->request->getPost('status')
         ];
         
-        $this->videoModel->updateVideo($id, $data);
+        // Get selected assignments (general and/or products)
+        $assignments = $this->request->getPost('assignments') ?? [];
+        
+        $this->videoModel->updateVideo($id, $data, $assignments);
         
         return redirect()->to('/admin/youtube-videos')->with('success', 'YouTube video updated successfully');
     }
@@ -172,7 +175,7 @@ class YoutubeVideo extends BaseController
             'fld_posted_at' => $videoDetails['posted_at']
         ];
         
-        $this->videoModel->updateVideo($id, $data);
+        $this->videoModel->update($id, $data);
         
         return redirect()->to('/admin/youtube-videos')->with('success', 'Video data refreshed successfully');
     }

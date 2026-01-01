@@ -38,7 +38,7 @@
                   <th>Video ID</th>
                   <th>Views</th>
                   <th>Posted Date</th>
-                  <th>Product</th>
+                  <th>Products</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -56,10 +56,22 @@
                       <td><?= number_format($video['fld_total_views']) ?></td>
                       <td><?= date('M d, Y', strtotime($video['fld_posted_at'])) ?></td>
                       <td>
-                        <?php if (!empty($video['product_title'])): ?>
-                          <span class="badge bg-label-primary"><?= $video['product_title'] ?></span>
-                        <?php else: ?>
+                        <?php 
+                        // Check if it's General only
+                        if ($video['product_titles'] === 'General'): 
+                        ?>
                           <span class="badge bg-label-secondary">General</span>
+                        <?php 
+                        // Check if it's General + Products
+                        elseif (strpos($video['product_titles'], 'General, ') === 0): 
+                        ?>
+                          <span class="badge bg-label-info me-1">General</span>
+                          <span class="badge bg-label-primary"><?= substr($video['product_titles'], 9) ?></span>
+                        <?php 
+                        // Products only
+                        else: 
+                        ?>
+                          <span class="badge bg-label-primary"><?= $video['product_titles'] ?></span>
                         <?php endif; ?>
                       </td>
                       <td>
@@ -100,6 +112,22 @@
               </tbody>
             </table>
           </div>
+          
+          <!-- Pagination -->
+          <?php if (isset($pager)): ?>
+          <div class="row mt-3">
+            <div class="col-sm-12 col-md-5">
+              <div class="dataTables_info">
+                Showing <?= (($currentPage - 1) * $perPage) + 1 ?> to <?= min($currentPage * $perPage, $totalVideos) ?> of <?= $totalVideos ?> entries
+              </div>
+            </div>
+            <div class="col-sm-12 col-md-7">
+              <div class="dataTables_paginate paging_simple_numbers">
+                <?= $pager->makeLinks($currentPage, $perPage, $totalVideos, 'default_full') ?>
+              </div>
+            </div>
+          </div>
+          <?php endif; ?>
         </div>
       </div>
     </div>
@@ -135,4 +163,15 @@
         $('#deleteModal').modal('show');
     }
 </script>
+<style>
+  .pagination li.active {
+    background-color: #696cff !important;
+  }
+  .pagination li {
+      background-color: #cccccc;
+      border-radius: 5px;
+      padding: 5px 15px;
+      margin-right: 5px;
+  }
+</style>
 <?= $this->endSection() ?>

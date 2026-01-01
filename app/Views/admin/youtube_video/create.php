@@ -29,21 +29,30 @@
                   <small class="text-muted">The 11-character ID from the YouTube URL (e.g., dQw4w9WgXcQ)</small>
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="form-group mb-3">
-                  <label for="product_id" class="form-label">Product</label>
-                  <select class="form-select" id="product_id" name="product_id">
-                    <option value="">General Video</option>
-                    <?php if (!empty($products)): ?>
-                      <?php foreach ($products as $product): ?>
-                        <option value="<?= $product['id'] ?>" <?= old('product_id') == $product['id'] ? 'selected' : '' ?>>
-                          <?= $product['fld_title'] ?>
-                        </option>
-                      <?php endforeach; ?>
-                    <?php endif; ?>
-                  </select>
+            </div>
+            
+            <div class="form-group mb-3">
+              <label class="form-label">Assign to <span class="text-danger">*</span></label>
+              <div class="border rounded p-3">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="general" id="general_video" name="assignments[]" checked>
+                  <label class="form-check-label" for="general_video">
+                    General (Show on Home Page)
+                  </label>
                 </div>
+                
+                <?php if (!empty($products)): ?>
+                  <?php foreach ($products as $product): ?>
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="checkbox" value="<?= $product['id'] ?>" id="product_<?= $product['id'] ?>" name="assignments[]">
+                      <label class="form-check-label" for="product_<?= $product['id'] ?>">
+                        <?= $product['fld_title'] ?>
+                      </label>
+                    </div>
+                  <?php endforeach; ?>
+                <?php endif; ?>
               </div>
+              <small class="text-muted">You can select General and/or any combination of products</small>
             </div>
             
             <div class="form-group mb-3">
@@ -72,6 +81,6 @@
 
 <?= $this->section('scripts') ?>
 <script>
-  // Add any JavaScript needed for this page
+// No additional script needed for this approach
 </script>
 <?= $this->endSection() ?>
