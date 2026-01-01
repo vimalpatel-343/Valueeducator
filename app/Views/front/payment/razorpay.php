@@ -1,6 +1,21 @@
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
 <script>
+let razorpayLoaded = false;
+
+function loadRazorpay(callback) {
+    if (razorpayLoaded) {
+        callback();
+        return;
+    }
+
+    const script = document.createElement('script');
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = function () {
+        razorpayLoaded = true;
+        callback();
+    };
+    document.body.appendChild(script);
+}
+
 $(document).ready(function() {
 
     /* -------------------------------
@@ -9,22 +24,28 @@ $(document).ready(function() {
     $('.buy-now-btn').click(function (e) {
         e.preventDefault();
 
-        // Check login (PHP condition)
-        <?php if (!session()->get('isLoggedIn')): ?>
+        const btn = this;
 
+        loadRazorpay(function () {
+            handleBuyNow(btn);
+        });
+    });
+
+    function handleBuyNow(btn)
+    {
+        // Login check
+        <?php if (!session()->get('isLoggedIn')): ?>
             $('.modal.show').modal('hide');
             $('#authModal').modal('show');
             return;
         <?php endif; ?>
 
-        // If KYC is done, proceed with payment
-        const productId     = $(this).data('product-id');
-        const productName   = $(this).data('product-name');
-        const amount        = $(this).data('amount');
-        const subTitle      = $(this).data('sub-title');
-        const expiredMonth  = $(this).data('expired-month');
+        const productId    = $(btn).data('product-id');
+        const productName  = $(btn).data('product-name');
+        const amount       = $(btn).data('amount');
+        const subTitle     = $(btn).data('sub-title');
+        const expiredMonth = $(btn).data('expired-month');
 
-        // Set modal values
         $('#modal-amount').text(amount);
         $('#modal-sub-title').text(subTitle);
         $('#button-amount').text(amount);
@@ -35,16 +56,14 @@ $(document).ready(function() {
         $('#payment_sub_title').val(subTitle);
         $('#payment_expired_month').val(expiredMonth);
 
-        // Reset modal
         $('#payment-content').show();
         $('#payment-loader').hide();
         $('#payment-success').hide();
         $('#payment-error').hide();
-        $('#error-payment-message').text('');
 
         $('.modal.show').modal('hide');
         $('#payment-modal').modal('show');
-    });
+    }
 
     /* -------------------------------
        PAYMENT FORM SUBMIT HANDLER

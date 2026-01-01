@@ -104,7 +104,7 @@
                             <?php 
                             $homeMainImage = isset($pageImages['home']['main_image']) ? $pageImages['home']['main_image'] : null;
                             if ($homeMainImage): ?>
-                                <img class="sc-border-radius" src="<?= base_url($homeMainImage['image_path']) ?>" alt="<?= $homeMainImage['image_alt'] ?>" srcset="<?= base_url($homeMainImage['image_path']) ?> 372w, <?= base_url($homeMainImage['image_path']) ?> 651w" sizes="(max-width: 768px) 100vw, 372px">
+                                <img class="sc-border-radius" src="<?= base_url($homeMainImage['image_path']) ?>" width="600" fetchpriority="high" decoding="async" alt="<?= esc($homeMainImage['image_alt']) ?>">
                             <?php else: ?>
                                 <img class="sc-border-radius" src="images/home/img-home.svg" alt="">
                             <?php endif; ?>
@@ -533,93 +533,68 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lite-youtube-embed@0.3.2/src/lite-yt-embed.css" />
 <script src="https://cdn.jsdelivr.net/npm/lite-youtube-embed@0.3.2/src/lite-yt-embed.js"></script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/lite-vimeo-embed/+esm"></script>
-<script src="<?= asset_versioned('front/js/swiper.min.js') ?>"></script>
+<script src="<?= asset_versioned('front/js/swiper.min.js') ?>" defer></script>
 <script>
-    // Initialize Swiper for Investment Philosophy
-    var philosophySwiper = new Swiper('.sc-swiper-slider', {
-        slidesPerView: 3,
-        spaceBetween: 25,
-        loop: true,
-        autoplay: false,
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        breakpoints: {
-            0: {
-                slidesPerView: 1,
-            },
-            768: {
-                slidesPerView: 2,
-            },
-            992: {
-                slidesPerView: 3,
-            }
-        }
+document.addEventListener('DOMContentLoaded', function () {
+
+  // Investment Philosophy Swiper
+  const philosophyEl = document.querySelector('.sc-swiper-slider');
+  if (philosophyEl) {
+    new Swiper(philosophyEl, {
+      slidesPerView: 3,
+      spaceBetween: 25,
+      loop: false, 
+      speed: 600,
+      observer: true,
+      observeParents: true,
+      pagination: {
+        el: philosophyEl.querySelector('.swiper-pagination'),
+        clickable: true,
+      },
+      navigation: {
+        nextEl: philosophyEl.querySelector('.swiper-button-next'),
+        prevEl: philosophyEl.querySelector('.swiper-button-prev'),
+      },
+      breakpoints: {
+        0: { slidesPerView: 1 },
+        768: { slidesPerView: 2 },
+        992: { slidesPerView: 3 }
+      }
     });
-    
-    // Initialize Swiper for YouTube Videos
-    var videoSwiper = new Swiper('.sc-blog-slider', {
-        slidesPerView: 3,
-        spaceBetween: 30,
-        loop: true,
-        autoplay: {
-            delay: 5000,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        breakpoints: {
-            0: {
-                slidesPerView: 1,
-            },
-            768: {
-                slidesPerView: 2,
-            },
-            992: {
-                slidesPerView: 3,
-            }
-        }
+  }
+
+  // Video Swiper
+  const videoEl = document.querySelector('.sc-blog-slider');
+  if (videoEl) {
+    new Swiper(videoEl, {
+      slidesPerView: 3,
+      spaceBetween: 30,
+      loop: false, 
+      speed: 600,
+      autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+      },
+      observer: true,
+      observeParents: true,
+      pagination: {
+        el: videoEl.querySelector('.swiper-pagination'),
+        clickable: true,
+      },
+      breakpoints: {
+        0: { slidesPerView: 1 },
+        768: { slidesPerView: 2 },
+        992: { slidesPerView: 3 }
+      }
     });
+  }
+
+});
 </script>
 
 <?= $this->include('front/footer') ?>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const counters = document.querySelectorAll(".odometer");
-
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const el = entry.target;
-                const target = el.getAttribute("data-count");
-
-                el.innerHTML = 0; // start from zero
-                setTimeout(() => {
-                    el.innerHTML = target;
-                }, 200);
-
-                observer.unobserve(el); // animate only once
-            }
-        });
-    }, {
-        threshold: 0.6
-    });
-
-    counters.forEach(counter => {
-        observer.observe(counter);
-    });
-
-});
-
 document.querySelectorAll('.counter').forEach(counter => {
   const target = +counter.dataset.target;
   const duration = 4000; // ⏱️ 4 seconds (increase for more slow)
