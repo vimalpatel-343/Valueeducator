@@ -91,9 +91,10 @@ $routes->get('pdf/generate-token/(:segment)/(:any)', 'Pdf::generateToken/$1/$2')
 $routes->get('pdf/view-with-token/(:segment)', 'Pdf::viewWithToken/$1');
 
 // Add these routes
- $routes->get('/auth', 'Auth::index');
- $routes->post('/auth/login', 'Auth::login');
- $routes->get('/logout', 'Auth::logout');
+$routes->get('/auth', 'Auth::index');
+$routes->post('/auth/login', 'Auth::login');
+$routes->get('/logout', 'Auth::logout');
+$routes->get('login', 'Front\Auth::loginPage');
 
 // Admin routes (protected by authentication filter)
 $routes->group('/admin', ['filter' => 'adminauth'], function($routes) {

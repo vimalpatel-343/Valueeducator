@@ -157,9 +157,12 @@
                         <div class="col-lg-3 col-5">
                             <div class="sc-menu-select-box d-flex align-items-center justify-content-end">
                                 <div class="header-btn d-block d-lg-none">
-                                    <a data-bs-target="#authModal" data-bs-toggle="modal" href="#" id="accountIcon">
+                                    <!-- <a data-bs-target="#authModal" data-bs-toggle="modal" href="#" id="accountIcon">
                                         <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>" width="32" style="width:32px; pointer: cursor;" alt="User Account Icon">
-                                    </a>
+                                    </a>   -->
+                                    <a href="<?= base_url('login') ?>" class="" id="accountIcon">
+                                        <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>"  style="width:32px; pointer: cursor;" alt="User Account Icon">
+                                    </a>                                  
                                 </div>
                                 <div class="sc-hambagur-icon d-none sc-ml-20 sc-mt-0">
                                     <a id="canva_expander" href="#" class="nav-menu-link menu-button">
@@ -169,7 +172,10 @@
                                     </a>
                                 </div>
                                 <div class="header-btn d-none d-lg-block">
-                                    <a class="sc-primary-btn auth-trigger" data-bs-toggle="modal" data-bs-target="#authModal" href="#">
+                                    <!-- <a class="sc-primary-btn auth-trigger" data-bs-toggle="modal" data-bs-target="#authModal" href="#">
+                                        <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>" alt="Login Icon"> Login
+                                    </a> -->
+                                    <a href="<?= base_url('login') ?>" class="sc-primary-btn">
                                         <img class="hover-image" src="<?= base_url('front/account_circle.svg') ?>" alt="Login Icon"> Login
                                     </a>
                                     <button type="button" class="info" aria-label="More information" aria-describedby="content1" nmouseenter="showDiv('content1')" onmouseleave="hideDiv('content1')" onfocus="showDiv('content1')" onblur="hideDiv('content1')" style="border: 0px; background: none;">

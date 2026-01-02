@@ -4,6 +4,7 @@ namespace App\Controllers\Front;
 
 use App\Controllers\BaseController;
 use App\Models\UserModel;
+use App\Models\ProductModel;
 use CodeIgniter\I18n\Time;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -12,10 +13,12 @@ use PHPMailer\PHPMailer\Exception;
 class Auth extends BaseController
 {
     protected $userModel;
+    protected $productModel;
     
     public function __construct()
     {
         $this->userModel = new UserModel();
+        $this->productModel = new ProductModel();
     }
     
     // Send OTP for signup
@@ -1033,5 +1036,26 @@ class Auth extends BaseController
         }
         
         return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Access denied']);
+    }
+
+    public function loginPage()
+    {
+        // If user is already logged in, redirect to dashboard
+        if (session()->get('isLoggedIn')) {
+            return redirect()->to($this->getUserRedirectUrl(session()->get('userId')));
+        }
+        
+        // Get all products for the footer
+        $allProducts = $this->productModel->getAllActiveProducts();
+        
+        $data = [
+            'allProducts' => $allProducts,
+            'meta' => [
+                'title' => 'Login - Value Educator',
+                'description' => 'Login to your Value Educator account to access premium investment research and recommendations.'
+            ]
+        ];
+        
+        return view('front/login', $data);
     }
 }
