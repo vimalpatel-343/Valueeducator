@@ -31,32 +31,43 @@ class SubstackUpdateModel extends Model
     }
     
     // Get updates with product names
-    public function getUpdatesWithProductNames()
+    public function getUpdatesWithProductNames($limit = null)
     {
-        $updates = $this->where('fld_status', 1)
-                      ->orderBy('fld_posted_at', 'DESC')
-                      ->findAll();
-        
+        $builder = $this->where('fld_status', 1)
+                        ->orderBy('fld_posted_at', 'DESC');
+
+        // ✅ Apply limit ONLY if provided
+        if (!empty($limit) && is_numeric($limit)) {
+            $builder->limit((int)$limit);
+        }
+
+        $updates = $builder->findAll();
+
         // Get all products
         $productModel = new ProductModel();
         $allProducts = $productModel->findAll();
+
         $productMap = [];
         foreach ($allProducts as $product) {
             $productMap[$product['id']] = $product['fld_title'];
         }
-        
+
         // Add product names to each update
         foreach ($updates as &$update) {
-            $productIds = !empty($update['fld_product_ids']) ? explode(',', $update['fld_product_ids']) : [];
+            $productIds = !empty($update['fld_product_ids'])
+                ? explode(',', $update['fld_product_ids'])
+                : [];
+
             $productNames = [];
             foreach ($productIds as $productId) {
                 if (isset($productMap[$productId])) {
                     $productNames[] = $productMap[$productId];
                 }
             }
+
             $update['product_names'] = implode(', ', $productNames);
         }
-        
+
         return $updates;
     }
 }

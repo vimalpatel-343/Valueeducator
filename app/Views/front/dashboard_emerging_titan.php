@@ -325,7 +325,7 @@
                         <img src="<?= base_url('uploads/blur/e7.png') ?>" alt="Subscribe to view content" style="width: 100%;">
                     <?php else: ?>
                         <p class="font-lg-14-normal font-green sc-mt-0 sc-mb-20">
-                            <img src="<?= base_url('images/icon-bell.svg') ?>"> New Update on 
+                            <img src="<?= base_url('images/icon-bell.svg') ?>"> New Update on <?= date('d/m/Y', strtotime($substackUpdates[0]['fld_updated_at'])) ?> 
                         </p>
                         <?php if (!empty($substackUpdates)): ?>
                             <?php foreach ($substackUpdates as $update): ?>
@@ -359,7 +359,7 @@
                         <img src="<?= base_url('uploads/blur/e8.png') ?>" alt="Subscribe to view content" style="width: 100%;">
                     <?php else: ?>
                         <p class="font-lg-14-normal font-green sc-mt-0 sc-mb-20">
-                            <img src="<?= base_url('images/icon-bell.svg') ?>"> New Update on 
+                            <img src="<?= base_url('images/icon-bell.svg') ?>"> New Update on <?= date('d/m/Y', strtotime($youtubeVideos[0]['fld_posted_at'])) ?>
                         </p>
                         <?php if (!empty($youtubeVideos)): ?>
                             <?php foreach ($youtubeVideos as $video): ?>

@@ -325,7 +325,7 @@
                         <img src="<?= base_url('uploads/blur/e7.png') ?>" alt="Subscribe to view content" style="width: 100%;">
                     <?php else: ?>
                         <p class="font-lg-14-normal font-green sc-mt-0 sc-mb-20">
-                            <img src="<?= base_url('images/icon-bell.svg') ?>"> New Update on 
+                            <img src="<?= base_url('images/icon-bell.svg') ?>"> New Update on <?= date('d/m/Y', strtotime($substackUpdates[0]['fld_updated_at'])) ?> 
                         </p>
                         <?php if (!empty($substackUpdates)): ?>
                             <?php foreach ($substackUpdates as $update): ?>
@@ -358,10 +358,11 @@
                     <?php if (!$hasAccess): ?>
                         <img src="<?= base_url('uploads/blur/e8.png') ?>" alt="Subscribe to view content" style="width: 100%;">
                     <?php else: ?>
-                        <p class="font-lg-14-normal font-green sc-mt-0 sc-mb-20">
-                            <img src="<?= base_url('images/icon-bell.svg') ?>"> New Update on 
-                        </p>
                         <?php if (!empty($youtubeVideos)): ?>
+                            <p class="font-lg-14-normal font-green sc-mt-0 sc-mb-20">
+                                <img src="<?= base_url('images/icon-bell.svg') ?>"> New Update on <?= date('d/m/Y', strtotime($youtubeVideos[0]['fld_posted_at'])) ?>
+                            </p>
+                        
                             <?php foreach ($youtubeVideos as $video): ?>
                                 <a class="popup-youtube video-thumb" data-video-id="<?= $video['video_id'] ?>" href="https://www.youtube.com/watch?v=<?= $video['video_id'] ?>">
                                     <img src="https://img.youtube.com/vi/<?= $video['video_id'] ?>/hqdefault.jpg" alt="Video Thumbnail">

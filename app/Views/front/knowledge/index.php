@@ -76,78 +76,32 @@
         <!--row-->
 
         <div class="substack-container">
-            <div class="substack-wrapper">
-                <div class="substack">
-                    <a href="https://substack.com/@valueeducator/p-177348655" target="_blank">
-                        <img src="images/substack_image/image41.jpg" alt="Sanathan Textiles Ltd.">
-                    </a>
-                    <div class="substack-content">
-                        <h3 class="font-lg-24-bold sc-mt-10">Sanathan Textiles Ltd.</h3>
-                        <p class="font-lg-16-normal">From a modest 4,500 MTPA setup in 2005 to becoming one of India’s
-                            most diversified yarn manufacturers, Sanathan Textiles Ltd has stitched a remarkable growth
-                            story rooted in innovation and scale. With over 140 years of cumulative promoter experience,
-                            the company today operates across polyester, cotton, and technical textile yarns serving
-                            diverse industries from fashion to defense.</p>
-                    </div>
-                    <div class="substack-footer">
-                        <span class="arrow">
-                            <a href="https://substack.com/@valueeducator/p-177348655" target="_blank">
-                                <img src="images/blog.png" alt="Read More">
+            
+            <?php if (!empty($substackUpdates)): ?>
+                <?php foreach ($substackUpdates as $update): ?>
+                    <div class="substack-wrapper">
+                        <div class="substack">
+                            <a href="<?= $update['fld_url'] ?>" target="_blank">
+                                <img src="<?= base_url($update['fld_image']) ?>" alt="<?= htmlspecialchars(strlen($update['fld_title']) > 30 ? substr($update['fld_title'], 0, 30) . '...' : $update['fld_title']) ?>">
                             </a>
-                        </span>
+                            <div class="substack-content">
+                                <h3 class="font-lg-24-bold sc-mt-10"><?= htmlspecialchars(strlen($update['fld_title']) > 30 ? substr($update['fld_title'], 0, 30) . '...' : $update['fld_title']) ?></h3>
+                                <p class="font-lg-16-normal"><?= character_limiter(strip_tags($update['fld_description']), 150) ?></p>
+                            </div>
+                            <div class="substack-footer">
+                                <span class="arrow">
+                                    <a href="<?= $update['fld_url'] ?>" target="_blank">
+                                        <img src="images/blog.png" alt="Read More">
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="post-date">Posted 19 days ago</div>
                     </div>
-                </div>
-                <div class="post-date">Posted 19 days ago</div>
-            </div>
-            <div class="substack-wrapper">
-                <div class="substack">
-                    <a href="https://substack.com/@valueeducator/p-177348830" target="_blank">
-                        <img src="images/substack_image/image40.jpg" alt="D.P. Abhushan Ltd.">
-                    </a>
-                    <div class="substack-content">
-                        <h3 class="font-lg-24-bold sc-mt-10">D.P. Abhushan Ltd.</h3>
-                        <p class="font-lg-16-normal">D.P. Abhushan Ltd, with its 85-year legacy, blends traditional
-                            craftsmanship with modern retail excellence, symbolizing trust, purity, and aspiration for
-                            generations. As the industry transitions from unorganized to organized retail, the company
-                            stands poised at the intersection of heritage and scale, steering its growth through
-                            innovation, design excellence, and operational precision.</p>
-                    </div>
-                    <div class="substack-footer">
-                        <span class="arrow">
-                            <a href="https://substack.com/@valueeducator/p-177348830" target="_blank">
-                                <img src="images/blog.png" alt="Read More">
-                            </a>
-                        </span>
-                    </div>
-                </div>
-                <div class="post-date">Posted 19 days ago</div>
-            </div>
-            <div class="substack-wrapper">
-                <div class="substack">
-                    <a href="https://substack.com/@valueeducator/p-177349133" target="_blank">
-                        <img src="images/substack_image/image39.jpg"
-                            alt="Sundrop Brands Limited: Comprehensive Business Overview, Strengths, Risks, and Future Prospects">
-                    </a>
-                    <div class="substack-content">
-                        <h3 class="font-lg-24-bold sc-mt-10">Sundrop Brands Limited: Comprehensive Business Overview,
-                            Strengths, Risks, and Future Prospects</h3>
-                        <p class="font-lg-16-normal">Sundrop Brands Limited (formerly Agro Tech Foods) is a food company
-                            transitioning into a scaled food platform with multiple market-leading brands. It aims to
-                            deliver innovative, convenient, and delicious packaged food solutions to modern consumers,
-                            focusing on convenience foods, snacking, culinary products, and edible oils. The company
-                            leverages significant manufacturing, distribution, and marketing resources to grow in
-                            emerging and fast-growing channels such as e-commerce and modern retail.</p>
-                    </div>
-                    <div class="substack-footer">
-                        <span class="arrow">
-                            <a href="https://substack.com/@valueeducator/p-177349133" target="_blank">
-                                <img src="images/blog.png" alt="Read More">
-                            </a>
-                        </span>
-                    </div>
-                </div>
-                <div class="post-date">Posted 19 days ago</div>
-            </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>No substack updates available</p>
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -164,7 +118,7 @@
                         Value Educator							
                         <span class="txt2 font-lg-16-normal font-14-normal">@Value Educator • 143k subscribers</span></h2>
                         </div>
-                        <a class="sc-primary-btn btn-color-5 font-lg-20-normal font-18-normal" href="https://www.youtube.com/@ValueEducator" target="_blank"><img src="images/notification.png" alt="Notification icon"> Subscribe to YouTube Channel</a>
+                        <a class="sc-primary-btn btn-color-5 font-lg-20-normal font-18-normal" href="<?= base_url('youtube-videos') ?>" target="_blank"><img src="images/notification.png" alt="Notification icon"> Subscribe to YouTube Channel</a>
                         </div>
                 </div>
             </div>
@@ -179,7 +133,7 @@
                 <div class="sc-heading-area sc-md-mt-40 sc-mb-10 text-left">
                     <div class="d-flex justify-content-between align-items-center sc-mb-10 sc-md-mb-10">
                         <h3 class="font-lg-32-bold">YouTube Videos</h3>
-                        <a href="https://youtube.com/@valueeducator?si=AcHPU4YALAFmfT7e" class="more font-lg-16-bold" target="_blank">See All</a>
+                        <a href="<?= base_url('youtube-videos') ?>" class="more font-lg-16-bold" target="_blank">See All</a>
                     </div>
                 </div>
             </div>

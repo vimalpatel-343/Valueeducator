@@ -146,6 +146,10 @@ class Knowledge extends BaseController
             }
         }
 
+        // Fetch all Substack Updates with product names
+        $substackUpdateModel = new \App\Models\SubstackUpdateModel();
+        $substackUpdates = $substackUpdateModel->getUpdatesWithProductNames(3);
+        
         $data = [
             'meta' => $meta,
             'siteSettings' => $siteSettings,
@@ -154,6 +158,7 @@ class Knowledge extends BaseController
             'allProducts' => $allProducts,
             'hasAccess' => $hasAccess,
             'showKycModal' => $showKycModal,
+            'substackUpdates' => $substackUpdates,
             'itemsByCategory' => $itemsByCategory
         ];
         
