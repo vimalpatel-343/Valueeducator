@@ -278,7 +278,7 @@
             
             <!-- Scuttlebutt Notes -->
             <div class="col-lg-4 col-12">
-                <div class="sidebar-popular-post sc-mb-20" style="height:400px;">
+                <div class="sidebar-popular-post sc-mb-20" style="height:470px;">
                     <div class="sidebar-title sc-mb-5 d-flex justify-content-between align-items-center">
                         <h3 class="font-lg-20-bold sc-mb-0">Scuttlebutt Notes</h3>
                         <?php if ($hasAccess): ?>
@@ -312,7 +312,7 @@
             
             <!-- Latest Substack Updates -->
             <div class="col-lg-4 col-12">
-                <div class="sidebar-popular-post sc-mb-20" style="height:450px;">
+                <div class="sidebar-popular-post sc-mb-20" style="height:470px;">
                     <div class="sidebar-title sc-mb-5 gap-4 d-flex justify-content-between align-items-top">
                         <h3 class="font-lg-20-bold sc-mb-0">Latest Substack Updates</h3>
                         <?php if ($hasAccess): ?>
@@ -346,7 +346,7 @@
             
             <!-- YouTube videos section -->
             <div class="col-lg-4 col-md-6">
-                <div class="sc-test-item sidebar-popular-post sc-mb-20" style="height:450px;">
+                <div class="sc-test-item sidebar-popular-post sc-mb-20" style="height:470px;">
                     <div class="sidebar-title sc-mb-5 d-flex justify-content-between align-items-center">
                         <h3 class="font-lg-20-bold sc-mb-0">YouTube videos</h3>
                         <?php if ($hasAccess): ?>

@@ -974,7 +974,7 @@ class Dashboard extends BaseController
         
         // Pagination parameters
         $page = $this->request->getVar('page') ?? 1;
-        $perPage = 2; // Show 12 videos per page
+        $perPage = 15; // Show 12 videos per page
         $offset = ($page - 1) * $perPage;
         
         // Get total count for pagination

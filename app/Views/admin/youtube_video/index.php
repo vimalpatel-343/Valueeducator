@@ -29,7 +29,7 @@
           <?php endif; ?>
           
           <div class="table-responsive text-nowrap">
-            <table class="table table-hover">
+            <table class="table table-hover youtube-table">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -172,6 +172,92 @@
       border-radius: 5px;
       padding: 5px 15px;
       margin-right: 5px;
+  }
+
+  /* Desktop: disable horizontal scroll */
+  @media (min-width: 992px) {
+      .table-responsive {
+          overflow-x: visible;
+      }
+  }
+
+  /* Table layout */
+  .youtube-table {
+      table-layout: fixed;
+      width: 100%;
+  }
+
+  /* Column widths (100% total) */
+  .youtube-table th:nth-child(1),
+  .youtube-table td:nth-child(1) { width: 5%; }
+
+  .youtube-table th:nth-child(2),
+  .youtube-table td:nth-child(2) { width: 8%; }
+
+  .youtube-table th:nth-child(3),
+  .youtube-table td:nth-child(3) {
+      width: 25%;
+      white-space: normal;
+  }
+
+  .youtube-table th:nth-child(4),
+  .youtube-table td:nth-child(4) {
+      width: 12%;
+      word-break: break-all;
+  }
+
+  .youtube-table th:nth-child(5),
+  .youtube-table td:nth-child(5) { width: 7%; }
+
+  .youtube-table th:nth-child(6),
+  .youtube-table td:nth-child(6) { width: 10%; }
+
+  .youtube-table th:nth-child(7),
+  .youtube-table td:nth-child(7) {
+      width: 18%;
+      white-space: normal;
+  }
+
+  .youtube-table th:nth-child(8),
+  .youtube-table td:nth-child(8) { width: 7%; }
+
+  .youtube-table th:nth-child(9),
+  .youtube-table td:nth-child(9) { width: 8%; }
+
+  /* Prevent overflow issues */
+  .youtube-table td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+  }
+
+  /* Thumbnail safety */
+  .youtube-table img {
+      max-width: 80px;
+      height: auto;
+  }
+
+  @media (min-width: 992px) {
+      .table-responsive {
+          overflow-x: visible;
+      }
+  }
+
+  .youtube-table {
+      table-layout: fixed;
+      width: 100%;
+  }
+
+  .youtube-table td,
+  .youtube-table th {
+      overflow: visible !important;
+  }
+
+  .youtube-table td:last-child {
+      position: relative;
+  }
+
+  .youtube-table .dropdown-menu {
+      z-index: 1055;
   }
 </style>
 <?= $this->endSection() ?>

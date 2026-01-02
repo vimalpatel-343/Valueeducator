@@ -28,7 +28,7 @@
                 // Default to Emerging Titans if not on a product page
                 $dashboard_link = base_url('dashboard-emerging-titan');
                 $portfolio_link = base_url('portfolio-emerging-titan');
-                $knowledge_link = base_url('knowledge-center');
+                $knowledge_link = base_url('knowledge-center-emerging-titan');
             }
             
             // Determine which footer item should be active based on current page
