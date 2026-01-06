@@ -5,6 +5,7 @@ namespace App\Controllers\Front;
 use App\Controllers\BaseController;
 use App\Models\UserModel;
 use App\Models\ProductModel;
+use App\Services\LoggerService;
 use CodeIgniter\I18n\Time;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -14,49 +15,57 @@ class Auth extends BaseController
 {
     protected $userModel;
     protected $productModel;
-    
+    protected LoggerService $authLogger;
+
     public function __construct()
     {
         $this->userModel = new UserModel();
         $this->productModel = new ProductModel();
+        $this->authLogger = service('authLogger');
     }
     
     // Send OTP for signup
     public function sendSignupOTP()
     {
-        if ($this->request->isAJAX()) {
+        $requestId = uniqid('auth_', true);
+        $startTime = microtime(true);
+        
+        try {
+            if (!$this->request->isAJAX()) {
+                throw new \Exception('Invalid request method');
+            }
+            
             $email = $this->request->getPost('email');
             $ipAddress = $this->request->getIPAddress();
             
+            // Log the attempt
+            $this->authLogger->logAuthAttempt([
+                'request_id' => $requestId,
+                'action' => 'send_signup_otp',
+                'email' => $email,
+                'ip' => $ipAddress,
+                'session_id' => session_id()
+            ]);
+            
             // Validate email
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Please enter a valid email address'
-                ]);
+                throw new \Exception('Please enter a valid email address');
             }
             
             // Check if email already exists
             $existingUser = $this->userModel->where('fld_email', $email)->first();
             if ($existingUser) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Email already registered. Please login instead.'
-                ]);
+                throw new \Exception('Email already registered. Please login instead.');
             }
             
             // Check rate limit
             $rateLimitCheck = $this->checkRateLimit($email);
             if (!$rateLimitCheck['allowed']) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => $rateLimitCheck['message'],
-                    'rate_limit_exceeded' => true // Flag to identify rate limit errors
-                ]);
+                throw new \Exception($rateLimitCheck['message']);
             }
             
             // Generate OTP
-            $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
             $expiresAt = Time::now()->addMinutes(OTP_EXPIRY_MINUTES); // OTP expires in 15 minutes
             
             // Save OTP to database
@@ -81,10 +90,7 @@ class Auth extends BaseController
             $emailSent = $this->sendOTPEmail($email, $otp);
             
             if (!$emailSent) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Failed to send OTP email. Please try again.'
-                ]);
+                throw new \Exception('Failed to send OTP email. Please try again.');
             }
             
             // Clean up old records for this email
@@ -93,13 +99,36 @@ class Auth extends BaseController
             // Store email in session for next steps
             session()->set('signup_email', $email);
             
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logAuthAttempt([
+                'request_id' => $requestId,
+                'action' => 'send_signup_otp_success',
+                'email' => $email,
+                'execution_time' => $executionTime
+            ]);
+            
             return $this->response->setJSON([
                 'success' => true,
-                'message' => 'OTP sent to your email address'
+                'message' => 'OTP sent to your email address',
+                'request_id' => $requestId
+            ]);
+            
+        } catch (\Exception $e) {
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logError('sendSignupOTP failed', [
+                'request_id' => $requestId,
+                'email' => $email ?? 'not_provided',
+                'execution_time' => $executionTime
+            ], $e);
+            
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'request_id' => $requestId
             ]);
         }
-        
-        return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Access denied']);
     }
     
     // Check rate limit for OTP requests (10 per hour per email/IP)
@@ -151,15 +180,27 @@ class Auth extends BaseController
     // Verify OTP for signup
     public function verifySignupOTP()
     {
-        if ($this->request->isAJAX()) {
+        $requestId = uniqid('auth_', true);
+        $startTime = microtime(true);
+        
+        try {
+            if (!$this->request->isAJAX()) {
+                throw new \Exception('Invalid request method');
+            }
+            
             $otp = $this->request->getPost('otp');
             $email = session()->get('signup_email');
             
+            $this->authLogger->logAuthAttempt([
+                'request_id' => $requestId,
+                'action' => 'verify_signup_otp',
+                'email' => $email,
+                'otp_provided' => !empty($otp),
+                'session_id' => session_id()
+            ]);
+            
             if (empty($email)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Session expired. Please try again.'
-                ]);
+                throw new \Exception('Session expired. Please try again.');
             }
             
             // Check OTP in database
@@ -173,46 +214,77 @@ class Auth extends BaseController
                 ->getRowArray();
             
             if (!$otpRecord) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Invalid OTP. Please try again.'
-                ]);
+                throw new \Exception('Invalid OTP. Please try again.');
             }
             
             // Mark OTP as used
             $db->table('ve_otps')->where('id', $otpRecord['id'])->delete();
             
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logAuthAttempt([
+                'request_id' => $requestId,
+                'action' => 'verify_signup_otp_success',
+                'email' => $email,
+                'execution_time' => $executionTime
+            ]);
+            
             return $this->response->setJSON([
                 'success' => true,
-                'message' => 'OTP verified successfully'
+                'message' => 'OTP verified successfully',
+                'request_id' => $requestId
+            ]);
+            
+        } catch (\Exception $e) {
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logError('verifySignupOTP failed', [
+                'request_id' => $requestId,
+                'email' => $email ?? 'not_in_session',
+                'execution_time' => $executionTime
+            ], $e);
+            
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'request_id' => $requestId
             ]);
         }
-        
-        return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Access denied']);
     }
     
     // Save user profile
     public function saveProfile()
     {
-        if ($this->request->isAJAX()) {
+        $requestId = uniqid('auth_', true);
+        $startTime = microtime(true);
+        
+        try {
+            if (!$this->request->isAJAX()) {
+                throw new \Exception('Invalid request method');
+            }
+            
             $firstName = $this->request->getPost('first_name');
             $lastName = $this->request->getPost('last_name');
             $mobile = $this->request->getPost('mobile');
             $email = session()->get('signup_email');
             
+            $this->authLogger->logAuthAttempt([
+                'request_id' => $requestId,
+                'action' => 'save_profile',
+                'email' => $email,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'mobile' => $mobile,
+                'session_id' => session_id()
+            ]);
+            
             if (empty($email)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Session expired. Please try again.'
-                ]);
+                throw new \Exception('Session expired. Please try again.');
             }
             
             // Validate inputs
             if (empty($firstName) || empty($lastName) || empty($mobile)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'All fields are required'
-                ]);
+                throw new \Exception('All fields are required');
             }
             
             // Create user
@@ -227,10 +299,7 @@ class Auth extends BaseController
             $userId = $this->userModel->insert($userData);
             
             if (!$userId) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Failed to create user account'
-                ]);
+                throw new \Exception('Failed to create user account');
             }
             
             // Generate a unique token for this signup
@@ -245,27 +314,55 @@ class Auth extends BaseController
                 'expires_at' => $expiresAt
             ]);
             
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logAuthAttempt([
+                'request_id' => $requestId,
+                'action' => 'save_profile_success',
+                'user_id' => $userId,
+                'email' => $email,
+                'execution_time' => $executionTime
+            ]);
+            
             return $this->response->setJSON([
                 'success' => true,
                 'message' => 'Profile saved successfully',
-                'token' => $token
+                'token' => $token,
+                'request_id' => $requestId
+            ]);
+            
+        } catch (\Exception $e) {
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logError('saveProfile failed', [
+                'request_id' => $requestId,
+                'email' => session()->get('signup_email') ?? 'not_in_session',
+                'execution_time' => $executionTime
+            ], $e);
+            
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'request_id' => $requestId
             ]);
         }
-        
-        return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Access denied']);
     }
     
     // Upload profile picture (FIXED VERSION with Query Builder)
     public function uploadProfilePicture()
     {
-        if ($this->request->isAJAX()) {
+        $requestId = uniqid('auth_', true);
+        $startTime = microtime(true);
+        
+        try {
+            if (!$this->request->isAJAX()) {
+                throw new \Exception('Invalid request method');
+            }
+            
             $token = $this->request->getPost('token');
             
             if (empty($token)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Invalid request'
-                ]);
+                throw new \Exception('Invalid request');
             }
             
             // Get user ID from token
@@ -277,10 +374,7 @@ class Auth extends BaseController
                 ->getRowArray();
             
             if (!$tokenRecord) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Invalid or expired token'
-                ]);
+                throw new \Exception('Invalid or expired token');
             }
             
             $userId = $tokenRecord['user_id'];
@@ -289,35 +383,23 @@ class Auth extends BaseController
             
             // Check if file was uploaded
             if (!$file || $file->getError() !== UPLOAD_ERR_OK) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'No file uploaded or upload error occurred'
-                ]);
+                throw new \Exception('No file uploaded or upload error occurred');
             }
             
             // Validate file
             if (!$file->isValid()) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Invalid file uploaded'
-                ]);
+                throw new \Exception('Invalid file uploaded');
             }
             
             // Check file type
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
             if (!in_array($file->getMimeType(), $allowedTypes)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Only JPG, PNG, GIF, and WEBP images are allowed'
-                ]);
+                throw new \Exception('Only JPG, PNG, GIF, and WEBP images are allowed');
             }
             
             // Check file size (5MB max)
             if ($file->getSize() > 5 * 1024 * 1024) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'File size must be less than 5MB'
-                ]);
+                throw new \Exception('File size must be less than 5MB');
             }
             
             // Generate new file name
@@ -325,10 +407,7 @@ class Auth extends BaseController
             
             // Move file to uploads directory
             if (!$file->move(ROOTPATH . 'public/uploads/profile_pictures', $newName)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Failed to move uploaded file'
-                ]);
+                throw new \Exception('Failed to move uploaded file');
             }
             
             // Prepare update data
@@ -337,52 +416,67 @@ class Auth extends BaseController
             ];
             
             // Use Query Builder to update the record
-            try {
-                $builder = $db->table('ve_users');
-                $builder->where('id', $userId);
-                $result = $builder->update($updateData);
-                
-                if (!$result) {
-                    // Delete the uploaded file if update failed
-                    @unlink(ROOTPATH . 'public/uploads/profile_pictures/' . $newName);
-                    
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => 'Failed to update user record'
-                    ]);
-                }
-                
-                return $this->response->setJSON([
-                    'success' => true,
-                    'message' => 'Profile picture uploaded successfully',
-                    'image_path' => base_url('uploads/profile_pictures/' . $newName),
-                    'token' => $token
-                ]);
-            } catch (\Exception $e) {
-                // Delete the uploaded file if exception occurred
+            $builder = $db->table('ve_users');
+            $builder->where('id', $userId);
+            $result = $builder->update($updateData);
+            
+            if (!$result) {
+                // Delete the uploaded file if update failed
                 @unlink(ROOTPATH . 'public/uploads/profile_pictures/' . $newName);
                 
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Database error: ' . $e->getMessage()
-                ]);
+                throw new \Exception('Failed to update user record');
             }
+            
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logAuthAttempt([
+                'request_id' => $requestId,
+                'action' => 'upload_profile_picture_success',
+                'user_id' => $userId,
+                'file_name' => $newName,
+                'execution_time' => $executionTime
+            ]);
+            
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Profile picture uploaded successfully',
+                'image_path' => base_url('uploads/profile_pictures/' . $newName),
+                'token' => $token,
+                'request_id' => $requestId
+            ]);
+            
+        } catch (\Exception $e) {
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logError('uploadProfilePicture failed', [
+                'request_id' => $requestId,
+                'token' => $token ?? 'not_provided',
+                'execution_time' => $executionTime
+            ], $e);
+            
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'request_id' => $requestId
+            ]);
         }
-        
-        return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Access denied']);
     }
     
     // Complete signup process
     public function completeSignup()
     {
-        if ($this->request->isAJAX()) {
+        $requestId = uniqid('auth_', true);
+        $startTime = microtime(true);
+        
+        try {
+            if (!$this->request->isAJAX()) {
+                throw new \Exception('Invalid request method');
+            }
+            
             $token = $this->request->getPost('token');
             
             if (empty($token)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Invalid request'
-                ]);
+                throw new \Exception('Invalid request');
             }
             
             // Get user ID from token
@@ -394,10 +488,7 @@ class Auth extends BaseController
                 ->getRowArray();
             
             if (!$tokenRecord) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Invalid or expired token'
-                ]);
+                throw new \Exception('Invalid or expired token');
             }
             
             $userId = $tokenRecord['user_id'];
@@ -406,10 +497,7 @@ class Auth extends BaseController
             $user = $this->userModel->find($userId);
             
             if (!$user) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'User not found'
-                ]);
+                throw new \Exception('User not found');
             }
             
             // Send welcome email
@@ -438,80 +526,159 @@ class Auth extends BaseController
             // Clear signup session
             session()->remove(['signup_email']);
             
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logAuthAttempt([
+                'request_id' => $requestId,
+                'action' => 'complete_signup_success',
+                'user_id' => $userId,
+                'email' => $user['fld_email'],
+                'execution_time' => $executionTime
+            ]);
+            
             return $this->response->setJSON([
                 'success' => true,
                 'message' => 'Signup completed successfully',
-                'redirect' => base_url()
+                'redirect' => base_url(),
+                'request_id' => $requestId
+            ]);
+            
+        } catch (\Exception $e) {
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logError('completeSignup failed', [
+                'request_id' => $requestId,
+                'token' => $token ?? 'not_provided',
+                'execution_time' => $executionTime
+            ], $e);
+            
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'request_id' => $requestId
             ]);
         }
-        
-        return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Access denied']);
     }
     
     // Send OTP for login
     public function sendLoginOTP()
     {
-        if ($this->request->isAJAX()) {
+        $requestId = uniqid('auth_', true);
+        $startTime = microtime(true);
+        
+        try {
+            if (!$this->request->isAJAX()) {
+                throw new \Exception('Invalid request method');
+            }
+            
             $email = $this->request->getPost('email');
             $ipAddress = $this->request->getIPAddress();
+            $userAgent = $this->request->getUserAgent();
+            
+            // Log the attempt
+            $this->authLogger->logAuthAttempt([
+                'request_id' => $requestId,
+                'action' => 'send_login_otp',
+                'email' => $email,
+                'ip' => $ipAddress,
+                'user_agent' => [
+                    'browser' => $userAgent->getBrowser(),
+                    'version' => $userAgent->getVersion(),
+                    'platform' => $userAgent->getPlatform(),
+                    'mobile' => $userAgent->isMobile(),
+                    'robot' => $userAgent->isRobot()
+                ],
+                'session_id' => session_id(),
+                'server_info' => [
+                    'php_version' => PHP_VERSION,
+                    'ci_version' => \CodeIgniter\CodeIgniter::CI_VERSION,
+                    'memory_usage' => memory_get_usage(true),
+                    'time' => time()
+                ]
+            ]);
             
             // Validate email
+            if (empty($email)) {
+                throw new \Exception('Email is required');
+            }
+            
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Please enter a valid email address'
-                ]);
+                throw new \Exception('Please enter a valid email address');
             }
             
             // Check if user exists
             $user = $this->userModel->where('fld_email', $email)->first();
             if (!$user) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Email not registered. Please signup first.'
-                ]);
+                throw new \Exception('Email not registered. Please signup first.');
             }
             
             // Check rate limit
             $rateLimitCheck = $this->checkRateLimit($email);
             if (!$rateLimitCheck['allowed']) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => $rateLimitCheck['message'],
-                    'rate_limit_exceeded' => true // Flag to identify rate limit errors
-                ]);
+                throw new \Exception($rateLimitCheck['message']);
             }
             
             // Generate OTP
-            $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
             $expiresAt = Time::now()->addMinutes(OTP_EXPIRY_MINUTES); // OTP expires in 15 minutes
             
-            // Save OTP to database
-            $otpData = [
-                'fld_email' => $email,
-                'fld_otp' => $otp,
-                'fld_type' => 'login',
-                'fld_expires_at' => $expiresAt
-            ];
-            
+            // Database operation with logging
             $db = \Config\Database::connect();
-            $db->table('ve_otps')->insert($otpData);
+            $dbStart = microtime(true);
             
-            // Record this OTP attempt with IP
-            $db->table('ve_otp_attempts')->insert([
-                'email' => $email,
-                'ip_address' => $ipAddress,
-                'request_time' => date('Y-m-d H:i:s')
-            ]);
+            try {
+                $db->transStart();
+                
+                // Save OTP to database
+                $otpData = [
+                    'fld_email' => $email,
+                    'fld_otp' => $otp,
+                    'fld_type' => 'login',
+                    'fld_expires_at' => $expiresAt
+                ];
+                
+                $db->table('ve_otps')->insert($otpData);
+                
+                // Record this OTP attempt with IP
+                $db->table('ve_otp_attempts')->insert([
+                    'email' => $email,
+                    'ip_address' => $ipAddress,
+                    'request_time' => date('Y-m-d H:i:s')
+                ]);
+                
+                $db->transComplete();
+                
+                if ($db->transStatus() === false) {
+                    throw new \Exception('Database transaction failed');
+                }
+                
+                $this->authLogger->logDatabaseQuery(
+                    'Insert OTP and attempt record',
+                    $otpData,
+                    microtime(true) - $dbStart
+                );
+                
+            } catch (\Exception $e) {
+                $this->authLogger->logError('Database error in sendLoginOTP', [
+                    'email' => $email,
+                    'request_id' => $requestId
+                ], $e);
+                throw new \Exception('Database error. Please try again.');
+            }
             
             // Send OTP email
+            $emailStart = microtime(true);
             $emailSent = $this->sendOTPEmail($email, $otp);
             
+            $this->authLogger->logEmailAttempt(
+                $email,
+                'Verify Your Email Address',
+                $emailSent,
+                $emailSent ? null : 'Email sending failed'
+            );
+            
             if (!$emailSent) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Failed to send OTP email. Please try again.'
-                ]);
+                throw new \Exception('Failed to send OTP email. Please try again.');
             }
             
             // Clean up old records for this email
@@ -519,58 +686,126 @@ class Auth extends BaseController
             
             // Store email in session for next steps
             session()->set('login_email', $email);
+            session()->set('login_request_id', $requestId);
+            
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logAuthAttempt([
+                'request_id' => $requestId,
+                'action' => 'send_login_otp_success',
+                'email' => $email,
+                'execution_time' => $executionTime,
+                'otp_expires_at' => $expiresAt->toDateTimeString()
+            ]);
             
             return $this->response->setJSON([
                 'success' => true,
-                'message' => 'OTP sent to your email address'
+                'message' => 'OTP sent to your email address',
+                'request_id' => $requestId,
+                'debug' => ENVIRONMENT === 'development' ? [
+                    'execution_time' => $executionTime,
+                    'otp_length' => strlen($otp)
+                ] : null
+            ]);
+            
+        } catch (\Exception $e) {
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logError('sendLoginOTP failed', [
+                'request_id' => $requestId,
+                'email' => $email ?? 'not_provided',
+                'execution_time' => $executionTime,
+                'post_data' => $this->request->getPost(),
+                'session_data' => [
+                    'id' => session_id(),
+                    'has_login_email' => session()->has('login_email')
+                ]
+            ], $e);
+            
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'request_id' => $requestId,
+                'debug' => ENVIRONMENT === 'development' ? [
+                    'error_code' => $e->getCode(),
+                    'execution_time' => $executionTime
+                ] : null
             ]);
         }
-        
-        return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Access denied']);
     }
     
     // Verify OTP for login
     public function verifyLoginOTP()
     {
-        if ($this->request->isAJAX()) {
+        $requestId = uniqid('auth_', true);
+        $startTime = microtime(true);
+        
+        try {
+            if (!$this->request->isAJAX()) {
+                throw new \Exception('Invalid request method');
+            }
+            
             $otp = $this->request->getPost('otp');
             $email = session()->get('login_email');
+            $loginRequestId = session()->get('login_request_id');
+            
+            $this->authLogger->logAuthAttempt([
+                'request_id' => $requestId,
+                'action' => 'verify_login_otp',
+                'email' => $email,
+                'otp_provided' => !empty($otp),
+                'login_request_id' => $loginRequestId,
+                'session_id' => session_id()
+            ]);
             
             if (empty($email)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Session expired. Please try again.'
-                ]);
+                throw new \Exception('Session expired. Please try again.');
             }
             
-            // Check OTP in database
+            if (empty($otp)) {
+                throw new \Exception('OTP is required');
+            }
+            
+            // Database operation
             $db = \Config\Database::connect();
-            $otpRecord = $db->table('ve_otps')
-                ->where('fld_email', $email)
-                ->where('fld_otp', $otp)
-                ->where('fld_type', 'login')
-                ->where('fld_expires_at >=', Time::now())
-                ->get()
-                ->getRowArray();
+            $dbStart = microtime(true);
             
-            if (!$otpRecord) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Invalid OTP. Please try again.'
-                ]);
+            try {
+                // Check OTP in database
+                $otpRecord = $db->table('ve_otps')
+                    ->where('fld_email', $email)
+                    ->where('fld_otp', $otp)
+                    ->where('fld_type', 'login')
+                    ->where('fld_expires_at >=', Time::now())
+                    ->get()
+                    ->getRowArray();
+                
+                $this->authLogger->logDatabaseQuery(
+                    'Select OTP record',
+                    ['email' => $email, 'otp' => '***'],
+                    microtime(true) - $dbStart
+                );
+                
+                if (!$otpRecord) {
+                    throw new \Exception('Invalid OTP. Please try again.');
+                }
+                
+                // Mark OTP as used
+                $db->table('ve_otps')->where('id', $otpRecord['id'])->delete();
+                
+            } catch (\Exception $e) {
+                $this->authLogger->logError('Database error in verifyLoginOTP', [
+                    'email' => $email,
+                    'request_id' => $requestId
+                ], $e);
+                throw new \Exception('Database error. Please try again.');
             }
-            
-            // Mark OTP as used
-            $db->table('ve_otps')->where('id', $otpRecord['id'])->delete();
             
             // Get user details
             $user = $this->userModel->where('fld_email', $email)->first();
             
             if (!$user) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'User not found'
-                ]);
+                throw new \Exception('User not found');
             }
             
             // Set user session
@@ -581,7 +816,8 @@ class Auth extends BaseController
                 'userName' => $user['fld_full_name'],
                 'userRole' => $user['fld_role'],
                 'userProfileImage' => $user['fld_profile_image'],
-                'isLoggedIn' => TRUE
+                'isLoggedIn' => TRUE,
+                'loginTime' => time()
             ];
             
             session()->set($sessionData);
@@ -590,24 +826,62 @@ class Auth extends BaseController
             $this->recordUserLogin($user['id']);
             
             // Clear login session
-            session()->remove('login_email');
+            session()->remove(['login_email', 'login_request_id']);
             
             // Check user subscriptions to determine redirect
             $redirectUrl = $this->getUserRedirectUrl($user['id']);
-
+            
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logAuthAttempt([
+                'request_id' => $requestId,
+                'action' => 'verify_login_otp_success',
+                'user_id' => $user['id'],
+                'email' => $email,
+                'redirect' => $redirectUrl,
+                'execution_time' => $executionTime
+            ]);
+            
             return $this->response->setJSON([
                 'success' => true,
                 'message' => 'Login successful',
-                'redirect' => $redirectUrl
+                'redirect' => $redirectUrl,
+                'request_id' => $requestId
+            ]);
+            
+        } catch (\Exception $e) {
+            $executionTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logError('verifyLoginOTP failed', [
+                'request_id' => $requestId,
+                'email' => $email ?? 'not_in_session',
+                'execution_time' => $executionTime,
+                'post_data' => $this->request->getPost(),
+                'session_data' => [
+                    'id' => session_id(),
+                    'has_login_email' => session()->has('login_email')
+                ]
+            ], $e);
+            
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'request_id' => $requestId
             ]);
         }
-        
-        return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Access denied']);
     }
     
     // Logout
     public function logout()
     {
+        $userId = session()->get('userId');
+        
+        $this->authLogger->logAuthAttempt([
+            'action' => 'logout',
+            'user_id' => $userId,
+            'session_id' => session_id()
+        ]);
+        
         session()->destroy();
         return redirect()->to(base_url());
     }
@@ -615,12 +889,13 @@ class Auth extends BaseController
     // Helper function to send OTP email using PHPMailer
     private function sendOTPEmail($email, $otp)
     {
-        // Load PHPMailer
-        require_once ROOTPATH . 'vendor/autoload.php';
-        
-        $mail = new PHPMailer(true);
+        $startTime = microtime(true);
         
         try {
+            require_once ROOTPATH . 'vendor/autoload.php';
+            
+            $mail = new PHPMailer(true);
+            
             // Server settings
             $mail->isSMTP();
             $mail->Host = 'smtp.hostinger.com';
@@ -629,6 +904,19 @@ class Auth extends BaseController
             $mail->Password = 'Value@100kk';
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $mail->Port = 465;
+            $mail->Timeout = 30; // 30 seconds timeout
+            
+            // Enable debug in development
+            if (ENVIRONMENT === 'development') {
+                $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+                $mail->Debugoutput = function($str, $level) {
+                    $this->authLogger->logAuthAttempt([
+                        'type' => 'smtp_debug',
+                        'level' => $level,
+                        'message' => $str
+                    ]);
+                };
+            }
             
             // Recipients
             $mail->setFrom('noreply@valueeducator.com', 'Value Educator');
@@ -640,7 +928,7 @@ class Auth extends BaseController
             
             $message = "Hi,<br><br>
                 Thank you for signing/login up with Value Educator! To complete your Login/Signup and verify your email address, please use the code below:<br><br>
-                Your Verification Code: $otp<br><br/>
+                Your Verification Code: <strong>$otp</strong><br><br/>
                 This code is valid for 30 minutes<br/>
                 Please enter this code on the verification page to confirm your email.<br><br>
                 If you did not request this code, please ignore this email or contact us at value.educator@gmail.com.<br><br>
@@ -649,11 +937,33 @@ class Auth extends BaseController
                 Admin Team at Value Educator";
             
             $mail->Body = $message;
+            $mail->AltBody = strip_tags($message);
             
-            $mail->send();
-            return true;
-        } catch (Exception $e) {
-            log_message('error', 'PHPMailer Error: ' . $mail->ErrorInfo);
+            $sendTime = microtime(true);
+            $result = $mail->send();
+            $totalTime = microtime(true) - $startTime;
+            
+            $this->authLogger->logAuthAttempt([
+                'type' => 'email_sent',
+                'to' => $email,
+                'success' => $result,
+                'send_time' => microtime(true) - $sendTime,
+                'total_time' => $totalTime,
+                'smtp_info' => [
+                    'host' => $mail->Host,
+                    'port' => $mail->Port,
+                    'secure' => $mail->SMTPSecure
+                ]
+            ]);
+            
+            return $result;
+            
+        } catch (\Exception $e) {
+            $this->authLogger->logError('Email sending failed', [
+                'to' => $email,
+                'execution_time' => microtime(true) - $startTime
+            ], $e);
+            
             return false;
         }
     }
@@ -661,12 +971,11 @@ class Auth extends BaseController
     // Helper function to send welcome email
     private function sendWelcomeEmail($email, $name)
     {
-        // Load PHPMailer
-        require_once ROOTPATH . 'vendor/autoload.php';
-        
-        $mail = new PHPMailer(true);
-        
         try {
+            require_once ROOTPATH . 'vendor/autoload.php';
+            
+            $mail = new PHPMailer(true);
+            
             // Server settings
             $mail->isSMTP();
             $mail->Host = 'smtp.hostinger.com';
@@ -1036,6 +1345,137 @@ class Auth extends BaseController
         }
         
         return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Access denied']);
+    }
+    
+    // Add a health check endpoint
+    public function healthCheck()
+    {
+        try {
+            $checks = [
+                'database' => $this->checkDatabase(),
+                'session' => $this->checkSession(),
+                'email' => $this->checkEmailService(),
+                'memory' => $this->checkMemory(),
+                'disk' => $this->checkDiskSpace()
+            ];
+            
+            $allHealthy = array_reduce($checks, function($carry, $check) {
+                return $carry && $check['status'] === 'ok';
+            }, true);
+            
+            return $this->response->setJSON([
+                'status' => $allHealthy ? 'healthy' : 'unhealthy',
+                'timestamp' => Time::now()->toDateTimeString(),
+                'checks' => $checks
+            ]);
+            
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'timestamp' => Time::now()->toDateTimeString()
+            ], 500);
+        }
+    }
+    
+    private function checkDatabase()
+    {
+        try {
+            $db = \Config\Database::connect();
+            $result = $db->query('SELECT 1')->getResult();
+            
+            return [
+                'status' => 'ok',
+                'message' => 'Database connection successful'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Database connection failed: ' . $e->getMessage()
+            ];
+        }
+    }
+    
+    private function checkSession()
+    {
+        try {
+            $sessionId = session_id();
+            if (empty($sessionId)) {
+                session_start();
+                $sessionId = session_id();
+            }
+            
+            $_SESSION['health_check'] = time();
+            
+            return [
+                'status' => 'ok',
+                'message' => 'Session working',
+                'session_id' => $sessionId
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Session error: ' . $e->getMessage()
+            ];
+        }
+    }
+    
+    private function checkEmailService()
+    {
+        try {
+            // Just check if we can create a PHPMailer instance
+            $mail = new PHPMailer(true);
+            
+            return [
+                'status' => 'ok',
+                'message' => 'Email service available'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Email service error: ' . $e->getMessage()
+            ];
+        }
+    }
+    
+    private function checkMemory()
+    {
+        $memoryUsage = memory_get_usage(true);
+        $memoryLimit = ini_get('memory_limit');
+        $memoryPercent = ($memoryUsage / 1024 / 1024); // Convert to MB
+        
+        return [
+            'status' => $memoryPercent < 256 ? 'ok' : 'warning', // Warning if > 256MB
+            'message' => "Memory usage: {$memoryPercent}MB / {$memoryLimit}",
+            'usage_bytes' => $memoryUsage
+        ];
+    }
+    
+    private function checkDiskSpace()
+    {
+        $freeSpace = disk_free_space(ROOTPATH);
+        $totalSpace = disk_total_space(ROOTPATH);
+        $percentUsed = (($totalSpace - $freeSpace) / $totalSpace) * 100;
+        
+        return [
+            'status' => $percentUsed < 90 ? 'ok' : 'warning', // Warning if > 90% used
+            'message' => sprintf("Disk usage: %.2f%%", $percentUsed),
+            'free_bytes' => $freeSpace
+        ];
+    }
+    
+    // Add client error logging endpoint
+    public function logClientError()
+    {
+        if ($this->request->isAJAX()) {
+            $errorData = $this->request->getPost();
+            
+            $this->authLogger->logError('Client-side error', $errorData);
+            
+            return $this->response->setJSON(['success' => true]);
+        }
+        
+        return $this->response->setStatusCode(403)->setJSON(['success' => false]);
     }
 
     public function loginPage()

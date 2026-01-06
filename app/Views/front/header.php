@@ -67,6 +67,42 @@
         });
     })();
     </script>
+
+    <!-- Zoho SalesIQ -->
+    <script>
+    window.$zoho = window.$zoho || {};
+    $zoho.salesiq = $zoho.salesiq || {
+        ready: function () {}
+    };
+    </script>
+
+    <script
+        id="zsiqscript"
+        src="https://salesiq.zohopublic.in/widget?wc=siq364c0e19a51d793c484bb4776cb02ee5ee45eb16f13dccc2cbd71188028302f2"
+        defer>
+    </script>
+
+    <style>
+    /* Force Zoho SalesIQ to LEFT */
+    #zsiq_float {
+        right: 15px !important;
+        left: auto !important;
+        bottom: 95px !important;
+        position: fixed !important;
+        z-index: 9999 !important;
+    }
+
+    @media (max-width: 768px) {
+        #zsiq_float {
+            right: 1px !important;
+            bottom: 145px !important;
+        }
+    }
+    </style>
+
+    <!--Zoho Page sense code -->
+    <script src="https://cdn-in.pagesense.io/js/valueeducator/6fe00de6b13041cfad6aeeb2952f2add.js" defer></script>
+
 </head>
 <body>
     <header class="sc-header-section" id="sc-header-sticky">

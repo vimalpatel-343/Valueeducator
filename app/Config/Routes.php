@@ -95,6 +95,8 @@ $routes->get('/auth', 'Auth::index');
 $routes->post('/auth/login', 'Auth::login');
 $routes->get('/logout', 'Auth::logout');
 $routes->get('login', 'Front\Auth::loginPage');
+$routes->get('auth/health-check', 'Front\Auth::healthCheck');
+$routes->post('auth/log-client-error', 'Front\Auth::logClientError');
 
 // Admin routes (protected by authentication filter)
 $routes->group('/admin', ['filter' => 'adminauth'], function($routes) {

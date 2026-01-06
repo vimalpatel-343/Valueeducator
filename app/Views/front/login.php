@@ -1,6 +1,10 @@
 <?= $this->include('front/header') ?>
-<style>
 
+<!-- Add these error containers right after <body> or at the top of your login container -->
+<div id="browser-issues" style="display: none;"></div>
+<div id="system-issues" style="display: none;"></div>
+
+<style>
     body {
         overflow: hidden;
     }
@@ -27,7 +31,6 @@
         z-index: 2;
         text-align: center;
         padding: 2rem;
-        max-width: 500px;
     }
     
     .login-left h1 {
@@ -169,11 +172,19 @@
         }
     }
 </style>
+
 <div class="login-container">
     <!-- Left Side - Illustration -->
     <div class="col-lg-6 login-left">
         <div class="login-left-content">
-            <img src="<?= base_url('images/login-illustration.png') ?>" alt="Login Illustration" class="illustration">            
+            <?php 
+            $loginPageImage = isset($pageImages['other']['loginpage_image']) ? $pageImages['other']['loginpage_image'] : null;
+            if ($loginPageImage): ?>
+                <img src="<?= base_url($loginPageImage['image_path']) ?>" class="illustration" alt="<?= esc($loginPageImage['image_alt']) ?>" />
+            <?php else: ?>
+                <img src="<?= base_url('images/login-illustration.png') ?>" alt="Login Illustration" class="illustration">
+            <?php endif; ?>
+                        
         </div>
     </div>
     

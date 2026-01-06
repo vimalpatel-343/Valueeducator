@@ -57,7 +57,8 @@ class PageImage extends BaseController
             'call_our_experts' => 'Call Our Experts (25X25)',
             'dashboard' => 'Dashboard (25X25)',
             'portfolio' => 'Portfolio (25X25)',
-            'knowledge_centre' => 'Knowledge Centre (25X25)'
+            'knowledge_centre' => 'Knowledge Centre (25X25)',
+            'loginpage_image' => 'Login Page Image'
         ]
     ];
     
