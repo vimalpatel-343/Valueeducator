@@ -123,11 +123,23 @@
                             </div>
                             <div class="sc-main-menu d-lg-block d-none">
                                 <ul class="list-gap main-menu">
-                                    <li><a href="<?= base_url() ?>" data-text="Home" class="">Home</a></li>
-                                    <li><a href="<?= base_url('about-us') ?>" data-text="About Us" class="">About Us</a></li>
-                                    <li><a href="<?= base_url('investment-philosophy') ?>" data-text="Investment Philosophy" class="">Investment Philosophy</a></li>
+                                    <li>
+                                        <a href="<?= appendUTMToURL(base_url()) ?>" data-text="Home">Home</a>
+                                    </li>
+
+                                    <li>
+                                        <a href="<?= appendUTMToURL(base_url('about-us')) ?>" data-text="About Us">About Us</a>
+                                    </li>
+
+                                    <li>
+                                        <a href="<?= appendUTMToURL(base_url('investment-philosophy')) ?>" data-text="Investment Philosophy">
+                                            Investment Philosophy
+                                        </a>
+                                    </li>
+
                                     <li class="menu-item-has-children">
-                                        <a href="<?= base_url('emerging-titans') ?>" onclick="return false;">Products</a>
+                                        <a href="javascript:void(0);">Products</a>
+
                                         <?php
                                             $dashboardLinks = [];
                                             foreach ($userSubscriptions as $sub) {
@@ -139,14 +151,17 @@
                                                 }
                                             }
                                         ?>
+
                                         <ul class="list-gap sub-menu-list">
                                             <li>
-                                                <a href="<?= $dashboardLinks['emerging-titans'] ?? base_url('emerging-titans'); ?>"
-                                                data-text="Emerging Titans">Emerging Titans</a>
+                                                <a href="<?= appendUTMToURL($dashboardLinks['emerging-titans'] ?? base_url('emerging-titans')) ?>">
+                                                    Emerging Titans
+                                                </a>
                                             </li>
                                             <li>
-                                                <a href="<?= $dashboardLinks['tiny-titans'] ?? base_url('tiny-titans'); ?>"
-                                                data-text="Tiny Titans">Tiny Titans</a>
+                                                <a href="<?= appendUTMToURL($dashboardLinks['tiny-titans'] ?? base_url('tiny-titans')) ?>">
+                                                    Tiny Titans
+                                                </a>
                                             </li>
                                         </ul>
                                     </li>

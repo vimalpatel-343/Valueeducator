@@ -236,4 +236,7 @@ $routes->group('/admin', ['filter' => 'adminauth'], function($routes) {
 
    $routes->get('page-images', 'Admin\PageImage::index');
    $routes->post('page-images/update', 'Admin\PageImage::update');
+
+   $routes->get('tracking', 'Admin\Tracking::index');
+   $routes->get('tracking/statistics', 'Admin\Tracking::statistics');
 });

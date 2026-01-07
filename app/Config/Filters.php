@@ -37,6 +37,7 @@ class Filters extends BaseFilters
         'auth'          => \App\Filters\Auth::class,
         'commondata' => \App\Filters\CommonDataFilter::class,
         'adminauth' => \App\Filters\AdminAuth::class,
+        'tracking' => \App\Filters\TrackingFilter::class,
     ];
 
     /**
@@ -79,6 +80,7 @@ class Filters extends BaseFilters
             // 'honeypot',
             // 'invalidchars',
             'commondata',
+            'tracking',
         ],
         'after' => [
             // 'honeypot',

@@ -88,7 +88,7 @@ class Autoload extends AutoloadConfig
      *
      * @var list<string>
      */
-    public $helpers = ['common'];
+    public $helpers = ['common', 'tracking'];
 
     public $providers = [
         'logger' => \App\Services\LoggerService::class,

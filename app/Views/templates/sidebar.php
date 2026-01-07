@@ -206,6 +206,30 @@
       </ul>
     </li>
 
+    <!-- Tracking & Analytics Section -->
+    <li class="menu-header small text-uppercase">
+      <span class="menu-header-text">Analytics</span>
+    </li>
+
+    <li class="menu-item <?= (strpos(current_url(), 'tracking') !== false) ? 'active open' : '' ?>">
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-line-chart"></i>
+        <div data-i18n="Tracking">Tracking</div>
+      </a>
+      <ul class="menu-sub">
+        <li class="menu-item <?= (current_url() === base_url('admin/tracking')) ? 'active' : '' ?>">
+          <a href="<?= base_url('admin/tracking') ?>" class="menu-link">
+            <div data-i18n="Overview">Overview</div>
+          </a>
+        </li>
+        <li class="menu-item <?= (strpos(current_url(), 'tracking/statistics') !== false) ? 'active' : '' ?>">
+          <a href="<?= base_url('admin/tracking/statistics') ?>" class="menu-link">
+            <div data-i18n="Statistics">Statistics</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+
     <!-- Administration Section -->
     <li class="menu-header small text-uppercase">
       <span class="menu-header-text">Administration</span>
