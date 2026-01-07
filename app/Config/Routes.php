@@ -7,6 +7,14 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Front\Home::index');
 
+// Front Auth Routes
+$routes->get('frontlogin', 'Front\Auth::loginPage');
+// Add these routes
+$routes->get('/auth', 'Auth::index');
+$routes->post('/auth/login', 'Auth::login');
+$routes->get('/logout', 'Auth::logout');
+$routes->get('login', 'Front\Auth::loginPage');
+
 // Dynamic content pages
 $routes->get('content/(:any)', 'Front\Content::index/$1');
 
@@ -91,10 +99,6 @@ $routes->get('pdf/generate-token/(:segment)/(:any)', 'Pdf::generateToken/$1/$2')
 $routes->get('pdf/view-with-token/(:segment)', 'Pdf::viewWithToken/$1');
 
 // Add these routes
-$routes->get('/auth', 'Auth::index');
-$routes->post('/auth/login', 'Auth::login');
-$routes->get('/logout', 'Auth::logout');
-$routes->get('login', 'Front\Auth::loginPage');
 $routes->get('auth/health-check', 'Front\Auth::healthCheck');
 $routes->post('auth/log-client-error', 'Front\Auth::logClientError');
 
