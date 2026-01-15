@@ -66,7 +66,20 @@ $routes->get('get-stock-updates/(:num)/(:num)', 'Front\Dashboard::getStockUpdate
 // Knowledge Centre routes
 $routes->get('knowledge-center-emerging-titan', 'Front\Knowledge::index');
 $routes->get('knowledge-center-tiny-titan', 'Front\Knowledge::index');
-$routes->get('knowledge-center/(:any)', 'Front\Knowledge::category/$1');
+
+$routes->group('knowledge-center', function ($routes) {
+
+   $routes->get('sector-information', 'Front\Knowledge::sectorinformation');
+   $routes->get('sector/(:any)/(:any)', 'Front\Knowledge::topic/$1/$2');
+   $routes->get('sector/(:any)', 'Front\Knowledge::sectorDetails/$1');
+
+   // Reports Routes
+   $routes->get('reports', 'Front\Knowledge::reports');
+   $routes->get('reports/detail/(:num)', 'Front\Knowledge::reportdetail/$1');
+   $routes->post('reports/toggle-favorite', 'Front\Knowledge::toggleFavorite');
+
+   $routes->get('(:any)', 'Front\Knowledge::category/$1');
+});
 
 // Front Auth Routes
 $routes->post('auth/send-signup-otp', 'Front\Auth::sendSignupOTP');
@@ -138,12 +151,6 @@ $routes->group('/admin', ['filter' => 'adminauth'], function($routes) {
    $routes->post('settings/update', 'Admin\SiteSettings::update');
 
    // Complaint Data routes
-   // $routes->get('complaint-data', 'Admin\ComplaintData::index');
-   // $routes->get('complaint-data/create', 'Admin\ComplaintData::create');
-   // $routes->post('complaint-data/store', 'Admin\ComplaintData::store');
-   // $routes->get('complaint-data/edit/(:num)', 'Admin\ComplaintData::edit/$1');
-   // $routes->post('complaint-data/update/(:num)', 'Admin\ComplaintData::update/$1');
-   // $routes->get('complaint-data/delete/(:num)', 'Admin\ComplaintData::delete/$1');
    $routes->get('complaint-data', 'Admin\ComplaintData::index');
    $routes->post('complaint-data/update', 'Admin\ComplaintData::update');
 
@@ -239,4 +246,25 @@ $routes->group('/admin', ['filter' => 'adminauth'], function($routes) {
 
    $routes->get('tracking', 'Admin\Tracking::index');
    $routes->get('tracking/statistics', 'Admin\Tracking::statistics');
+
+   $routes->get('knowledge-centre/sectors', 'Admin\KnowledgeCentre::sectors');
+   $routes->get('knowledge-centre/create-sector', 'Admin\KnowledgeCentre::createSector');
+   $routes->post('knowledge-centre/store-sector', 'Admin\KnowledgeCentre::storeSector');
+   $routes->get('knowledge-centre/edit-sector/(:num)', 'Admin\KnowledgeCentre::editSector/$1');
+   $routes->post('knowledge-centre/update-sector/(:num)', 'Admin\KnowledgeCentre::updateSector/$1');
+   $routes->get('knowledge-centre/delete-sector/(:num)', 'Admin\KnowledgeCentre::deleteSector/$1');
+
+   $routes->get('knowledge-centre/reports', 'Admin\KnowledgeCentre::reports');
+   $routes->get('knowledge-centre/create-report', 'Admin\KnowledgeCentre::createReport');
+   $routes->post('knowledge-centre/store-report', 'Admin\KnowledgeCentre::storeReport');
+   $routes->get('knowledge-centre/edit-report/(:num)', 'Admin\KnowledgeCentre::editReport/$1');
+   $routes->post('knowledge-centre/update-report/(:num)', 'Admin\KnowledgeCentre::updateReport/$1');
+   $routes->post('knowledge-centre/delete-report/(:num)', 'Admin\KnowledgeCentre::deleteReport/$1');
+
+   $routes->get('knowledge-centre/topics', 'Admin\KnowledgeCentre::topics');
+   $routes->get('knowledge-centre/create-topic', 'Admin\KnowledgeCentre::createTopic');
+   $routes->post('knowledge-centre/store-topic', 'Admin\KnowledgeCentre::storeTopic');
+   $routes->get('knowledge-centre/edit-topic/(:num)', 'Admin\KnowledgeCentre::editTopic/$1');
+   $routes->post('knowledge-centre/update-topic/(:num)', 'Admin\KnowledgeCentre::updateTopic/$1');
+   $routes->post('knowledge-centre/delete-topic/(:num)', 'Admin\KnowledgeCentre::deleteTopic/$1');
 });

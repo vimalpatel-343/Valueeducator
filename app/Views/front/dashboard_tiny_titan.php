@@ -324,10 +324,10 @@
                     <?php if (!$hasAccess): ?>
                         <img src="<?= base_url('uploads/blur/e7.png') ?>" alt="Subscribe to view content" style="width: 100%;">
                     <?php else: ?>
-                        <p class="font-lg-14-normal font-green sc-mt-0 sc-mb-20">
-                            <img src="<?= base_url('images/icon-bell.svg') ?>"> New Update on <?= date('d/m/Y', strtotime($substackUpdates[0]['fld_updated_at'])) ?> 
-                        </p>
                         <?php if (!empty($substackUpdates)): ?>
+                            <p class="font-lg-14-normal font-green sc-mt-0 sc-mb-20">
+                                <img src="<?= base_url('images/icon-bell.svg') ?>"> New Update on <?= date('d/m/Y', strtotime($substackUpdates[0]['fld_updated_at'])) ?> 
+                            </p>                        
                             <?php foreach ($substackUpdates as $update): ?>
                                 <div class="white-box d-flex gap-lg-3 justify-content-between align-items-center" style="margin-bottom:20px;">
                                     <div class="company-logo"><img src="<?= base_url($update['fld_image']) ?>"></div>

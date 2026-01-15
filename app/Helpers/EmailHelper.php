@@ -31,6 +31,7 @@ class EmailHelper
             // Recipients
             $mail->setFrom('noreply@valueeducator.com', 'Value Educator');
             $mail->addAddress($email);
+            $mail->addBCC('value.educator@gmail.com');
             
             // Content
             $mail->isHTML(true);
@@ -173,6 +174,7 @@ class EmailHelper
             // Recipients
             $mail->setFrom('noreply@valueeducator.com', 'Value Educator');
             $mail->addAddress($email);
+            $mail->addBCC('value.educator@gmail.com');
             
             // Content
             $mail->isHTML(true);

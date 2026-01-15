@@ -94,6 +94,23 @@
             <div data-i18n="Items">Items</div>
           </a>
         </li>
+
+        <li class="menu-item <?= (strpos(current_url(), 'knowledge-centre/sectors') !== false) ? 'active' : '' ?>">
+          <a href="<?= base_url('admin/knowledge-centre/sectors') ?>" class="menu-link">
+            <div data-i18n="Sectors">Sectors</div>
+          </a>
+        </li>
+        <li class="menu-item <?= (strpos(current_url(), 'knowledge-centre/reports') !== false) ? 'active' : '' ?>">
+          <a href="<?= base_url('admin/knowledge-centre/reports') ?>" class="menu-link">
+            <div data-i18n="Reports">Reports</div>
+          </a>
+        </li>
+        <li class="menu-item <?= (strpos(current_url(), 'knowledge-centre/topics') !== false) ? 'active' : '' ?>">
+          <a href="<?= base_url('admin/knowledge-centre/topics') ?>" class="menu-link">
+            <div data-i18n="Topics">Topics</div>
+          </a>
+        </li>
+
       </ul>
     </li>
 

@@ -179,14 +179,14 @@ class Dashboard extends BaseController
         
         // Fetch Latest Substack Updates (Latest 3)
         $substackUpdates = $this->substackUpdateModel
-            ->where('fld_product_ids', 1)
+            ->where("FIND_IN_SET(" . (int)$productId . ", fld_product_ids) !=", 0)
             ->where('fld_status', 1)
             ->orderBy('fld_created_at', 'DESC')
             ->findAll(3);
 
         // Fetch YouTube Videos (Latest 1)
         $youtubeVideos = $this->youtubeVideoModel
-            ->where('fld_product_id', $productId)
+            ->where("FIND_IN_SET(" . (int)$productId . ", fld_product_id) !=", 0)
             ->where('fld_status', 1)
             ->orderBy('fld_posted_at', 'DESC')
             ->findAll(1);
@@ -362,14 +362,14 @@ class Dashboard extends BaseController
         
         // Fetch Latest Substack Updates (Latest 3)
         $substackUpdates = $this->substackUpdateModel
-            ->where('fld_product_ids', 1)
+            ->where("FIND_IN_SET(" . (int)$productId . ", fld_product_ids) !=", 0)
             ->where('fld_status', 1)
             ->orderBy('fld_created_at', 'DESC')
             ->findAll(3);
         
         // Fetch YouTube Videos (Latest 1)
         $youtubeVideos = $this->youtubeVideoModel
-            ->where('fld_product_id', $productId)
+            ->where("FIND_IN_SET(" . (int)$productId . ", fld_product_id) !=", 0)
             ->where('fld_status', 1)
             ->orderBy('fld_posted_at', 'DESC')
             ->findAll(1);

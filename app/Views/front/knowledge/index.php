@@ -7,7 +7,20 @@
             <?php foreach ($categories as $category): ?>
             <div class="col-lg-4 col-md-6 col-6 sc-pb-20">
                 <?php if ($hasAccess): ?>
-                    <a href="<?= base_url('knowledge-center/' . $category['fld_slug']) ?>" target="_blank">
+                    <?php if($category['fld_slug'] == "management-meet-notes") { ?>
+                        <?php
+                            $current_url = current_url();
+                            $dataProduct = '';
+                            if (strpos($current_url, 'knowledge-center-emerging-titan') !== false) {
+                                $dataProduct = 1;
+                            } elseif (strpos($current_url, 'knowledge-center-tiny-titan') !== false) {
+                                $dataProduct = 2;
+                            }
+                        ?>
+                        <a href="javascript:void(0);" data-product="<?= $dataProduct ?>" class="font-lg-16-bold font-purple scuttlebutt-trigger" data-bs-toggle="modal" data-bs-target="#scuttlebut-modal">
+                    <?php } else { ?>
+                        <a href="<?= base_url('knowledge-center/' . $category['fld_slug']) ?>" target="_blank">
+                    <?php } ?>
                 <?php else: ?>
                     <a href="#" class="disabled">
                 <?php endif; ?>

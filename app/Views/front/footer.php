@@ -342,7 +342,9 @@
             strpos($current_url, 'portfolio-tiny-titan') !== false ||
             strpos($current_url, 'portfolio-emerging-titan') !== false ||
             strpos($current_url, 'dashboard-emerging-titan') !== false ||
-            strpos($current_url, 'dashboard-tiny-titan') !== false
+            strpos($current_url, 'dashboard-tiny-titan') !== false ||
+            strpos($current_url, 'knowledge-center-emerging-titan') !== false ||
+            strpos($current_url, 'knowledge-center-tiny-titan') !== false 
         ) {
     ?>
         <script src="<?= asset_versioned('assets/js/pdf-viewer.js') ?>"></script>

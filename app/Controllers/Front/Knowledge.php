@@ -9,6 +9,9 @@ use App\Models\YoutubeVideoModel;
 use App\Models\ProductModel;
 use App\Models\UserSubscriptionModel;
 use App\Models\UserModel;
+use App\Models\SectorModel;
+use App\Models\TopicModel;
+use App\Models\ReportModel;
 
 class Knowledge extends BaseController
 {
@@ -19,6 +22,9 @@ class Knowledge extends BaseController
     protected $productModel;
     protected $userSubscriptionModel;
     protected $userModel;
+    protected $sectorModel;
+    protected $topicModel;
+    protected $reportModel;
 
     public function __construct()
     {
@@ -36,6 +42,9 @@ class Knowledge extends BaseController
         $this->productModel = new ProductModel();
         $this->userSubscriptionModel = new UserSubscriptionModel();
         $this->userModel = new UserModel();
+        $this->sectorModel = new SectorModel();
+        $this->topicModel = new TopicModel();
+        $this->reportModel = new ReportModel();
     }
 
     // Modified function to check both subscription and KYC status
@@ -292,5 +301,258 @@ class Knowledge extends BaseController
         ];
         
         return view('front/knowledge/item', $data);
-    }    
+    }
+    
+    public function sectorinformation()
+    {
+        // Get all knowledge sectors
+        $sectors = $this->sectorModel->getKnowledgeSectors();
+        
+        // Check if user has access (you may need to adjust this based on your authentication system)
+        $hasAccess = session()->has('isLoggedIn') ? true : false;
+        
+        // Get site settings
+        $siteSettingsModel = new \App\Models\SiteSettingsModel();
+        $siteSettings = $siteSettingsModel->getSettings();
+        
+        // Set meta data
+       $meta = [
+            'title' => 'Sector Information - Knowledge Centre - Value Educator',
+            'description' => 'Explore detailed sector-wise insights, trends, risks, and growth opportunities to make informed investment and business decisions with Value Educator.'
+        ];
+
+        $data = [
+            'meta' => $meta,
+            'sectors' => $sectors,
+            'categories' => $sectors, // Using 'categories' for backward compatibility
+            'hasAccess' => $hasAccess,
+            'siteSettings' => $siteSettings
+        ];
+        
+        return view('front/knowledge/sectorinformation', $data);
+    }
+
+    public function sector($slug = null)
+    {
+        // If slug is provided, show sector details
+        if ($slug) {
+            return $this->sectorDetails($slug);
+        }
+        
+        // Otherwise, show all sectors
+        return $this->index();
+    }
+    
+    public function sectorDetails($slug)
+    {
+        // Find sector by slug (you may need to add a slug field to your sector table)
+        // For now, we'll use the sector name as slug
+        $sector = $this->sectorModel->where('name', urldecode($slug))->where('used_for', 1)->first();
+        
+        if (!$sector) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Sector not found');
+        }
+        
+        // Get topics for this sector
+        $topics = $this->topicModel->getActiveTopics($sector['id']);
+        
+        // Check if user has access
+        $hasAccess = session()->has('isLoggedIn') ? true : false;
+        
+        // Get site settings
+        $siteSettingsModel = new \App\Models\SiteSettingsModel();
+        $siteSettings = $siteSettingsModel->getSettings();
+        
+        // Set meta data
+        $meta = [
+            'title' => 'Sector Information - Knowledge Centre - Value Educator',
+            'description' => 'Explore detailed sector-wise insights, trends, risks, and growth opportunities to make informed investment and business decisions with Value Educator.'
+        ];
+
+        $data = [
+            'meta' => $meta,
+            'sector' => $sector,
+            'topics' => $topics,
+            'hasAccess' => $hasAccess,
+            'siteSettings' => $siteSettings
+        ];
+        
+        return view('front/knowledge/sector', $data);
+    }
+    
+    public function topic($sectorSlug, $topicSlug)
+    {
+        // Find sector by slug
+        $sector = $this->sectorModel->where('name', urldecode($sectorSlug))->where('used_for', 1)->first();
+        
+        if (!$sector) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Sector not found');
+        }
+        
+        // Find topic by slug (you may need to add a slug field to your topics table)
+        // For now, we'll use the topic name as slug
+        $topic = $this->topicModel->where('sector_id', $sector['id'])
+                                 ->where('name', urldecode($topicSlug))
+                                 ->where('active', 1)
+                                 ->first();
+        
+        if (!$topic) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Topic not found');
+        }
+        
+        // Check if user has access
+        $hasAccess = session()->has('isLoggedIn') ? true : false;
+        
+        // Get site settings
+        $siteSettingsModel = new \App\Models\SiteSettingsModel();
+        $siteSettings = $siteSettingsModel->getSettings();
+        
+        // Set meta data
+        $meta = [
+            'title' => 'Sector Information - Knowledge Centre - Value Educator',
+            'description' => 'Explore detailed sector-wise insights, trends, risks, and growth opportunities to make informed investment and business decisions with Value Educator.'
+        ];
+
+        $data = [
+            'meta' => $meta,
+            'sector' => $sector,
+            'topic' => $topic,
+            'hasAccess' => $hasAccess,
+            'siteSettings' => $siteSettings
+        ];
+        
+        return view('front/knowledge/topic', $data);
+    }
+
+    public function reports()
+    {
+        // Get filters from request
+        $marketCap = $this->request->getGet('market_cap') ?? 'all';
+        $sectorIds = $this->request->getGet('sector_id') ?? [];
+        $recommended = $this->request->getGet('recommended') ?? 0;
+        $favorites = $this->request->getGet('favourites') ?? 0;
+        $keyword = $this->request->getGet('keyword') ?? '';
+        
+        // Prepare filters
+        $filters = [
+            'market_cap' => $marketCap,
+            'sector_id' => $sectorIds,
+            'recommended' => $recommended,
+            'favorites' => $favorites,
+            'keyword' => $keyword
+        ];
+        
+        // Add user ID if logged in and filtering favorites
+        if ($favorites == 1 && session()->has('userId')) {
+            $filters['user_id'] = session()->get('userId');
+        }
+        
+        // Get reports
+        $reports = $this->reportModel->getReportsWithSector(20, $filters);
+        
+        // Get sectors for filter
+        $sectors = $this->reportModel->getReportSectors();
+        
+        // Get market cap options
+        $marketCapOptions = $this->reportModel->getMarketCapOptions();
+        
+        // Check if user is logged in
+        $isLoggedIn = session()->has('isLoggedIn');
+        
+        // Get user favorites if logged in
+        $userFavorites = [];
+        if ($isLoggedIn) {
+            $userId = session()->get('userId');
+            $allReports = $this->reportModel->getAllReportsWithSector();
+            
+            foreach ($allReports as $report) {
+                $userFavorites[$report['id']] = $this->reportModel->isFavorited($report['id'], $userId);
+            }
+        }
+
+        // Set meta data
+        $meta = [
+            'title' => 'Reports - Knowledge Centre - Value Educator',
+            'description' => 'Explore detailed sector-wise insights, trends, risks, and growth opportunities to make informed investment and business decisions with Value Educator.'
+        ];
+        
+        $data = [
+            'meta' => $meta,
+            'reports' => $reports,
+            'sectors' => $sectors,
+            'marketCapOptions' => $marketCapOptions,
+            'filters' => $filters,
+            'isLoggedIn' => $isLoggedIn,
+            'userFavorites' => $userFavorites,
+            'pager' => $this->reportModel->pager
+        ];
+        
+        // If AJAX request, return JSON
+        if ($this->request->isAJAX()) {
+            $html = view('front/reports/report_list', $data);
+            return $this->response->setJSON([
+                'html' => $html,
+                'pagination' => $this->reportModel->pager->links('default', 'custom_pagination')
+            ]);
+        }
+        
+        return view('front/reports/index', $data);
+    }
+    
+    public function toggleFavorite()
+    {
+        // Check if user is logged in
+        if (!session()->has('isLoggedIn')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Please login to add favorites'
+            ]);
+        }
+        
+        $reportId = $this->request->getPost('report_id');
+        $userId = session()->get('userId');
+        
+        $result = $this->reportModel->toggleFavorite($reportId, $userId);
+        
+        return $this->response->setJSON($result);
+    }
+    
+    public function reportdetail($id)
+    {
+        // Get report with sector information
+        $report = $this->reportModel->select('ve_reports.*, ve_sector.name as sector_name, ve_sector.icon as sector_icon')
+                                   ->join('ve_sector', 've_sector.id = ve_reports.sector_id')
+                                   ->where('ve_reports.id', $id)
+                                   ->where('ve_reports.active', 1)
+                                   ->first();
+        
+        if (!$report) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Report not found');
+        }
+        
+        // Check if user is logged in
+        $isLoggedIn = session()->has('isLoggedIn');
+        
+        // Check if report is favorited by user
+        $isFavorited = false;
+        if ($isLoggedIn) {
+            $userId = session()->get('userId');
+            $isFavorited = $this->reportModel->isFavorited($id, $userId);
+        }
+        
+        // Set meta data
+        $meta = [
+            'title' => 'Reports - Knowledge Centre - Value Educator',
+            'description' => 'Explore detailed sector-wise insights, trends, risks, and growth opportunities to make informed investment and business decisions with Value Educator.'
+        ];
+
+        $data = [
+            'meta' => $meta,
+            'report' => $report,
+            'isLoggedIn' => $isLoggedIn,
+            'isFavorited' => $isFavorited
+        ];
+        
+        return view('front/reports/detail', $data);
+    }
 }
